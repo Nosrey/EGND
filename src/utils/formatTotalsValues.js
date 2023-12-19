@@ -2,6 +2,8 @@
 
 import numeral from 'numeral';
 
+import currency from 'currency.js';
+
 export default function formatNumber(value) {
   const number = parseFloat(value);
   if (!Number.isNaN(number)) {
@@ -42,10 +44,17 @@ export const formatearNumero = (numero) => {
 
 export const formatNumberPrestamos = (numero) => {
   // Aseguramos que el número tenga exactamente 2 decimales
-  numero = parseFloat(numero).toFixed(2);
+  // numero = parseFloat(numero).toFixed(2);
 
-  // Formateamos el número con separadores de miles y coma para decimales
-  let numeroFormateado = parseFloat(numero).toLocaleString('es-ES');
+  const newNumberr = currency(
+    numero,
+    {
+    symbol: "",
+    pattern: "# !",
+    separator: ".",
+    decimal: ",",
+    }
+  );
 
-  return numeroFormateado;
+  return newNumberr.format()
 }
