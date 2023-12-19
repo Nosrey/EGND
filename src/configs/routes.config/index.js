@@ -276,14 +276,14 @@ export const protectedRoutes = [
     ),
     authority: [],
   },
-  // {
-  //   key: 'CashflowIndirecto',
-  //   path: '/cashflow-indirecto',
-  //   component: React.lazy(() =>
-  //     import('views/FinancialPlan/Estados Financieros/CashflowIndirecto/CashflowIndirecto'),
-  //   ),
-  //   authority: [],
-  // },
+  {
+    key: 'CashflowIndirecto',
+    path: '/cashflow-indirecto',
+    component: React.lazy(() =>
+      import('views/FinancialPlan/Estados Financieros/CashflowIndirecto/CashflowIndirecto'),
+    ),
+    authority: [],
+  },
   // {
   //   key: 'CashflowDirecto',
   //   path: '/cashflow-directo',

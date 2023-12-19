@@ -292,7 +292,7 @@ export const multiplicacionPxQCapex = (dataVolumen, dataPrecio) => {
 
 export const calcAmortizaciones = (PxQCapex) => {
   const myArrayAmort = [0,0,0,0,0,0,0,0,0,0]
-
+  console.log("PxQ capex", PxQCapex)
     for (let j = 0; j < PxQCapex.length; j++) { // cada bien
       for (let a = 0; a < PxQCapex[j].años.length; a++) { // cada anio
         MONTHS.map((s, indexM) => {
@@ -328,6 +328,18 @@ export const calcAmortizaciones = (PxQCapex) => {
             }              
           }
         })
+      }
+    }
+  return myArrayAmort
+}
+
+
+export const calcInversiones = (PxQCapex) => {
+  const myArrayAmort = [0,0,0,0,0,0,0,0,0,0]
+  console.log("PxQ capex", PxQCapex)
+    for (let j = 0; j < PxQCapex.length; j++) { // cada bien
+      for (let a = 0; a < PxQCapex[j].años.length; a++) { // cada anio
+        myArrayAmort[a] += PxQCapex[j].años[a].ventasTotal
       }
     }
   return myArrayAmort
@@ -395,4 +407,14 @@ export const calcInteresesPagadosPorAnio = (prestamosData) => {
     }
   }
   return dataIntereses
+}
+
+export const calcFinanciacionDeTerceros = (prestamosData) => {
+  let dataFinanciacionDeTerceros = [0,0,0,0,0,0,0,0,0,0] // no tenemos eleccionde anio asique se suman todos lso montos como del anio 1 
+
+  for (let i = 0; i < prestamosData.length; i++) {
+    const { mesInicio, monto, plazo, tasaAnual } = prestamosData[i];
+    dataFinanciacionDeTerceros[0] += parseInt(monto);
+  }
+  return dataFinanciacionDeTerceros
 }
