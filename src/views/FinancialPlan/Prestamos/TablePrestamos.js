@@ -402,7 +402,7 @@ function TablePrestamos(props) {
                             cta.tasaAnual,
                             cta.plazo,
                           ),
-                        )}
+                        ).toLocaleString("es-ES")}
                       />
 
                         </Tooltip>

@@ -31,6 +31,12 @@ const authRoute = [
     component: React.lazy(() => import('views/auth/Construccion')),
     authority: [],
   },
+  {
+    key: 'activar-cuenta',
+    path: `/activar-cuenta`,
+    component: React.lazy(() => import('views/auth/ActidatedAccount')),
+    authority: [],
+  },
 ]
 
 export default authRoute;
