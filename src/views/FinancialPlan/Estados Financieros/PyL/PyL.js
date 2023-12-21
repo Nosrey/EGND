@@ -88,7 +88,7 @@ function PyL() {
   }, [infoCuentas]);
 
   useEffect(() => {
-    if (capexPData && capexQData) {
+    if (capexPData && capexPData.length !== 0  && capexQData && capexQData.length !== 0 && !amortizaciones ) {
       const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData)
       setAmortizaciones(calcAmortizaciones(PxQCapex))
     }
