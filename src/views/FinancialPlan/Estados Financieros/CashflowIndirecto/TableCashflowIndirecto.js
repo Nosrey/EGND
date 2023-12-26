@@ -10,8 +10,14 @@ import {
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
+import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
+import MySpinner from 'components/shared/loaders/MySpinner';
 
   function TableWorkingCapital(props) {
+
+    const [showLoader, setShowLoader] = useState(true);
+
+
     const [cajaYBancos, setCajaYBancos] = useState([]);
     const [amortizaciones, setAmortizaciones] = useState([]);
     const [interesesPagados, setInteresesPagados] = useState([]);
@@ -22,6 +28,8 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
     const [financiacion, setFinanciacion] = useState([]);
     const [pagoPrestamos, setPagoPrestamos] = useState([]);
     const [FEfinanciacion, setFEfinanciacion] = useState([]);
+    const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
+    const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([]);
 
     const currentState = useSelector((state) => state.auth.user);
 
@@ -36,17 +44,66 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
         inversiones:"0" ,
         financiacion:"0" ,
         pagoPrestamos:"0" ,
+        FEfinanciacion:"0" ,
+        variacionCajaYBco:"0" ,
+        cajaYBancosAlCierre:"0" ,
     });
 
    const handleChangeInputs = (key , value) => {
         const copy = {...inputsValues}
-        if (value.startsWith("0")) {
+        if (value.startsWith("0") && value.length >1) {
             value = value.slice(1);
         }
         copy[key] = value
         setinputsValues(copy)
     }
 
+    
+   const handleChangeCyB = (value) => {
+    const copy = [...cajaYBancos]
+    if (value.startsWith("0") && value.length >1) {
+        value = value.slice(1);
+    }
+    copy[0] = parseInt(value)
+    setCajaYBancos(copy)
+}
+
+  // ***************** ACORDION ******************
+
+  const [hiddenItems, setHiddenItems] = useState([true, true, true]);
+  const [allOpen, setAllOpen] = useState(false);
+
+  const playAccordion = (index) => {
+      const copy = [...hiddenItems]
+      copy[index] = !copy[index]
+      setHiddenItems(copy)
+  }
+  
+  const closeAll = () => {
+      setHiddenItems([true, true, true]);
+      setAllOpen(false)
+  } 
+
+  const openAll = () => {
+      setHiddenItems([false, false, false])
+      setAllOpen(true)
+  } 
+
+  useEffect(() => {
+      if (hiddenItems) {
+          let todasSonTrue = hiddenItems.every(valor => valor === true);
+          let todasSonFalse = hiddenItems.every(valor => valor === false);
+
+          if (todasSonTrue) {
+              setAllOpen(false)
+          }
+          if (todasSonFalse) {
+              setAllOpen(true)
+          }
+      }
+      
+    }, [hiddenItems]);
+  // **********************************************
     // **********************************************
 
     const currency = useSelector((state) => state.auth.user.currency);
@@ -60,7 +117,6 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
        setInteresesPagados(props.interesesPagados)
        setVariacion(props.variacion)
        setInversiones(props.inversiones)
-       console.log(props)
        setFinanciacion(props.financiacion)
     }, [props]);
 
@@ -97,19 +153,51 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
         }
      }, [pagoPrestamos, financiacion]);
 
-    //  useEffect(() => {
-    //     if (inputsValues) {
-    //         const copy = {...inputsValues}
-    //         const valor = parseInt(copy.cajaYBancos) + parseInt(copy.amortizaciones) - parseInt(copy.interesesPagados)
-           
-    //         const copyArray = [...resultadoNeto]
-    //         copyArray[0]=valor;
-    //         setResultadoNeto(copyArray)
-    //     }
-    //  }, [inputsValues]);
+     useEffect(() => {
+        if (inputsValues) {
+            const copy = {...inputsValues}
+            const valorFOp = parseInt(copy.amortizaciones) + parseInt(copy.interesesPagados) - parseInt(copy.variacion)
+           copy.FEOperativas = Number.isNaN(valorFOp) ? "0" : valorFOp;
+
+           const valorFFinanciacion = parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos)
+           copy.FEfinanciacion = Number.isNaN(valorFFinanciacion) ? "0" : valorFFinanciacion;
+
+           const varCyB = parseInt(copy.FEfinanciacion) + parseInt(copy.FEOperativas)+ parseInt(copy.inversiones)
+           copy.variacionCajaYBco = Number.isNaN(varCyB) ? "0" : varCyB;
+
+           const CyB = parseInt(copy.variacionCajaYBco) + parseInt(copy.cajaYBancos)
+           copy.cajaYBancosAlCierre = Number.isNaN(CyB) ? "0" : CyB;
+
+           setinputsValues(copy)
+            
+        }
+     }, [inputsValues]);
+
+    useEffect(() => {
+        if (FEOperativas && FEfinanciacion  && inversiones) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                resultado.push(FEOperativas[i] + FEfinanciacion[i] + inversiones[i])
+            }
+             setVariacionCajaYBco(resultado)
+        }
+     }, [FEOperativas, FEfinanciacion , inversiones]);
+
+     useEffect(() => {
+        if (variacionCajaYBco && cajaYBancos  ) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                resultado.push(variacionCajaYBco[i] + cajaYBancos[i] )
+            }
+             setCajaYBancosAlCierre(resultado)
+             setTimeout(() => {
+                
+                setShowLoader(false)
+            }, 4000);
+        }
+     }, [variacionCajaYBco, cajaYBancos ]);
 
       const submitInfoForm = () => {
-        console.log(inputsValues)
         const value = {...inputsValues, idUser:localStorage.getItem('userId') }
         createWorkingCapital(value).then((resp) =>{
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -137,10 +225,23 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
           })
           .catch((error) => console.error(error));
       }, []);
-    return (
-      <>
-      { 
+    return (<>
+        { showLoader ? (
+          <div style={{marginLeft:'auto', marginRight:'auto', width:'100%'}} >
+              <MySpinner />
+  
+          </div>
+            ) : (
+              <>
+              { 
+            <>
           <FormContainer>
+            <div className='flex justify-end mt-[0px] mb-[10px]'>
+                {allOpen ?
+                    <span className='cursor-pointer text-blue-700 text-sm' onClick={closeAll}> Cerrar Todos</span>
+                    :
+                    <span className='cursor-pointer text-blue-700 text-sm' onClick={openAll}> Abrir Todos</span>}
+            </div>
               <section className="contenedor pl-[25px] pr-[35px]">
             
                 {/** *********** Caja y bancos al inicio del periodo  ************ */}
@@ -190,10 +291,11 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={indexYear !== 0 ? formatNumberPrestamos(año.toFixed(2)) : año}
                                       name="year"
-                                      disabled
+                                      disabled={indexYear !== 0 }
                                       prefix={currency}
+                                      onChange={(e) => handleChangeCyB( e.target.value)}
 
                                       />
                                   </Tooltip>
@@ -201,10 +303,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={indexYear !== 0 ? formatNumberPrestamos(año.toFixed(2)) : año}
                                       name="year"
                                       prefix={currency}
-                                      disabled
+                                      disabled={indexYear !== 0 }
+                                      onChange={(e) => handleChangeCyB( e.target.value)}
+
                                   />
                                   )}
                               </FormItem>
@@ -226,6 +330,22 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                               value= 'Resultado Neto'
                           />
                       </FormItem>
+                      <div className="flex flex-col" >
+                   
+                        <FormItem
+                            className="mb-0"
+                        >
+                            <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.resultadoNeto}
+                                onChange={(e) => handleChangeInputs('resultadoNeto' , e.target.value)}
+                                name="initial"
+                                prefix={currency}
+
+                            />
+                        </FormItem>
+                    </div>
                       {resultadoNeto.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                               <FormItem
@@ -263,6 +383,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
 
                 <div className='linea' />
                 <span className="block  pl-3  mb-3 ">Actividades operativas</span>
+                {!hiddenItems[0]&& <>
                 {/** *********** Amortizaciones  ************ */}
                 <div
                       className="flex  gap-x-3 gap-y-3  mb-6 "
@@ -458,13 +579,14 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                       ))}
                   </div>
                 {/** *********** ****************  ************ */}
-              
+                </>}
                    {/** *********** FF generado en act. operativas  ************ */}
                    <div
                       className="flex  gap-x-3 gap-y-3  mb-6 "
                   >
-                      <div className='iconDesplegable'/>        
-                    
+                    <div className='iconDesplegable' onClick={() => playAccordion(0)}>
+                        {hiddenItems[0] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>                    
                       <FormItem className=" mb-1 w-[240px] ">
                           <Input
                               disabled
@@ -527,7 +649,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
 
                 <div className='linea' />
                 <span className="block  pl-3  mb-3 ">Actividades de inversión</span>
-
+                {!hiddenItems[1]&& <>
                      {/** *********** Inversiones  ************ */}
                      <div
                     className="flex  gap-x-3 gap-y-3  mb-6 "
@@ -592,13 +714,14 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                       ))}
                   </div>
                 {/** *********** ****************  ************ */}
-              
+                </> }
                    {/** *********** FF generado en act. de inversión  ************ */}
                    <div
                       className="flex  gap-x-3 gap-y-3  mb-6 "
                   >
-                      <div className='iconDesplegable'/>        
-                    
+                <div className='iconDesplegable' onClick={() => playAccordion(1)}>
+                        {hiddenItems[1] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>                       
                       <FormItem className=" mb-1 w-[240px] ">
                           <Input
                               disabled
@@ -660,7 +783,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                 {/** *********** ****************  ************ */}
                 <div className='linea' />
                 <span className="block  pl-3  mb-3 ">Actividades de financiación</span>
-
+                {!hiddenItems[2]&& <>
                      {/** *********** Financiación de terceros  ************ */}
                      <div
                     className="flex  gap-x-3 gap-y-3  mb-6 "
@@ -789,12 +912,14 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                       ))}
                   </div>
                 {/** *********** ****************  ************ */}
+                </> }
                    {/** *********** FF generado en act. de financiación  ************ */}
                    <div
                       className="flex  gap-x-3 gap-y-3  mb-6 "
                   >
-                      <div className='iconDesplegable'/>        
-                    
+                <div className='iconDesplegable' onClick={() => playAccordion(2)}>
+                        {hiddenItems[2] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>                       
                       <FormItem className=" mb-1 w-[240px] ">
                           <Input
                               disabled
@@ -854,10 +979,141 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                       ))}
                   </div>
                 {/** *********** ****************  ************ */}
+
+                    {/** *********** Variación de caja y bancos  ************ */}
+                    <div
+                      className="flex  gap-x-3 gap-y-3  mb-6 "
+                  >
+                      <div className='iconDesplegable'/>        
+                    
+                      <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                              disabled
+                              type="text"
+                              className="capitalize font-bold bg-blue-100"
+                              value= 'Variación de caja y bancos'
+                          />
+                      </FormItem>
+                      <div className="flex flex-col" >
+                   
+                        <FormItem
+                            className="mb-0"
+                        >
+                            <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.variacionCajaYBco}
+                                // onChange={(e) => handleChangeInputs('FEOperativas' , e.target.value)}
+                                name="initial"
+                                disabled
+                                prefix={currency}
+
+                            />
+                        </FormItem>
+                    </div>
+                      {variacionCajaYBco.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                              <FormItem
+                                  className="mb-0"
+                              >
+                                  {Math.round(año).toString().length > 5 ? (
+                                  <Tooltip
+                                      placement="top-end"
+                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                  >
+                                      <Input
+                                      className="w-[130px] font-bold text-base"
+                                      type="text"
+                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                      />
+                                  </Tooltip>
+                                  ) : (
+                                  <Input
+                                      className="w-[130px] font-bold "
+                                      type="text"
+                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                  />
+                                  )}
+                              </FormItem>
+                          </div>
+                      ))}
+                  </div>
+                {/** *********** ****************  ************ */}
+
+                  {/** *********** Caja y bancos al cierre  ************ */}
+                  <div
+                      className="flex  gap-x-3 gap-y-3  mb-6 "
+                  >
+                      <div className='iconDesplegable'/>        
+                    
+                      <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                              disabled
+                              type="text"
+                              className="capitalize font-bold bg-blue-100"
+                              value= 'Caja y bancos al cierre'
+                          />
+                      </FormItem>
+                      <div className="flex flex-col" >
+                   
+                        <FormItem
+                            className="mb-0"
+                        >
+                            <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.cajaYBancosAlCierre}
+                                // onChange={(e) => handleChangeInputs('FEOperativas' , e.target.value)}
+                                name="initial"
+                                disabled
+                                prefix={currency}
+
+                            />
+                        </FormItem>
+                    </div>
+                      {cajaYBancosAlCierre.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                              <FormItem
+                                  className="mb-0"
+                              >
+                                  {Math.round(año).toString().length > 5 ? (
+                                  <Tooltip
+                                      placement="top-end"
+                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                  >
+                                      <Input
+                                      className="w-[130px] font-bold text-base"
+                                      type="text"
+                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                      />
+                                  </Tooltip>
+                                  ) : (
+                                  <Input
+                                      className="w-[130px] font-bold "
+                                      type="text"
+                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                  />
+                                  )}
+                              </FormItem>
+                          </div>
+                      ))}
+                  </div>
+                {/** *********** ****************  ************ */}
               </section>
           </FormContainer>
       
-      }
       <Button
         className="border mt-6b btnSubmitTable mt-[40px]"
         variant="solid"
@@ -865,9 +1121,13 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
         onClick={submitInfoForm}
       >
         Guardar
-      </Button>
-      </>
-    );
+      </Button> 
+          </> 
+        }
+        </>
+        )
+    }
+    </>)
   }
   
   export default TableWorkingCapital;
