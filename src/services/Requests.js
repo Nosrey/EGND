@@ -11,6 +11,20 @@ const URL_API = 'http://localhost:8080';
 // const idUser = app.auth.user.id && app.auth.user.id;
 const idUser = localStorage.getItem('userId');
 
+export const activateAccount = async (token) => {
+  try {
+    const response = await fetch(`${URL_API}/api/confirm-email/${token}`, {
+      method: 'POST',
+      // headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
 const compareChannelsInfo = (newChannel, oldChannel) => {
   let updatedChannel = { ...newChannel };
 

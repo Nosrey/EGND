@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Input, Button, FormItem, FormContainer, Alert } from 'components/ui';
+import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { activateAccount } from 'services/Requests';
+import { Input, Button, FormItem, FormContainer, Alert, Spinner } from 'components/ui';
 import { ActionLink } from 'components/shared';
 import { apiForgotPassword } from 'services/AuthService';
 import useTimeOutMessage from 'utils/hooks/useTimeOutMessage';
@@ -20,20 +22,47 @@ function ActivatedAccountForm(props) {
   } = props;
 
   const [emailSent, setEmailSent] = useState(false);
+  const [isActivated, setIsActivated] = useState(false);
 
+  const { token } = useParams()
+  useEffect(() => {
+    if (token) {
+      activateAccount(token).then((resp)=> {
+        if (resp.success) {
+          setIsActivated(true)
+        }
+      })
+    }
+    
+  }, [token]);
   return (
     <div className={className}>
-      <div className="mb-6">
-      
-          <>
-            <img  src={checkImg} className='mb-[13px] ml-[auto] mr-[auto]' alt="done"/>
-            <p className="text-[#292929] text-[16px] text-center font-normal">
-           Cuenta activada con exito. Ya puedes  <ActionLink to={signInUrl}> Iniciar sesión</ActionLink>
+    {
+      isActivated ?
+        <div className="mb-6">
+              
+              <>
+                <img  src={checkImg} className='mb-[13px] ml-[auto] mr-[auto]' alt="done"/>
+                <p className="text-[#292929] text-[16px] text-center font-normal">
+              Cuenta activada con exito. Ya puedes  <ActionLink to={signInUrl}> Iniciar sesión</ActionLink>
+              
+                </p>
+              </>
+            
+          </div>
+      :
+        <div className="mb-6">
+                
+            <>
+            <Spinner className="mr-[auto] ml-[auto] mb-[20px]" size="40px" />
+              <p className="text-[#292929] text-[16px] text-center font-normal">
+                Activando cuenta ...
+              </p>
+            </>
           
-            </p>
-          </>
-        
-      </div>
+        </div>
+    }
+      
     </div>
   );
 }

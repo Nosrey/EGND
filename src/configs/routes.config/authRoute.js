@@ -33,7 +33,7 @@ const authRoute = [
   },
   {
     key: 'activar-cuenta',
-    path: `/activar-cuenta`,
+    path: `/activar-cuenta/:token`,
     component: React.lazy(() => import('views/auth/ActidatedAccount')),
     authority: [],
   },
