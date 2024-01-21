@@ -292,14 +292,14 @@ export const protectedRoutes = [
   //   ),
   //   authority: [],
   // },
-  // {
-  //   key: 'Balance',
-  //   path: '/balance',
-  //   component: React.lazy(() =>
-  //     import('views/FinancialPlan/Estados Financieros/Balance/Balance'),
-  //   ),
-  //   authority: [],
-  // },
+  {
+    key: 'Balance',
+    path: '/balance',
+    component: React.lazy(() =>
+      import('views/FinancialPlan/Estados Financieros/Balance/Balance'),
+    ),
+    authority: [],
+  },
   {
     key: 'WorkingCapital',
     path: '/working-capital',

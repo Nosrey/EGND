@@ -292,7 +292,6 @@ export const multiplicacionPxQCapex = (dataVolumen, dataPrecio) => {
 
 export const calcAmortizaciones = (PxQCapex) => {
   const myArrayAmort = [0,0,0,0,0,0,0,0,0,0]
-  console.log("PxQ capex", PxQCapex)
     for (let j = 0; j < PxQCapex.length; j++) { // cada bien
       for (let a = 0; a < PxQCapex[j].años.length; a++) { // cada anio
         MONTHS.map((s, indexM) => {
@@ -336,7 +335,6 @@ export const calcAmortizaciones = (PxQCapex) => {
 
 export const calcInversiones = (PxQCapex) => {
   const myArrayAmort = [0,0,0,0,0,0,0,0,0,0]
-  console.log("PxQ capex", PxQCapex)
     for (let j = 0; j < PxQCapex.length; j++) { // cada bien
       for (let a = 0; a < PxQCapex[j].años.length; a++) { // cada anio
         myArrayAmort[a] += PxQCapex[j].años[a].ventasTotal
@@ -401,7 +399,6 @@ export const calcInteresesPagadosPorAnio = (prestamosData) => {
         }
 
       }
-      console.log('ocupo mas de una nio')
     } else {
       dataIntereses[1] +=  mesesQueFaltan * montoMensual;
     }

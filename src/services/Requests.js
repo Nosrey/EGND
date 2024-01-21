@@ -896,3 +896,29 @@ export const getWorkingCapitalInfo = async (id = idUser) => {
     throw new Error('No se pudo obtener los datos del usuario.');
   }
 };
+
+export const createCashflowIndirecto = async (values) => {
+  try {
+    const response = await fetch(`${URL_API}/api/cashflowindirecto`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
+export const getCashflowIndirectoInfo = async (id = idUser) => {
+  try {
+    const resp = await fetch(`${URL_API}/api/cashflowindirecto/${id}`);
+    const data = await resp.json();
+    return data.response;
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('No se pudo obtener los datos del usuario.');
+  }
+};

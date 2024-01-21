@@ -4,6 +4,8 @@ import auth from './auth'
 import base from './base'
 import locale from './locale/localeSlice'
 import icon from './icon/iconSlice'
+import netoResult from './netoResult/netoResultSlice'
+import cajaYBcoCierre from './cajaYBcoCierre/cajaYBcoCierreSlice'
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
@@ -12,6 +14,8 @@ const rootReducer = (asyncReducers) => (state, action) => {
     base,
     locale,
     icon,
+    netoResult,
+    cajaYBcoCierre,
     ...asyncReducers,
   })
   return combinedReducer(state, action)

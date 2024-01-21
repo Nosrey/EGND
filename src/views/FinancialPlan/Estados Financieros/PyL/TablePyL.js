@@ -6,17 +6,18 @@ import {
     Input,
     Tooltip,
   } from 'components/ui';
-  import { useEffect , useState} from 'react';
-import { useSelector } from 'react-redux';
+  import { useEffect , useState, createContext} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import { createPyL, getPyLInfo } from 'services/Requests';
 import MySpinner from 'components/shared/loaders/MySpinner';
-
+import { addResult } from 'store/netoResult/netoResultSlice';
 
 const impGanancias = 20 
   function TablePyL(props) {
     const [showLoader, setShowLoader] = useState(true);
+    const MiContexto = createContext();
 
     const [vtasTot, setVtasTot] = useState([]);
     const [vtasProd, setVtasProd] = useState([]);
@@ -175,6 +176,7 @@ const impGanancias = 20
             for (let i = 0; i < MBPesos.length; i++) {
                 resultado.push(MBPesos[i] - gastoEnCtasTotal[i])
             }
+           
              setEBITDA(resultado)
         }
         
@@ -235,6 +237,8 @@ const impGanancias = 20
         }
       }, [BAT])
 
+
+      const dispatch = useDispatch()
       useEffect(() => {
         if (BAT && IIGG) {
             let resultado = [];
@@ -242,6 +246,7 @@ const impGanancias = 20
                 resultado.push(BAT[i] - IIGG[i])
             }
             setRdoNeto(resultado)
+            dispatch(addResult([resultado]))
         }
       }, [IIGG, BAT])
 
@@ -291,6 +296,7 @@ const impGanancias = 20
 
     return (
       <>
+      <MiContexto.Provider value={rdoNeto}>
       { showLoader ? (
         <div style={{marginLeft:'auto', marginRight:'auto', width:'100%'}} >
             <MySpinner />
@@ -347,12 +353,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px] "
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -361,7 +367,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             prefix={currency}
                                             disabled />
@@ -406,12 +412,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -420,7 +426,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -480,12 +486,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold text-base"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -494,7 +500,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold "
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -539,12 +545,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -553,7 +559,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             prefix={currency}
                                             disabled />
@@ -598,12 +604,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -612,7 +618,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -657,12 +663,12 @@ const impGanancias = 20
                                     {Math.round(año).toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px] font-bold bg-blue-100"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -671,7 +677,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -716,12 +722,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -730,7 +736,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -775,12 +781,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -789,7 +795,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -834,12 +840,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -848,7 +854,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -893,12 +899,12 @@ const impGanancias = 20
                                     {Math.round(año).toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px] font-bold bg-blue-100"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -907,7 +913,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -953,12 +959,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold text-base"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -967,7 +973,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold "
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -1012,12 +1018,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1026,7 +1032,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold bg-blue-100"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -1070,12 +1076,12 @@ const impGanancias = 20
                                 {año.toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={`%${formatNumberPrestamos(año.toFixed(2))}`}
+                                        title={`%${formatNumberPrestamos(año)}`}
                                     >
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix='%' />
@@ -1084,7 +1090,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px]"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix='%' />
@@ -1194,12 +1200,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold text-base"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1208,7 +1214,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold "
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -1254,12 +1260,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1268,7 +1274,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold bg-blue-100"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -1314,12 +1320,12 @@ const impGanancias = 20
                                 {año.toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={`%${formatNumberPrestamos(año.toFixed(2))}`}
+                                        title={`%${formatNumberPrestamos(año)}`}
                                     >
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix='%' />
@@ -1328,7 +1334,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px]"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix='%' />
@@ -1372,12 +1378,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -1386,7 +1392,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1431,12 +1437,12 @@ const impGanancias = 20
                                     {Math.round(año).toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px] font-bold bg-blue-100"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -1445,7 +1451,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1490,12 +1496,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={`%${formatNumberPrestamos(año.toFixed(2))}`}
+                                            title={`%${formatNumberPrestamos(año)}`}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix='%' />
@@ -1504,7 +1510,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix='%' />
@@ -1549,12 +1555,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -1563,7 +1569,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1608,12 +1614,12 @@ const impGanancias = 20
                                     {Math.round(año).toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px] font-bold bg-blue-100"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -1622,7 +1628,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1667,12 +1673,12 @@ const impGanancias = 20
                                     {año.toString().length > 5 ? (
                                         <Tooltip
                                             placement="top-end"
-                                            title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                            title={currency + formatNumberPrestamos(año)}
                                         >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año.toFixed(2))}
+                                                value={formatNumberPrestamos(año)}
                                                 name="year"
                                                 disabled
                                                 prefix={currency} />
@@ -1681,7 +1687,7 @@ const impGanancias = 20
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1729,12 +1735,12 @@ const impGanancias = 20
                                 {Math.round(año).toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                        title={currency + formatNumberPrestamos(año)}
                                     >
                                         <Input
                                             className="w-[130px] font-bold bg-blue-100"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix={currency} />
@@ -1743,7 +1749,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px] font-bold bg-blue-100"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix={currency} />
@@ -1788,12 +1794,12 @@ const impGanancias = 20
                                 {año.toString().length > 5 ? (
                                     <Tooltip
                                         placement="top-end"
-                                        title={`%${formatNumberPrestamos(año.toFixed(2))}`}
+                                        title={`%${formatNumberPrestamos(año)}`}
                                     >
                                         <Input
                                             className="w-[130px]"
                                             type="text"
-                                            value={formatNumberPrestamos(año.toFixed(2))}
+                                            value={formatNumberPrestamos(año)}
                                             name="year"
                                             disabled
                                             prefix='%' />
@@ -1802,7 +1808,7 @@ const impGanancias = 20
                                     <Input
                                         className="w-[130px]"
                                         type="text"
-                                        value={formatNumberPrestamos(año.toFixed(2))}
+                                        value={formatNumberPrestamos(año)}
                                         name="year"
                                         disabled
                                         prefix='%' />
@@ -1826,6 +1832,7 @@ const impGanancias = 20
           
           </> )
         }
+         </MiContexto.Provider>
         </>
     );
   }

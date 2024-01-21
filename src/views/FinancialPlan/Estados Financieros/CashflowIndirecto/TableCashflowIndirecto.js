@@ -7,18 +7,17 @@ import {
     Tooltip,
   } from 'components/ui';
   import { useEffect , useState} from 'react';
-import { useSelector } from 'react-redux';
+  import { useDispatch, useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
+import { createCashflowIndirecto, getCashflowIndirectoInfo } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
+import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 
-  function TableWorkingCapital(props) {
+  function TableCashflowIndirecto(props) {
+    const dispatch = useDispatch()
 
     const [showLoader, setShowLoader] = useState(true);
-
-
-    const [cajaYBancos, setCajaYBancos] = useState([]);
     const [amortizaciones, setAmortizaciones] = useState([]);
     const [interesesPagados, setInteresesPagados] = useState([]);
     const [resultadoNeto, setResultadoNeto] = useState([]);
@@ -30,12 +29,14 @@ import MySpinner from 'components/shared/loaders/MySpinner';
     const [FEfinanciacion, setFEfinanciacion] = useState([]);
     const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
     const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([]);
+    const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
     const currentState = useSelector((state) => state.auth.user);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
         cajaYBancos: "0" ,
+        cajaYBancosAnioUno: "0" ,
         resultadoNeto: "0" ,
         amortizaciones: "0" ,
         interesesPagados: "0" ,
@@ -54,18 +55,35 @@ import MySpinner from 'components/shared/loaders/MySpinner';
         if (value.startsWith("0") && value.length >1) {
             value = value.slice(1);
         }
-        copy[key] = value
+        copy[key] = value;
+            const valorFOp = parseInt(copy.amortizaciones) + parseInt(copy.interesesPagados) - parseInt(copy.variacion)
+           copy.FEOperativas = Number.isNaN(valorFOp) ? "0" : valorFOp.toString();
+
+           const valorFFinanciacion = parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos)
+           copy.FEfinanciacion = Number.isNaN(valorFFinanciacion) ? "0" : valorFFinanciacion.toString();
+
+           const varCyB = parseInt(copy.FEfinanciacion) + parseInt(copy.FEOperativas)+ parseInt(copy.inversiones)
+           copy.variacionCajaYBco = Number.isNaN(varCyB) ? "0" : varCyB.toString();
+
+           const CyB = parseInt(copy.variacionCajaYBco) + parseInt(copy.cajaYBancos)
+           copy.cajaYBancosAlCierre = Number.isNaN(CyB) ? "0" : CyB.toString();
         setinputsValues(copy)
     }
 
     
    const handleChangeCyB = (value) => {
-    const copy = [...cajaYBancos]
+ 
+    // const copy = [...cajaYBancos]
     if (value.startsWith("0") && value.length >1) {
         value = value.slice(1);
     }
-    copy[0] = parseInt(value)
-    setCajaYBancos(copy)
+    if (Number.isNaN(value) || value === "") {
+        value = 0;
+    }
+    const copy = {...inputsValues}
+    copy.cajaYBancosAnioUno = value
+    setinputsValues(copy)
+    setCajaYBancosInicioManual(parseInt(value))
 }
 
   // ***************** ACORDION ******************
@@ -110,7 +128,6 @@ import MySpinner from 'components/shared/loaders/MySpinner';
 
 
     useEffect(() => {
-       setCajaYBancos(props.cajaYBancos)
        setResultadoNeto(props.resultadoNeto)
 
        setAmortizaciones(props.amortizaciones)
@@ -153,26 +170,6 @@ import MySpinner from 'components/shared/loaders/MySpinner';
         }
      }, [pagoPrestamos, financiacion]);
 
-     useEffect(() => {
-        if (inputsValues) {
-            const copy = {...inputsValues}
-            const valorFOp = parseInt(copy.amortizaciones) + parseInt(copy.interesesPagados) - parseInt(copy.variacion)
-           copy.FEOperativas = Number.isNaN(valorFOp) ? "0" : valorFOp;
-
-           const valorFFinanciacion = parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos)
-           copy.FEfinanciacion = Number.isNaN(valorFFinanciacion) ? "0" : valorFFinanciacion;
-
-           const varCyB = parseInt(copy.FEfinanciacion) + parseInt(copy.FEOperativas)+ parseInt(copy.inversiones)
-           copy.variacionCajaYBco = Number.isNaN(varCyB) ? "0" : varCyB;
-
-           const CyB = parseInt(copy.variacionCajaYBco) + parseInt(copy.cajaYBancos)
-           copy.cajaYBancosAlCierre = Number.isNaN(CyB) ? "0" : CyB;
-
-           setinputsValues(copy)
-            
-        }
-     }, [inputsValues]);
-
     useEffect(() => {
         if (FEOperativas && FEfinanciacion  && inversiones) {
             let resultado = [];
@@ -184,22 +181,33 @@ import MySpinner from 'components/shared/loaders/MySpinner';
      }, [FEOperativas, FEfinanciacion , inversiones]);
 
      useEffect(() => {
-        if (variacionCajaYBco && cajaYBancos  ) {
+        
+        if (variacionCajaYBco  ) {
             let resultado = [];
             for (let i = 0; i < 10; i++) {
-                resultado.push(variacionCajaYBco[i] + cajaYBancos[i] )
+                if (i === 0) {
+
+                    resultado.push(variacionCajaYBco[0] + cajaYBancosInicioManual )
+                } else {
+                    resultado.push(variacionCajaYBco[i] + resultado[i-1] )
+                }
             }
              setCajaYBancosAlCierre(resultado)
+            //  console.log(resultado)
+             dispatch(addResult([resultado]))
              setTimeout(() => {
                 
                 setShowLoader(false)
             }, 4000);
         }
-     }, [variacionCajaYBco, cajaYBancos ]);
+     }, [variacionCajaYBco,  cajaYBancosInicioManual]);
 
-      const submitInfoForm = () => {
+      const submitInfoFormCashflow = () => {
         const value = {...inputsValues, idUser:localStorage.getItem('userId') }
-        createWorkingCapital(value).then((resp) =>{
+        delete value.bienesDeCambio;
+        delete value.creditosVentas;
+        delete value.deudasComerciales;
+        createCashflowIndirecto(value).then((resp) =>{
             window.scrollTo({ top: 0, behavior: 'smooth' });
             props.showAlertSuces(true);
             setTimeout(() => {
@@ -216,15 +224,18 @@ import MySpinner from 'components/shared/loaders/MySpinner';
       }
 
       useEffect(() => {
-        getWorkingCapitalInfo(currentState.id)
+        getCashflowIndirectoInfo(currentState.id)
           .then((data) => {
+            console.log(data)
             if (data.length !==0) {
                 setinputsValues(data[0])
+                setCajaYBancosInicioManual(data[0].cajaYBancosAnioUno)
             } 
             
           })
           .catch((error) => console.error(error));
       }, []);
+
     return (<>
         { showLoader ? (
           <div style={{marginLeft:'auto', marginRight:'auto', width:'100%'}} >
@@ -275,7 +286,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   />
                               </FormItem>
                         </div>
-                      {cajaYBancos.map((año, indexYear) => (
+                      {cajaYBancosAlCierre.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                               <div className="titleRow w-[130px]">
                                   <p className="cursor-default"> Año {indexYear + 1 }</p>
@@ -286,12 +297,12 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={indexYear !== 0 ? formatNumberPrestamos(año.toFixed(2)) : año}
+                                      value={indexYear !== 0 ? formatNumberPrestamos(año) : año}
                                       name="year"
                                       disabled={indexYear !== 0 }
                                       prefix={currency}
@@ -303,7 +314,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={indexYear !== 0 ? formatNumberPrestamos(año.toFixed(2)) : año}
+                                      value={indexYear !== 0 ? formatNumberPrestamos(año) : año}
                                       name="year"
                                       prefix={currency}
                                       disabled={indexYear !== 0 }
@@ -437,7 +448,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -770,7 +781,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -1048,7 +1059,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
 
                   {/** *********** Caja y bancos al cierre  ************ */}
                   <div
-                      className="flex  gap-x-3 gap-y-3  mb-6 "
+                      className="flex  gap-x-3 gap-y-3  mb-6"
                   >
                       <div className='iconDesplegable'/>        
                     
@@ -1085,12 +1096,12 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -1100,7 +1111,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -1118,9 +1129,9 @@ import MySpinner from 'components/shared/loaders/MySpinner';
         className="border mt-6b btnSubmitTable mt-[40px]"
         variant="solid"
         type="submit"
-        onClick={submitInfoForm}
+        onClick={submitInfoFormCashflow}
       >
-        Guardar
+        Guardaraa
       </Button> 
           </> 
         }
@@ -1130,5 +1141,5 @@ import MySpinner from 'components/shared/loaders/MySpinner';
     </>)
   }
   
-  export default TableWorkingCapital;
+  export default TableCashflowIndirecto;
   

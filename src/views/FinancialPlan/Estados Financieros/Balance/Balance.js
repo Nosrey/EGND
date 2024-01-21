@@ -8,73 +8,49 @@
 import ContainerScrollable from 'components/shared/ContainerScrollable';
 import MySpinner from 'components/shared/loaders/MySpinner'; 
 import { Alert, FormContainer } from 'components/ui';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, } from 'react';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
-import TableCashflowIndirecto from './TableCashflowIndirecto';
-import PyL from '../PyL/PyL';
+import TableBalance from './TableBalance';
+import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 
-function CashflowIndirecto() {
+function Balance() {
   // const rn = useContext(MiContexto);
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [capexPData, setCapexPData] = useState();
-  const [capexQData, setCapexQData] = useState();
-  const [prestamosData, setPrestamosData] = useState();
-  const myResult = useSelector(state => state.netoResult)
+  const myResult = useSelector(state => state.cajaYBcoCierre)
 
-
-
-  // INFO A MOSTRAR EN LA TABLA 
-const [amortizaciones, setAmortizaciones] = useState();
-const [intereses, setIntereses] = useState();
-const [inversiones, setInversiones] = useState();
-const [financiacion, setFinanciacion] = useState();
-
-  useEffect(() => {
-    if (capexPData && capexPData.length !== 0  && capexQData && capexQData.length !== 0 && !amortizaciones) {
-      const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData)
-      setAmortizaciones(calcAmortizaciones(PxQCapex))
-      setInversiones(calcInversiones(PxQCapex))
-    }
-  }, [capexPData, capexQData]);
-
-  useEffect(() => {
-    if (prestamosData ) {
-      setIntereses(calcInteresesPagadosPorAnio(prestamosData) )
-      setFinanciacion(calcFinanciacionDeTerceros(prestamosData))
-    }
-  }, [prestamosData]);
 
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
-        if (data?.capexPData[0]?.length !== 0) {
-          setCapexPData(data?.capexPData[0]?.capexP);
-        }else {
-          console.log("Falta completar info en Costo Inversiones")
-        }
+        // if (data?.capexPData[0]?.length !== 0) {
+        //   setCapexPData(data?.capexPData[0]?.capexP);
+        // }else {
+        //   console.log("Falta completar info en Costo Inversiones")
+        // }
 
-        if (data?.capexQData[0]?.length !== 0) {
-          setCapexQData(data?.capexQData[0]?.capexQ);
-        }else {
-          console.log("Falta completar info en Volumen de Inversiones")
-        }
+        // if (data?.capexQData[0]?.length !== 0) {
+        //   setCapexQData(data?.capexQData[0]?.capexQ);
+        // }else {
+        //   console.log("Falta completar info en Volumen de Inversiones")
+        // }
 
-        if (data?.prestamos?.length !== 0) {
-          setPrestamosData(data?.prestamos);
-        }else {
-          console.log("Falta completar info en la sección de Préstamos")
-        }
+        // if (data?.prestamos?.length !== 0) {
+        //   setPrestamosData(data?.prestamos);
+        // }else {
+        //   console.log("Falta completar info en la sección de Préstamos")
+        // }
         setTimeout(() => {
           setShowLoader(false)
         }, 4000);
       })
       .catch((error) => console.error(error));
   }, []);
+
 
   return (
     <>
@@ -89,7 +65,7 @@ const [financiacion, setFinanciacion] = useState();
         </Alert>
       )}
       <div className='oculto'>
-        <PyL/>
+        <CashflowIndirecto/>
         </div>
         <div/>
       {showLoader ? (
@@ -101,7 +77,7 @@ const [financiacion, setFinanciacion] = useState();
           <div>
           <div className="border-b-2 mb-8 pb-1">
             <h4 className="cursor-default">
-              Cashflow Indirecto
+              Balance
             </h4>
             <span className="cursor-default">Estados Financieros</span>
           </div>
@@ -109,14 +85,14 @@ const [financiacion, setFinanciacion] = useState();
             <FormContainer className="cont-countries">
               <ContainerScrollable
                 contenido={
-                  <TableCashflowIndirecto
-                    resultadoNeto={myResult[0]}
-                    variacion={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300]}
+                  <TableBalance
+                    cajaYBancos={myResult[0]} // ver
 
-                    amortizaciones={amortizaciones || []}
-                    interesesPagados={intereses || []}
-                    inversiones={inversiones || []}
-                    financiacion={financiacion || []}
+                    creditosPorVentas={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+                    creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+                    bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+                    bienesDeUso={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+                  
                     showAlertSuces={(boolean) =>
                       setShowSuccessAlert(boolean)
                     }
@@ -136,4 +112,4 @@ const [financiacion, setFinanciacion] = useState();
   );
 }
 
-export default CashflowIndirecto;
+export default Balance;

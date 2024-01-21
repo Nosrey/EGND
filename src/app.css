@@ -50,3 +50,7 @@ input[name="password"] , input[name="confirmPassword"]{
     margin-top: 7px;
     margin-left: -12px;
   }
+  .oculto {
+    visibility: hidden; 
+    height: 2px;
+  }
