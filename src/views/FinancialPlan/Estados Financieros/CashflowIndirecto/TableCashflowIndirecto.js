@@ -128,8 +128,8 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 
 
     useEffect(() => {
+        console.log(props)
        setResultadoNeto(props.resultadoNeto)
-
        setAmortizaciones(props.amortizaciones)
        setInteresesPagados(props.interesesPagados)
        setVariacion(props.variacion)
@@ -187,13 +187,13 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
             for (let i = 0; i < 10; i++) {
                 if (i === 0) {
 
-                    resultado.push(variacionCajaYBco[0] + cajaYBancosInicioManual )
+                    resultado.push(parseInt(variacionCajaYBco[0]) + parseInt(cajaYBancosInicioManual) )
                 } else {
-                    resultado.push(variacionCajaYBco[i] + resultado[i-1] )
+                    resultado.push(parseInt(variacionCajaYBco[i]) + parseInt(resultado[i-1]) )
                 }
             }
+             console.log(resultado)
              setCajaYBancosAlCierre(resultado)
-            //  console.log(resultado)
              dispatch(addResult([resultado]))
              setTimeout(() => {
                 
@@ -226,7 +226,6 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
       useEffect(() => {
         getCashflowIndirectoInfo(currentState.id)
           .then((data) => {
-            console.log(data)
             if (data.length !==0) {
                 setinputsValues(data[0])
                 setCajaYBancosInicioManual(data[0].cajaYBancosAnioUno)
@@ -365,12 +364,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -380,7 +379,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -432,12 +431,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -497,12 +496,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -513,7 +512,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -563,12 +562,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -579,7 +578,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -631,12 +630,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -646,7 +645,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -698,12 +697,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -714,7 +713,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -766,12 +765,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -832,12 +831,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -848,7 +847,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -896,12 +895,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -912,7 +911,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -964,12 +963,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -979,7 +978,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -1030,12 +1029,12 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -1045,7 +1044,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
