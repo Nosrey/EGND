@@ -86,10 +86,11 @@ function Balance() {
               <ContainerScrollable
                 contenido={
                   <TableBalance
-                    cajaYBancos={myResult[0]} // ver
+                  cajaYBancos={myResult[0]} // ver
+                  creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
 
+                  // calcular  para remplazasr estos arrasy hardcodeados
                     creditosPorVentas={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                    creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
                     bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
                     bienesDeUso={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
                   
