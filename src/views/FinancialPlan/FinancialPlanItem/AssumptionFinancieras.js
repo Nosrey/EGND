@@ -80,7 +80,10 @@ function AssumptionsFinancieras() {
       const newData = { ...dataFinanciera[campo], [input]: value };
       let tot = 0;
       Object.keys(newData).forEach((key, index) => {
-        tot += Number(newData[key]);
+        if(index < 13){
+          tot += Number(newData[key]);
+        }
+
       });
 
       if (tot > 100) {
