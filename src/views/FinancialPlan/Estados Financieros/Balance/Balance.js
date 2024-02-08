@@ -4,12 +4,11 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
 
-
 import ContainerScrollable from 'components/shared/ContainerScrollable';
-import MySpinner from 'components/shared/loaders/MySpinner'; 
+import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
 import { useEffect, useState, } from 'react';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcVentasPorMes, costoPorMes } from 'utils/calcs';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableBalance from './TableBalance';
@@ -22,6 +21,8 @@ function Balance() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const myResult = useSelector(state => state.cajaYBcoCierre)
+  const [creditosVentas, setCreditosVentas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+  const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 
   useEffect(() => {
@@ -49,12 +50,14 @@ function Balance() {
         }, 4000);
       })
       .catch((error) => console.error(error));
+    calcVentasPorMes(currentState.id, creditosVentas, setCreditosVentas)
+    costoPorMes(currentState.id, setCostos)
   }, []);
 
 
   return (
     <>
-     {showSuccessAlert && (
+      {showSuccessAlert && (
         <Alert className="mb-4" type="success" showIcon>
           Los datos se guardaron satisfactoriamente.
         </Alert>
@@ -65,48 +68,48 @@ function Balance() {
         </Alert>
       )}
       <div className='oculto'>
-        <CashflowIndirecto/>
-        </div>
-        <div/>
+        <CashflowIndirecto />
+      </div>
+      <div />
       {showLoader ? (
         <MySpinner />
       ) : (
         <>
-        { 
-        // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
-          <div>
-          <div className="border-b-2 mb-8 pb-1">
-            <h4 className="cursor-default">
-              Balance
-            </h4>
-            <span className="cursor-default">Estados Financieros</span>
-          </div>
-          <div className="container-countries">
-            <FormContainer className="cont-countries">
-              <ContainerScrollable
-                contenido={
-                  <TableBalance
-                  cajaYBancos={myResult[0]} // ver
-                  creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+          {
+            // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
+            <div>
+              <div className="border-b-2 mb-8 pb-1">
+                <h4 className="cursor-default">
+                  Balance
+                </h4>
+                <span className="cursor-default">Estados Financieros</span>
+              </div>
+              <div className="container-countries">
+                <FormContainer className="cont-countries">
+                  <ContainerScrollable
+                    contenido={
+                      <TableBalance
+                        cajaYBancos={myResult[0]} // ver
+                        creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
 
-                  // calcular  para remplazasr estos arrasy hardcodeados
-                    creditosPorVentas={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                    bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                    bienesDeUso={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                  
-                    showAlertSuces={(boolean) =>
-                      setShowSuccessAlert(boolean)
+                        // calcular  para remplazasr estos arrasy hardcodeados
+                        creditosPorVentas={creditosVentas.slice(0, 10) || []}
+                        bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+                        bienesDeUso={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+
+                        showAlertSuces={(boolean) =>
+                          setShowSuccessAlert(boolean)
+                        }
+                        showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                      />
                     }
-                    showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                    />
-                }
-              />
-            </FormContainer>
-          </div>
+                  />
+                </FormContainer>
+              </div>
 
-        </div>
-        }
-          
+            </div>
+          }
+
         </>
       )}
     </>
