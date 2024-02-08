@@ -128,7 +128,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 
 
     useEffect(() => {
-        console.log(props)
+        // console.log(props)
        setResultadoNeto(props.resultadoNeto)
        setAmortizaciones(props.amortizaciones)
        setInteresesPagados(props.interesesPagados)
@@ -192,7 +192,7 @@ import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
                     resultado.push(parseInt(variacionCajaYBco[i]) + parseInt(resultado[i-1]) )
                 }
             }
-             console.log(resultado)
+            //  console.log(resultado)
              setCajaYBancosAlCierre(resultado)
              dispatch(addResult([resultado]))
              setTimeout(() => {
