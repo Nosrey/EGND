@@ -24,37 +24,6 @@ function Balance() {
   const [creditosVentas, setCreditosVentas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
   const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-
-  useEffect(() => {
-    getUser(currentState.id)
-      .then((data) => {
-        // if (data?.capexPData[0]?.length !== 0) {
-        //   setCapexPData(data?.capexPData[0]?.capexP);
-        // }else {
-        //   console.log("Falta completar info en Costo Inversiones")
-        // }
-
-        // if (data?.capexQData[0]?.length !== 0) {
-        //   setCapexQData(data?.capexQData[0]?.capexQ);
-        // }else {
-        //   console.log("Falta completar info en Volumen de Inversiones")
-        // }
-
-        // if (data?.prestamos?.length !== 0) {
-        //   setPrestamosData(data?.prestamos);
-        // }else {
-        //   console.log("Falta completar info en la sección de Préstamos")
-        // }
-        setTimeout(() => {
-          setShowLoader(false)
-        }, 4000);
-      })
-      .catch((error) => console.error(error));
-    calcVentasPorMes(currentState.id, creditosVentas, setCreditosVentas)
-    costoPorMes(currentState.id, setCostos)
-  }, []);
-
-
   return (
     <>
       {showSuccessAlert && (
@@ -93,9 +62,9 @@ function Balance() {
                         creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
 
                         // calcular  para remplazasr estos arrasy hardcodeados
-                        creditosPorVentas={creditosVentas.slice(0, 10) || []}
+                        creditosPorVentas={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
                         bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                        bienesDeUso={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
+                        bienesDeUso={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
 
                         showAlertSuces={(boolean) =>
                           setShowSuccessAlert(boolean)

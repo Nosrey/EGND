@@ -5,6 +5,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
 import { MONTHS, optionsBienes } from 'constants/forms.constants';
+import { set } from 'lodash';
 import { getUser } from 'services/Requests';
 
 
@@ -889,60 +890,295 @@ export const calcVentasPorMes = (id, creditosVentas, setCreditosVentas) => {
     });
 }
 
-export const costoPorMes = (id, setCostos) => {
-  
+export const costoPorMes = (id, setCostos, stockInicialUser) => {
+  // lo vuelvo numero de serlo, si no lo cambio a 0
+  stockInicialUser = Number(stockInicialUser) || 0
   getUser(id)
     .then((data) => {
       let costosFinal = []
-      const { volumenData, costoData } = data;
+      const { volumenData, costoData, assumpFinancierasData } = data;
+      let stockFijo = (assumpFinancierasData[0]?.stock / 30) 
+      // let stockFijo = 1.5
+
       let costos = showMultiplicacionPxQ(volumenData, costoData);
-      // console.log('costos: ', costos)
-      // recorro cada pais
+      let mesesCubiertos = 0
+      let mesesTratados = 0
+
+      function calcularCompras(items, month, year, forLoop) {
+
+        let itemActual = items.años[year].costoMeses[month] // aca puedo obtener el .costo
+
+        let monthSiguiente
+        let yearSiguiente
+        let monthSiguienteIndex
+
+        mesesCubiertos -= 1
+
+        let comprasFinal = 0
+        let decimalHandler = 0
+
+        if (mesesCubiertos === -1) {
+          comprasFinal = itemActual.costo
+          mesesCubiertos = 0
+          mesesTratados = 1
+        } else if (mesesCubiertos < 1) {
+          yearSiguiente = Math.floor(mesesTratados / 12)
+          monthSiguienteIndex = Math.ceil(mesesTratados) - (yearSiguiente * 12)
+          if (monthSiguienteIndex === 12) monthSiguienteIndex = 0
+
+          if (monthSiguienteIndex !== 0) monthSiguienteIndex -= 1
+          else monthSiguienteIndex = 11
+
+          monthSiguiente = MONTHS[monthSiguienteIndex]
+
+          let itemSiguiente = items?.años?.[yearSiguiente]?.costoMeses?.[monthSiguiente]
+
+          if (yearSiguiente > 9) itemSiguiente = { costo: 0 }
+
+          // obtengo cuando necesito de ese decimal para alcanzar el 1 completo
+          let decimal = mesesCubiertos % 1
+          // calculo cuanto le falta para llegar a 1 a decimal
+          let decimalFaltante = 1 - decimal
+
+          let costoRestante = itemSiguiente.costo * decimalFaltante
+
+          comprasFinal += costoRestante
+
+          decimalHandler = decimalFaltante
+          mesesTratados += decimalFaltante
+          mesesCubiertos += decimalFaltante
+        }
+
+
+        let falta = (mesesCubiertos - stockFijo) * -1
+
+        while (falta > 0) {
+
+          yearSiguiente = Math.floor(mesesTratados / 12)
+          monthSiguienteIndex = Math.ceil(mesesTratados) - (yearSiguiente * 12)
+          if (monthSiguienteIndex === 12) monthSiguienteIndex = 0
+          monthSiguiente = MONTHS[monthSiguienteIndex]
+
+          if (yearSiguiente > 9) break
+
+          let itemSiguiente = items.años[yearSiguiente].costoMeses[monthSiguiente]
+
+          // identifico si mesesTratados es un numero con decimales
+          if (falta < 1) {
+            // obtengo cuando necesito de ese decimal para alcanzar el 1 completo
+            let decimal = falta
+            // calculo cuanto le falta para llegar a 1 a decimal
+            let decimalFaltante = 1 - decimal
+
+            let costoRestante = itemSiguiente.costo * decimalFaltante
+
+            comprasFinal += costoRestante
+            mesesTratados += decimalFaltante
+            mesesCubiertos += decimalFaltante
+          } else {
+            comprasFinal += itemSiguiente.costo
+            mesesCubiertos += 1
+            mesesTratados += 1
+          }
+
+          falta = (mesesCubiertos - stockFijo) * -1
+        }
+        return comprasFinal
+      }
+
       for (let i = 0; i < costos.length; i++) {
         // recorro cada canal
         for (let x = 0; x < costos[i].stats.length; x++) {
           // recorro cada producto
           for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-            // recorro cada año
-            for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
-              // recorro cada mes del año que seran asi  "volMeses": { "enero": 20000, "febrero": 40000...}
-              // y lo transformo en un objeto asi: "volMeses": {"enero": {costo: 20000}}
-              costos[i].stats[x].productos[j].años[t] = {
-                ...costos[i].stats[x].productos[j].años[t],
-                costoMeses: {
-                  'enero': {},
-                  'febrero': {},
-                  'marzo': {},
-                  'abril': {},
-                  'mayo': {},
-                  'junio': {},
-                  'julio': {},
-                  'agosto': {},
-                  'septiembre': {},
-                  'octubre': {},
-                  'noviembre': {},
-                  'diciembre': {}
+            if (costos[i].stats[x].productos[j].type === "producto") {
+              // recorro cada año
+              for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+                // recorro cada mes del año que seran asi  "volMeses": { "enero": 20000, "febrero": 40000...}
+                // y lo transformo en un objeto asi: "volMeses": {"enero": {costo: 20000}}
+                costos[i].stats[x].productos[j].años[t] = {
+                  ...costos[i].stats[x].productos[j].años[t],
+                  costoMeses: {
+                    'enero': {},
+                    'febrero': {},
+                    'marzo': {},
+                    'abril': {},
+                    'mayo': {},
+                    'junio': {},
+                    'julio': {},
+                    'agosto': {},
+                    'septiembre': {},
+                    'octubre': {},
+                    'noviembre': {},
+                    'diciembre': {}
+                  }
                 }
-              }
 
-              for (let month in costos[i].stats[x].productos[j].años[t].volMeses) {
-                costos[i].stats[x].productos[j].años[t].costoMeses[month] = {
-                  costo: costos[i].stats[x].productos[j].años[t].volMeses[month]
+                for (let month in costos[i].stats[x].productos[j].años[t].volMeses) {
+                  costos[i].stats[x].productos[j].años[t].costoMeses[month] = {
+                    costo: costos[i].stats[x].productos[j].años[t].volMeses[month]
+                  }
+                }
+
+                // creo una propíedad llamada costoAnual que sera la suma de todos los costos de cada mes
+                costos[i].stats[x].productos[j].años[t].costoAnual = 0;
+                for (let month in costos[i].stats[x].productos[j].años[t].costoMeses) {
+                  costos[i].stats[x].productos[j].años[t].costoAnual += costos[i].stats[x].productos[j].años[t].costoMeses[month].costo;
                 }
               }
-              // creo una propíedad llamada costoAnual que sera la suma de todos los costos de cada mes
-              costos[i].stats[x].productos[j].años[t].costoAnual = 0;
-              for (let month in costos[i].stats[x].productos[j].años[t].costoMeses) {
-                costos[i].stats[x].productos[j].años[t].costoAnual += costos[i].stats[x].productos[j].años[t].costoMeses[month].costo;
-              }
-              // console.log('costos del año ', t, ': ', costos[i].stats[x].productos[j].años[t].costoAnual)
-              costosFinal[t] = costosFinal[t] ? costosFinal[t] + costos[i].stats[x].productos[j].años[t].costoAnual : costos[i].stats[x].productos[j].años[t].costoAnual;
             }
           }
         }
       }
-      setCostos(costosFinal)
+
+      // VUELVO a recorrer hasta .años
+      for (let i = 0; i < costos.length; i++) {
+        // recorro cada canal
+        for (let x = 0; x < costos[i].stats.length; x++) {
+          // recorro cada producto
+          for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
+            if (costos[i].stats[x].productos[j].type === "producto") {
+              // recorro cada año
+              mesesCubiertos = 0
+              mesesTratados = 0
+              for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+                // creo la propiedad donde obtendre stockCalculos
+                costos[i].stats[x].productos[j].años[t] = {
+                  ...costos[i].stats[x].productos[j].años[t],
+                  stockCalculos: {
+                    'enero': {
+                      stockInicial: t === 0 ? stockInicialUser : costos[i].stats[x].productos[j].años[t - 1].stockCalculos.diciembre.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'enero', t, false),
+                      // consumo será el mismo valor que costoMeses[month].costo
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.enero.costo,
+                      stockFinal: 0,
+                    },
+                    'febrero': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.enero?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'febrero', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.febrero.costo,
+                      stockFinal: 0,
+                    },
+                    'marzo': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.febrero?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'marzo', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.marzo.costo,
+                      stockFinal: 0,
+                    },
+                    // ... repeat for the remaining months
+                    'abril': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.marzo?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'abril', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.abril.costo,
+                      stockFinal: 0,
+                    },
+                    'mayo': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.abril?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'mayo', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.mayo.costo,
+                      stockFinal: 0,
+                    },
+                    'junio': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.mayo?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'junio', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.junio.costo,
+                      stockFinal: 0,
+                    },
+                    'julio': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.junio?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'julio', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.julio.costo,
+                      stockFinal: 0,
+                    },
+                    'agosto': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.julio?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'agosto', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.agosto.costo,
+                      stockFinal: 0,
+                    },
+                    'septiembre': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.agosto?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'septiembre', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.septiembre.costo,
+                      stockFinal: 0,
+                    },
+                    'octubre': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.septiembre?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'octubre', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.octubre.costo,
+                      stockFinal: 0,
+                    },
+                    'noviembre': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.octubre?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'noviembre', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.noviembre.costo,
+                      stockFinal: 0,
+                    },
+
+                    'diciembre': {
+                      stockInicial: costos[i].stats[x].productos[j].años[t]?.stockCalculos?.noviembre?.stockFinal,
+                      compras: calcularCompras(costos[i].stats[x].productos[j], 'diciembre', t, false),
+                      consumo: costos[i].stats[x].productos[j].años[t].costoMeses.diciembre.costo,
+                      stockFinal: 0,
+                    },
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // VUELVO a recorrer hasta .años para agregar propiedades extras
+      for (let i = 0; i < costos.length; i++) {
+        // recorro cada canal
+        for (let x = 0; x < costos[i].stats.length; x++) {
+          // recorro cada producto
+          for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
+            if (costos[i].stats[x].productos[j].type === "producto") {
+              // recorro cada año
+              mesesCubiertos = 0
+              mesesTratados = 0
+              for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+                for (let month in costos[i].stats[x].productos[j].años[t].stockCalculos) {              
+                  // stockInicial sera igual a stockFinal del mes anterior A MENOS que sea enero y año 0, en cuyo caso sera igual a stockInicialUser, si es enero y otro año sera igual al stockFinal del año anterior de diciembre
+                  costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockInicial = t === 0 && month === 'enero' ? stockInicialUser : month === 'enero' ? costos[i].stats[x].productos[j].años[t - 1].stockCalculos.diciembre.stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos[MONTHS[MONTHS.indexOf(month) - 1]].stockFinal
+
+                  // stockFinal sera igual a stockInicial + compras - consumo
+                  costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockFinal = (costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockInicial + costos[i].stats[x].productos[j].años[t].stockCalculos[month].compras - costos[i].stats[x].productos[j].años[t].stockCalculos[month].consumo === 0 ? costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockInicial : costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockInicial + costos[i].stats[x].productos[j].años[t].stockCalculos[month].compras - costos[i].stats[x].productos[j].años[t].stockCalculos[month].consumo)
+
+
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // vuelvo a recorrer hasta años, entonces tomo el stockFinal de diciembre del ultimo año y lo guardo en costosFinal
+      for (let i = 0; i < costos.length; i++) {
+        // recorro cada canal
+        for (let x = 0; x < costos[i].stats.length; x++) {
+          // recorro cada producto
+          for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
+            if (costos[i].stats[x].productos[j].type === "producto") {
+              // recorro cada año
+              for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+                // ahora agrego el stockFinal de diciembre de cada año sumado al valor de costosFinal en esa posicion del array si ya existia un valor alli
+                let indexMonth = MONTHS.length - (1 + Math.ceil(stockFijo))
+                if (indexMonth < 0) indexMonth += MONTHS.length
+                let month = MONTHS[indexMonth]
+                if (t === 9) console.log('indexMonth FINAL', indexMonth)
+                if (t <= 8) costosFinal[t] = costosFinal[t] ? costosFinal[t] + costos[i].stats[x].productos[j].años[t].stockCalculos.diciembre.stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos.diciembre.stockFinal
+                else if (t === 9) costosFinal[t] = costosFinal[t] ? costosFinal[t] + costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockFinal
+              }
+            }
+          }
+        }
+      }
+
+      console.log('costos', costos)
       console.log('costosFinal', costosFinal)
+      setCostos(costosFinal)
     });
-    
 }
