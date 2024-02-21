@@ -9,9 +9,12 @@ import {
   import { useEffect , useState} from 'react';
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { createCashflowIndirecto, getCashflowIndirectoInfo } from 'services/Requests';
+import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
+
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcVentasPorMes, costoPorMes } from 'utils/calcs';
+import { set } from 'lodash';
 
   function TableBalance(props) {
 
@@ -22,6 +25,8 @@ import MySpinner from 'components/shared/loaders/MySpinner';
     const [bienesDeUso, setBienesDeUso] = useState([]);
     const [cajaYBancos, setCajaYBancos] = useState([]);
     const [totActivo, setTotActivo] = useState([]);
+    const [updateBienesDeCambio, setUpdateBienesDeCambio] = useState(true);
+    const [timeoutId, setTimeoutId] = useState(null);
 
     const currentState = useSelector((state) => state.auth.user);
 
@@ -96,20 +101,55 @@ import MySpinner from 'components/shared/loaders/MySpinner';
 
     const currency = useSelector((state) => state.auth.user.currency);
 
+    function handleBienesDeCambio(value) {
+        handleChangeInputs('BienesDeCambio' , value)
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        setTimeoutId(setTimeout(() => {
+            setUpdateBienesDeCambio(true)
+        }, 3000))
+    }
 
     useEffect(() => {
        setCajaYBancos(props.cajaYBancos)
-       setCreditosPorVentas(props.creditosPorVentas)
+    //    setCreditosPorVentas(props.creditosPorVentas)
        setCreditosFiscales(props.creditosFiscales)
-       setBienesDeCambio(props.bienesDeCambio)
+    //    setBienesDeCambio(props.bienesDeCambio)
        setBienesDeUso(props.bienesDeUso)
         
     }, [props]);
+
+      useEffect(() => {
+        if (updateBienesDeCambio) {
+            getUser(currentState.id)
+            .then((data) => {
+                setTimeout(() => {
+                    setShowLoader(false)
+                }, 4000);
+            })
+            .catch((error) => console.error(error));
+            costoPorMes(currentState.id, setBienesDeCambio, inputsValues.BienesDeCambio)
+            setUpdateBienesDeCambio(false)
+        }
+      }, [updateBienesDeCambio]);
+
+      useEffect(() => {
+          getUser(currentState.id)
+              .then((data) => {
+                  setTimeout(() => {
+                      setShowLoader(false)
+                  }, 4000);
+              })
+              .catch((error) => console.error(error));
+          calcVentasPorMes(currentState.id, creditosPorVentas, setCreditosPorVentas)
+      }, []);
+
     useEffect(() => {
-        if (cajaYBancos && creditosPorVentas && creditosFiscales  && bienesDeCambio && bienesDeUso) {
+        if (cajaYBancos && creditosPorVentas && creditosFiscales && bienesDeCambio && bienesDeUso) {
             let resultado = [];
             for (let i = 0; i < 10; i++) {
-                resultado.push(bienesDeUso[i] + creditosPorVentas[i] + creditosFiscales[i] + bienesDeCambio[i] -cajaYBancos[i])
+                resultado.push((bienesDeUso[i] + creditosPorVentas[i] + creditosFiscales[i] + bienesDeCambio[i]) + (i < 1 ? (cajaYBancos[i] * -1) : (cajaYBancos[i])))
 
             }
             setTotActivo(resultado)
@@ -399,7 +439,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
                                       className="w-[130px]"
                                       type="text"
                                       value={inputsValues.BienesDeCambio}
-                                      onChange={(e) => handleChangeInputs('BienesDeCambio' , e.target.value)}
+                                      onChange={(e) => handleBienesDeCambio(e.target.value)}
                                       name="initial"
                                       prefix='$'
 
@@ -584,7 +624,7 @@ import MySpinner from 'components/shared/loaders/MySpinner';
         type="submit"
         onClick={submitInfoFormBalance}
       >
-        Guardaraa
+        Guardar
       </Button> 
           </> 
         }

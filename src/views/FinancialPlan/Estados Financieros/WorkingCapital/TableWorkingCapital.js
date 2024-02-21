@@ -9,15 +9,18 @@ import {
   import { useEffect , useState} from 'react';
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
+import { createWorkingCapital, getWorkingCapitalInfo, getUser } from 'services/Requests';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcVentasPorMes, costoPorMes } from 'utils/calcs';
 
   function TableWorkingCapital(props) {
     const [creditosVentas, setCreditosVentas] = useState([]);
     const [bienesDeCambio, setBienesDeCambio] = useState([]);
+    const [updateBienesDeCambio, setUpdateBienesDeCambio] = useState(true);
     const [deudasComerciales, setDeudasComerciales] = useState([]);
     const [posicionAlCierre, setPosicionAlCierre] = useState([]);
     const [variacion, setVariacion] = useState([]);
     const currentState = useSelector((state) => state.auth.user);
+    const [timeoutId, setTimeoutId] = useState(null);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
@@ -27,24 +30,52 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
     });
 
    const handleChangeInputs = (key , value) => {
-        const copy = {...inputsValues}
-        if (value.startsWith("0")) {
-            value = value.slice(1);
-        }
-        copy[key] = value
-        setinputsValues(copy)
-    }
+          const copy = { ...inputsValues }
+          if (value.startsWith("0")) {
+              value = value.slice(1);
+          }
+          copy[key] = value
+          setinputsValues(copy)
+      }
 
-    // **********************************************
+      // **********************************************
 
-    const currency = useSelector((state) => state.auth.user.currency);
+      const currency = useSelector((state) => state.auth.user.currency);
 
+      function handleBienesDeCambio(value) {
+          handleChangeInputs('bienesDeCambio', value)
+          if (timeoutId) {
+              clearTimeout(timeoutId);
+          }
+          setTimeoutId(setTimeout(() => {
+              setUpdateBienesDeCambio(true)
+          }, 3000))
+      }
 
-    useEffect(() => {
-       setCreditosVentas(props.creditosVentas)
-       setBienesDeCambio(props.bienesDeCambio)
-       setDeudasComerciales(props.deudasComerciales)
-    }, [props]);
+      useEffect(() => {
+          if (updateBienesDeCambio) {
+              getUser(currentState.id)
+                  .then((data) => {                  
+                  })
+                  .catch((error) => console.error(error));
+              costoPorMes(currentState.id, setBienesDeCambio, inputsValues.bienesDeCambio)
+              setUpdateBienesDeCambio(false)
+          }
+      }, [updateBienesDeCambio]);
+
+      useEffect(() => {
+          getUser(currentState.id)
+              .then((data) => {
+              })
+              .catch((error) => console.error(error));
+          calcVentasPorMes(currentState.id, creditosVentas, setCreditosVentas)
+      }, []);
+
+      useEffect(() => {
+          setCreditosVentas(props.creditosVentas)
+          setBienesDeCambio(props.bienesDeCambio)
+          setDeudasComerciales(props.deudasComerciales)
+      }, [props]);
 
     useEffect(() => {
         if (creditosVentas && bienesDeCambio && deudasComerciales) {
@@ -159,12 +190,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -175,7 +206,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -208,7 +239,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                       className="w-[130px]"
                                       type="text"
                                       value={inputsValues.bienesDeCambio}
-                                      onChange={(e) => handleChangeInputs('bienesDeCambio' , e.target.value)}
+                                      onChange={(e) => handleBienesDeCambio(e.target.value)}
                                       name="initial"
                                       prefix='$'
 
@@ -223,12 +254,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -239,7 +270,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -288,12 +319,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -304,7 +335,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
@@ -339,12 +370,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   {Math.round(año).toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] font-bold text-base"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -354,7 +385,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px] font-bold "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -401,12 +432,12 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   {año.toString().length > 5 ? (
                                   <Tooltip
                                       placement="top-end"
-                                      title={currency + formatNumberPrestamos(año.toFixed(2))}
+                                      title={currency + formatNumberPrestamos(año)}
                                   >
                                       <Input
                                       className="w-[130px] "
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
                                       prefix={currency}
@@ -417,7 +448,7 @@ import { createWorkingCapital, getWorkingCapitalInfo } from 'services/Requests';
                                   <Input
                                       className="w-[130px]"
                                       type="text"
-                                      value={formatNumberPrestamos(año.toFixed(2))}
+                                      value={formatNumberPrestamos(año)}
                                       name="year"
                                       prefix={currency}
                                       disabled
