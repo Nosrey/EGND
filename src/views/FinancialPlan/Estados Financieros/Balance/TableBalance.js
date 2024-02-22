@@ -634,7 +634,7 @@ function TableBalance(props) {
                                         className="flex  gap-x-3 gap-y-3  mb-6 "
                                     >
                                         <div className='iconDesplegable' />
-                                        <FormItem className=" mb-1 w-[240px] mt-[49px]">
+                                        <FormItem className=" mb-1 w-[240px]">
                                             <Input
                                                 disabled
                                                 type="text"
