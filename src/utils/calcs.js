@@ -897,7 +897,7 @@ export const costoPorMes = (id, setCostos, stockInicialUser) => {
     .then((data) => {
       let costosFinal = []
       const { volumenData, costoData, assumpFinancierasData } = data;
-      let stockFijo = (assumpFinancierasData[0]?.stock / 30) 
+      let stockFijo = (assumpFinancierasData[0]?.stock / 30)
       // let stockFijo = 1.5
 
       let costos = showMultiplicacionPxQ(volumenData, costoData);
@@ -1140,7 +1140,7 @@ export const costoPorMes = (id, setCostos, stockInicialUser) => {
               mesesCubiertos = 0
               mesesTratados = 0
               for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
-                for (let month in costos[i].stats[x].productos[j].años[t].stockCalculos) {              
+                for (let month in costos[i].stats[x].productos[j].años[t].stockCalculos) {
                   // stockInicial sera igual a stockFinal del mes anterior A MENOS que sea enero y año 0, en cuyo caso sera igual a stockInicialUser, si es enero y otro año sera igual al stockFinal del año anterior de diciembre
                   costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockInicial = t === 0 && month === 'enero' ? stockInicialUser : month === 'enero' ? costos[i].stats[x].productos[j].años[t - 1].stockCalculos.diciembre.stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos[MONTHS[MONTHS.indexOf(month) - 1]].stockFinal
 
@@ -1168,7 +1168,6 @@ export const costoPorMes = (id, setCostos, stockInicialUser) => {
                 let indexMonth = MONTHS.length - (1 + Math.ceil(stockFijo))
                 if (indexMonth < 0) indexMonth += MONTHS.length
                 let month = MONTHS[indexMonth]
-                if (t === 9) console.log('indexMonth FINAL', indexMonth)
                 if (t <= 8) costosFinal[t] = costosFinal[t] ? costosFinal[t] + costos[i].stats[x].productos[j].años[t].stockCalculos.diciembre.stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos.diciembre.stockFinal
                 else if (t === 9) costosFinal[t] = costosFinal[t] ? costosFinal[t] + costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockFinal : costos[i].stats[x].productos[j].años[t].stockCalculos[month].stockFinal
               }
@@ -1177,8 +1176,87 @@ export const costoPorMes = (id, setCostos, stockInicialUser) => {
         }
       }
 
-      console.log('costos', costos)
-      console.log('costosFinal', costosFinal)
       setCostos(costosFinal)
     });
+}
+
+export const bienesDeUsoFunction = (id, setBienesDeUso) => {
+  getUser(id)
+    .then((data) => {
+      let capexPxQ = []
+      // let amortizaciones = [] creo un array con 10 objetos y cada uno de esos 10 tendra los 12 meses del año con un objeto vacio, asi [{enero: {}, febrero: {}...}, {enero: {}, febrero: {}...}...] 
+      let amortizaciones = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, {}])))
+      let saldoBienesDeUso = []
+      const { capexPData, capexQData } = data;
+
+      // recorro capexQData
+      for (let i = 0; i < capexQData[0].capexQ.length; i++) {
+        // recorro el .años de cada elemento
+        for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
+          // recorro volMeses usando MONTHS
+          for (let month in capexQData[0].capexQ[i].años[j].volMeses) {
+            // agrego la propiedad .vol a cada mes
+
+            if (capexQData[0].capexQ[i].años[j].volMeses[month] !== 0) {
+              let Q = capexQData[0].capexQ[i].años[j].volMeses[month]
+              let P = capexPData[0].capexP[i].años[j].volMeses[month]
+              let resultado = P * Q
+              capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + (resultado) : (resultado)
+
+              console.log('bien: ', capexQData[0].capexQ[i])
+              let bien = capexQData[0].capexQ[i].bien
+              // dentro de optionsBienes recorro hasta encontrar el elemento cuya propiedad .value sea igual a bien
+              let bienEncontrado = optionsBienes.find(option => option.value === bien)
+              let tiempoAmortizacion = bienEncontrado ? (bienEncontrado?.amortizacion * 12) : 0
+              let conteo = tiempoAmortizacion
+              // ahora divido el resultado por el tiempo de amortizacion y lo redondeo a un entero mas cercano con Math.round
+              let resultadoAmortizacion = resultado / tiempoAmortizacion
+
+              amortizaciones[j][month] = Number(amortizaciones[j][month]) ? Number(amortizaciones[j][month]) + resultadoAmortizacion : resultadoAmortizacion
+              conteo -= 1
+
+              // subo al month siguiente (usando MONTHS) y resto 1 a conteo, si el mes siguiente pasa de diciembre entonces lo reinicio a enero y paso al año siguiente (j + 1), asi hasta que llegue a diciembre con el indice de año en 9 o que conteo sea 0
+              let yearIndex = j
+              while (!(yearIndex === 9 && month === 'diciembre') && conteo > -1) {
+                let monthIndex = MONTHS.indexOf(month) + 1
+                if (monthIndex === 12) {
+                  monthIndex = 0
+                  yearIndex += 1
+                }
+                month = MONTHS[monthIndex]
+                amortizaciones[yearIndex][month] = Number(amortizaciones[yearIndex][month]) ? Number(amortizaciones[yearIndex][month]) + resultadoAmortizacion : resultadoAmortizacion
+                conteo -= 1
+              }
+            } else {
+              capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + 0 : 0
+            }
+          }
+        }
+      }
+
+      // recorro el array de 10 de amortizaciones y sumo todos los valores de cada mes para obtener el total de cada año en un array llamado amortizacionesAños
+      let amortizacionesAños = []
+      for (let i = 0; i < amortizaciones.length; i++) {
+        let total = 0
+        for (let month in amortizaciones[i]) {
+          total += amortizaciones[i][month]
+        }
+        amortizacionesAños[i] = total
+      }
+
+      for (let i = 0; i < 10; i++) {
+        let valorInicial = i === 0 ? 0 : saldoBienesDeUso[i - 1]
+        console.log("valorInicial", valorInicial)
+        saldoBienesDeUso[i] = Math.round((valorInicial + capexPxQ[i]) - amortizacionesAños[i])
+      }
+
+      console.log("capexPxQ", capexPxQ)
+      console.log("amortizaciones", amortizaciones)
+      console.log("amortizacionesAños", amortizacionesAños)
+      console.log("saldoBienesDeUso", saldoBienesDeUso)
+
+      setBienesDeUso(saldoBienesDeUso)
+
+      // creo 10 elementos en mi array de saldoBienesDeUso donde el primer valor es 0 y el resultado de cada uno sera capexPxQ[i] + valorInicial (en todos sera el resultado del anterior menos en el primer elemento, en ese caso sera 0) - amortizacionesAños[i]
+    })
 }
