@@ -4,8 +4,9 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable prefer-destructuring */
+
 import { MONTHS, optionsBienes } from 'constants/forms.constants';
-import { set } from 'lodash';
 import { getUser } from 'services/Requests';
 
 
