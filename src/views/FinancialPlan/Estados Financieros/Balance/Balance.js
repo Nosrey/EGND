@@ -8,7 +8,7 @@ import ContainerScrollable from 'components/shared/ContainerScrollable';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
 import { useEffect, useState, } from 'react';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcVentasPorMes, costoPorMes } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableBalance from './TableBalance';
@@ -61,10 +61,6 @@ function Balance() {
                         cajaYBancos={myResult[0]} // ver
                         creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
 
-                        // calcular  para remplazasr estos arrasy hardcodeados
-                        creditosPorVentas={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
-                        bienesDeCambio={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300] || []}
-                        bienesDeUso={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
 
                         showAlertSuces={(boolean) =>
                           setShowSuccessAlert(boolean)

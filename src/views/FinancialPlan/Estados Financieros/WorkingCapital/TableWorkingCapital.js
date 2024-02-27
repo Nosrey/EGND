@@ -10,7 +10,7 @@ import {
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createWorkingCapital, getWorkingCapitalInfo, getUser } from 'services/Requests';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcVentasPorMes, costoPorMes } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio } from 'utils/calcs';
 
   function TableWorkingCapital(props) {
     const [creditosVentas, setCreditosVentas] = useState([]);
@@ -55,10 +55,10 @@ import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPor
       useEffect(() => {
           if (updateBienesDeCambio) {
               getUser(currentState.id)
-                  .then((data) => {                  
+                  .then((data) => { 
+                      calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.bienesDeCambio)
                   })
                   .catch((error) => console.error(error));
-              costoPorMes(currentState.id, setBienesDeCambio, inputsValues.bienesDeCambio)
               setUpdateBienesDeCambio(false)
           }
       }, [updateBienesDeCambio]);
@@ -66,9 +66,9 @@ import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPor
       useEffect(() => {
           getUser(currentState.id)
               .then((data) => {
+                  calcularCreditosPorVentas(data, creditosVentas, setCreditosVentas)
               })
               .catch((error) => console.error(error));
-          calcVentasPorMes(currentState.id, creditosVentas, setCreditosVentas)
       }, []);
 
       useEffect(() => {
