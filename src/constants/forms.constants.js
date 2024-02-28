@@ -354,7 +354,7 @@ export const optionsBienes = [
   {
     value: 'Fabricas, Edificios, Oficinas',
     label: 'Fabricas, Edificios, Oficinas',
-    amortizacion: 20,
+    amortizacion: 50,
     medida: 'UNIDAD',
   },
   {
@@ -366,19 +366,19 @@ export const optionsBienes = [
   {
     value: 'Equipos informaticos',
     label: 'Equipos informaticos',
-    amortizacion: 5,
+    amortizacion: 3,
     medida: 'UNIDAD',
   },
   {
     value: 'Equipos electronicos',
     label: 'Equipos electronicos',
-    amortizacion: 5,
+    amortizacion: 3,
     medida: 'UNIDAD',
   },
   {
     value: 'Terreno',
     label: 'Terreno',
-    amortizacion: 10,
+    amortizacion: 0,
     medida: 'UNIDAD',
   },
   {
@@ -390,13 +390,13 @@ export const optionsBienes = [
   {
     value: 'Utiles y Muebles',
     label: 'Utiles y Muebles',
-    amortizacion: 5,
+    amortizacion: 10,
     medida: 'UNIDAD',
   },
   {
     value: 'Herramientas',
     label: 'Herramientas',
-    amortizacion: 5,
+    amortizacion: 10,
     medida: 'UNIDAD',
   },
 ];

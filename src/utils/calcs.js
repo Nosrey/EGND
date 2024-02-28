@@ -4,8 +4,9 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable prefer-destructuring */
+
 import { MONTHS, optionsBienes } from 'constants/forms.constants';
-import { set } from 'lodash';
 import { getUser } from 'services/Requests';
 
 
@@ -1431,7 +1432,7 @@ export const comprasProductos = (data, stockInicialUser, obtenerIva) => {
 
 }
 
-export const calcularDeudasComerciales = (data, stockInicialUser) => {
+export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComerciales) => {
 
   const { volumenData, precioData, assumpFinancierasData, costoData, gastosPorCCData, capexPData, capexQData } = data;
 
@@ -2561,19 +2562,15 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
     gastosAnualesPorPagarInversiones.push(gastosAnualesInversiones[i] - gastosAnualesPagadosInversiones[i])
   }
 
+  // los 3 elementos son un array de 10 elementos, sumo los 3 en un solo llamado let resultadoGastosAnualesPorPagar
+  let resultadoGastosAnualesPorPagar = []
 
+  for (let i = 0; i < gastosPorPagarAnualesProducto.length; i++) {
+    resultadoGastosAnualesPorPagar.push(gastosPorPagarAnualesProducto[i] + gastosPorPagarAnualesServicios[i] + gastosAnualesPorPagarInversiones[i])
+  }
 
-  console.log('gastosAnualesPagadosInversiones: ', gastosAnualesPagadosInversiones)
-  console.log('gastosAnualesPorPagarInversiones: ', gastosAnualesPorPagarInversiones)
-  console.log('gastosAnualesInversiones: ', gastosAnualesInversiones)
-  console.log('capexQData: ', capexQData)
+  console.log('resultadoGastosAnualesPorPagar: ', resultadoGastosAnualesPorPagar)
 
-
-
-  console.log('costos: ', costos)
-
-  // parte 1 //
-  console.log('gastosPorPagarAnualesProducto: ', gastosPorPagarAnualesProducto)
-  // parte 2 //
-  console.log('gastosPorPagarAnualesServicios: ', gastosPorPagarAnualesServicios)
+  setDeudasComerciales(resultadoGastosAnualesPorPagar)
+  return resultadoGastosAnualesPorPagar
 }
