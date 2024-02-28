@@ -1433,7 +1433,7 @@ export const comprasProductos = (data, stockInicialUser, obtenerIva) => {
 
 export const calcularDeudasComerciales = (data, stockInicialUser) => {
 
-  const { volumenData, precioData, assumpFinancierasData, costoData, gastosPorCCData } = data;
+  const { volumenData, precioData, assumpFinancierasData, costoData, gastosPorCCData, capexPData, capexQData } = data;
 
   function obtenerIva(assumpFinancierasData) {
     // obtendre el Iva de assumpFinancierasData
@@ -1457,14 +1457,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
     return iva;
   }
 
-  function obtenerIvaServicios2(assumpFinancierasData) {
-    // obtendre el Iva de assumpFinancierasData
-    let iva = 0;
-    let ivaObtenido = assumpFinancierasData[0]?.pagoServicio?.IVA
-    // reviso si existe y si es un numero
-    if (ivaObtenido && !isNaN(ivaObtenido)) {
-      iva = ivaObtenido
-    }
+  function return0() {
     return 0;
   }
 
@@ -1851,63 +1844,112 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
     for (let x = 0; x < costos[i].stats.length; x++) {
       // recorro cada producto
       for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        // recorro cada año
-        for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
-          // agrego la propiedad .iva a cada año
-          costos[i].stats[x].productos[j].años[t].iva = costos[i].stats[x].productos[j].años[t].ventasTotal * (obtenerIva(assumpFinancierasData) / 100);
+        if (costos[i].stats[x].productos[j].type === 'producto') {
+          // recorro cada año
+          for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+            // agrego la propiedad .iva a cada año
+            costos[i].stats[x].productos[j].años[t].iva = costos[i].stats[x].productos[j].años[t].ventasTotal * (obtenerIva(assumpFinancierasData) / 100);
 
-          // agrego la propiedad .comprasTotalConIva que sera la suma de todo lo que hay en .compras * IVA
+            // agrego la propiedad .comprasTotalConIva que sera la suma de todo lo que hay en .compras * IVA
 
-          // recorro todos los meses de compras y obtengo su total
-          let totalCompras = 0
-          for (let month in costos[i].stats[x].productos[j].años[t].compras) {
-            totalCompras += costos[i].stats[x].productos[j].años[t].compras[month]
-          }
-
-          costos[i].stats[x].productos[j].años[t].comprasTotalConIva = totalCompras * (obtenerIva(assumpFinancierasData) / 100 + 1);
-
-          // recorro cada mes del año que seran asi  "compras": { "enero": 20000, "febrero": 40000...}
-          // y lo transformo en un objeto asi: "compras": {"enero": { "vol": 20000, "volConIva": (20000 * IVA) }}
-          costos[i].stats[x].productos[j].años[t] = {
-            ...costos[i].stats[x].productos[j].años[t],
-            cobroDeProducto: {
-              'enero': {},
-              'febrero': {},
-              'marzo': {},
-              'abril': {},
-              'mayo': {},
-              'junio': {},
-              'julio': {},
-              'agosto': {},
-              'septiembre': {},
-              'octubre': {},
-              'noviembre': {},
-              'diciembre': {}
+            // recorro todos los meses de compras y obtengo su total
+            let totalCompras = 0
+            for (let month in costos[i].stats[x].productos[j].años[t].compras) {
+              totalCompras += costos[i].stats[x].productos[j].años[t].compras[month]
             }
-          }
 
-          for (let month in costos[i].stats[x].productos[j].años[t].compras) {
-            costos[i].stats[x].productos[j].años[t].cobroDeProducto[month] = {
-              cobrado: agregarCobranza(month, t, cobranzasGrupo, costos[i].stats[x].productos[j], obtenerIva, assumpFinancierasData),
-              // vol: costos[i].stats[x].productos[j].años[t].compras[month],
-              // volConIva: costos[i].stats[x].productos[j].años[t].compras[month] * (obtenerIva(assumpFinancierasData) / 100 + 1),
+            costos[i].stats[x].productos[j].años[t].comprasTotalConIva = totalCompras * (obtenerIva(assumpFinancierasData) / 100 + 1);
+
+            costos[i].stats[x].productos[j].años[t] = {
+              ...costos[i].stats[x].productos[j].años[t],
+              cobroDeProducto: {
+                'enero': {},
+                'febrero': {},
+                'marzo': {},
+                'abril': {},
+                'mayo': {},
+                'junio': {},
+                'julio': {},
+                'agosto': {},
+                'septiembre': {},
+                'octubre': {},
+                'noviembre': {},
+                'diciembre': {}
+              }
             }
-          }
-          // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
-          costos[i].stats[x].productos[j].años[t].cobradoAnual = 0;
-          for (let month in costos[i].stats[x].productos[j].años[t].cobroDeProducto) {
-            costos[i].stats[x].productos[j].años[t].cobradoAnual += costos[i].stats[x].productos[j].años[t].cobroDeProducto[month].cobrado;
-          }
 
-          // creo la propiedad llamada pendientePorCobrar que sera la resta de comprasTotalConIva - cobradoAnual
-          costos[i].stats[x].productos[j].años[t].pendientePorCobrar = costos[i].stats[x].productos[j].años[t].comprasTotalConIva - costos[i].stats[x].productos[j].años[t].cobradoAnual;
+            for (let month in costos[i].stats[x].productos[j].años[t].compras) {
+              costos[i].stats[x].productos[j].años[t].cobroDeProducto[month] = {
+                cobrado: agregarCobranza(month, t, cobranzasGrupo, costos[i].stats[x].productos[j], obtenerIva, assumpFinancierasData),
+              }
+            }
+            // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
+            costos[i].stats[x].productos[j].años[t].cobradoAnual = 0;
+            for (let month in costos[i].stats[x].productos[j].años[t].cobroDeProducto) {
+              costos[i].stats[x].productos[j].años[t].cobradoAnual += costos[i].stats[x].productos[j].años[t].cobroDeProducto[month].cobrado;
+            }
 
-          // creditos.push(costos[i].stats[x].productos[j].años[t].pendientePorCobrar);
-          creditos[t] = creditos[t] ? creditos[t] + costos[i].stats[x].productos[j].años[t].pendientePorCobrar : costos[i].stats[x].productos[j].años[t].pendientePorCobrar;
+            // creo la propiedad llamada pendientePorCobrar que sera la resta de comprasTotalConIva - cobradoAnual
+            costos[i].stats[x].productos[j].años[t].pendientePorCobrar = costos[i].stats[x].productos[j].años[t].comprasTotalConIva - costos[i].stats[x].productos[j].años[t].cobradoAnual;
+
+            // creditos.push(costos[i].stats[x].productos[j].años[t].pendientePorCobrar);
+            creditos[t] = creditos[t] ? creditos[t] + costos[i].stats[x].productos[j].años[t].pendientePorCobrar : costos[i].stats[x].productos[j].años[t].pendientePorCobrar;
+          }
         }
       }
     }
   }
+
+  // obtengo de costos la propiedad .cobradoAnual de los productos de type 'producto'
+  let gastosPagadosAnualesProducto = []
+  for (let i = 0; i < costos.length; i++) {
+    // recorro cada canal
+    for (let x = 0; x < costos[i].stats.length; x++) {
+      // recorro cada producto
+      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
+        if (costos[i].stats[x].productos[j].type === 'producto') {
+          // recorro cada año
+          for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+            // agrego a indice del año
+            if (gastosPagadosAnualesProducto[t] === undefined) {
+              gastosPagadosAnualesProducto[t] = 0
+            }
+            // sumo el valor de .cobradoAnual de cada producto
+            gastosPagadosAnualesProducto[t] += Number(costos[i].stats[x].productos[j].años[t].cobradoAnual)
+          }
+        }
+      }
+    }
+  }
+
+  // obtengo de costos la propiedad .comprasTotalConIva de los productos de type 'producto'
+  let gastosAnualesProducto = []
+  for (let i = 0; i < costos.length; i++) {
+    // recorro cada canal
+    for (let x = 0; x < costos[i].stats.length; x++) {
+      // recorro cada producto
+      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
+        if (costos[i].stats[x].productos[j].type === 'producto') {
+          // recorro cada año
+          for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
+            // agrego a indice del año
+            if (gastosAnualesProducto[t] === undefined) {
+              gastosAnualesProducto[t] = 0
+            }
+            // sumo el valor de .comprasTotalConIva de cada producto
+            gastosAnualesProducto[t] += Number(costos[i].stats[x].productos[j].años[t].comprasTotalConIva)
+          }
+        }
+      }
+    }
+  }
+
+  let gastosPorPagarAnualesProducto = []
+  for (let i = 0; i < 10; i++) {
+    gastosPorPagarAnualesProducto[i] = gastosAnualesProducto[i] - gastosPagadosAnualesProducto[i]
+  }
+
+
   // el resultado esta en la propiedad .pendientePorCobrar de cada año que es la resta de .comprasTotalConIva - .cobradoAnual
 
 
@@ -2044,6 +2086,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
   function agregarCobranzaServicios(mes, año, cobranzasGrupo, productosLista, obtenerIva, assumpFinancierasData) {
     let cobradoFinal = productosLista?.años[año][mes].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
     // saco el volcoIva con contado
+
     cobradoFinal *= (cobranzasGrupo?.contado / 100);
 
     // --- para treintaDias ---
@@ -2069,7 +2112,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el treintaDias del mesAnterior      
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let treintaDias = cobranzasGrupo?.treintaDias
       let treintaDiasFinal = treintaDias ?? 0
       // sumo a cobradoFinal el treintaDias del mesAnterior
@@ -2099,7 +2142,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let cuarentaycincoDias = cobranzasGrupo?.cuarentaycincoDias
       let cuarentaycincoDiasFinal = cuarentaycincoDias ?? 0
       // sumo a cobradoFinal el cuarentaycincoDias del mesAnterior
@@ -2128,7 +2171,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let sesentaDias = cobranzasGrupo?.sesentaDias
       let sesentaDiasFinal = sesentaDias ?? 0
       // sumo a cobradoFinal el sesentaDias del mesAnterior
@@ -2158,7 +2201,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el noventaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let noventaDias = cobranzasGrupo?.noventaDias
       let noventaDiasFinal = noventaDias ?? 0
       // sumo a cobradoFinal el noventaDias del mesAnterior
@@ -2188,7 +2231,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el cientoveinteDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let cientoveinteDias = cobranzasGrupo?.cveinteDias
       let cientoveinteDiasFinal = cientoveinteDias ?? 0
       // sumo a cobradoFinal el cientoveinteDias del mesAnterior
@@ -2218,7 +2261,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el cientocincuentaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let cientocincuentaDias = cobranzasGrupo?.ccincuentaDias
       let cientocincuentaDiasFinal = cientocincuentaDias ?? 0
       // sumo a cobradoFinal el cientocincuentaDias del mesAnterior
@@ -2248,7 +2291,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el cientoochentaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let cientoochentaDias = cobranzasGrupo?.cochenteDias
       let cientoochentaDiasFinal = cientoochentaDias ?? 0
       // sumo a cobradoFinal el cientoochentaDias del mesAnterior
@@ -2278,7 +2321,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el doscientosDiezDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let doscientosDiezDias = cobranzasGrupo?.ddiezDiaz
       let doscientosDiezDiasFinal = doscientosDiezDias ?? 0
       // sumo a cobradoFinal el doscientosDiezDias del mesAnterior
@@ -2308,7 +2351,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el doscientosCuarentaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let doscientosCuarentaDias = cobranzasGrupo?.dcuarentaDias
       let doscientosCuarentaDiasFinal = doscientosCuarentaDias ?? 0
       // sumo a cobradoFinal el doscientosCuarentaDias del mesAnterior
@@ -2338,7 +2381,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el doscientosSetentaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let doscientosSetentaDias = cobranzasGrupo?.dsetentaDias
       let doscientosSetentaDiasFinal = doscientosSetentaDias ?? 0
       // sumo a cobradoFinal el doscientosSetentaDias del mesAnterior
@@ -2368,7 +2411,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el trescientosDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let trescientosDias = cobranzasGrupo?.trescientosDias
       let trescientosDiasFinal = trescientosDias ?? 0
       // sumo a cobradoFinal el trescientosDias del mesAnterior
@@ -2398,7 +2441,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado]
       // teniendo el mesAnterior, calculo el trescientosTreintaDias del mesAnterior
-      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior] * (obtenerIva(assumpFinancierasData) / 100 + 1)
+      let cobradoMesAnterior = productosLista?.años[añoTemp][mesAnterior].volMeses * (obtenerIva(assumpFinancierasData) / 100 + 1)
       let trescientosTreintaDias = cobranzasGrupo?.ttreintaDias
       let trescientosTreintaDiasFinal = trescientosTreintaDias ?? 0
       // sumo a cobradoFinal el trescientosTreintaDias del mesAnterior
@@ -2408,18 +2451,13 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
     return cobradoFinal
   }
 
-  // function agregarCobranza(mes, año, cobranzasGrupo, productosLista, obtenerIva, assumpFinancierasData) {
-  //   let cobradoFinal = productosLista?.años[año]?.compras[mes] * (obtenerIva(assumpFinancierasData) / 100 + 1)
-
-  // cobrado: agregarCobranza(month, t, cobranzasGrupo, costos[i].stats[x].productos[j], obtenerIva, assumpFinancierasData),
-
   let cobranzasGrupoServicios = assumpFinancierasData[0]?.pagoServicio
 
   for (let i = 0; i < sumaGastos.length; i++) {
     for (let month in sumaGastos[i]) {
       sumaGastos[i][month] = {
         ...sumaGastos[i][month],
-        cobrado: agregarCobranzaServicios(month, i, cobranzasGrupoServicios, { años: sumaGastos }, obtenerIvaServicios2, assumpFinancierasData)
+        cobrado: agregarCobranzaServicios(month, i, cobranzasGrupoServicios, { años: sumaGastos }, return0, assumpFinancierasData)
       }
     }
   }
@@ -2428,13 +2466,114 @@ export const calcularDeudasComerciales = (data, stockInicialUser) => {
   for (let i = 0; i < sumaGastos.length; i++) {
     let gastosPagados = 0
     for (let month in sumaGastos[i]) {
-      gastosPagados += sumaGastos[i][month].cobrado
+      gastosPagados += Math.round(sumaGastos[i][month].cobrado)
     }
     gastosPagadosAnuales.push(gastosPagados)
   }
 
+  let GastosAnuales = []
+  for (let i = 0; i < sumaGastos.length; i++) {
+    let gastosPorPagar = 0
+    for (let month in sumaGastos[i]) {
+      gastosPorPagar += Math.round(sumaGastos[i][month].volMeses)
+    }
+    GastosAnuales.push(gastosPorPagar)
+  }
 
-  console.log('sumaGastos: ', sumaGastos)
+  let gastosPorPagarAnualesServicios = []
+  for (let i = 0; i < sumaGastos.length; i++) {
+    gastosPorPagarAnualesServicios.push(GastosAnuales[i] - gastosPagadosAnuales[i])
+  }
+
+
+  // parte 3, calculo de inversiones
+
+  function obtenerIvaInversiones(assumpFinancierasData) {
+    // obtendre el Iva de assumpFinancierasData
+    let iva = 0;
+    let ivaObtenido = assumpFinancierasData[0]?.inversion?.IVA
+    // reviso si existe y si es un numero
+    if (ivaObtenido && !isNaN(ivaObtenido)) {
+      iva = ivaObtenido
+    }
+    return iva;
+  }
+
+  let cobranzaGrupoInversiones = assumpFinancierasData[0]?.inversion
+
+  let capexPxQ = []
+  // una copia profunda de capexQData
+
+  // recorro capexQData
+  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
+    // recorro el .años de cada elemento
+    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
+      // recorro volMeses usando MONTHS
+      // creo la propiedad .cobrado que sera un objeto con los 12 meses del año
+      capexQData[0].capexQ[i].años[j].cobrado = {}
+      for (let month in capexQData[0].capexQ[i].años[j].volMeses) {
+        // agrego la propiedad .vol a cada mes
+        if (capexQData[0].capexQ[i].años[j].volMeses[month] !== 0) {
+          let Q = capexQData[0].capexQ[i].años[j].volMeses[month]
+          let P = capexPData[0].capexP[i].años[j].volMeses[month]
+          let resultado = P * Q
+          capexQData[0].capexQ[i].años[j][month] = { volMeses: resultado }
+
+          capexQData[0].capexQ[i].años[j].cobrado[month] = agregarCobranzaServicios(month, j, cobranzaGrupoInversiones, capexQData[0].capexQ[i], obtenerIvaInversiones, assumpFinancierasData)
+
+          capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + (resultado) : (resultado)
+        } else {
+          capexQData[0].capexQ[i].años[j][month] = { volMeses: 0 }
+          capexQData[0].capexQ[i].años[j].cobrado[month] = agregarCobranzaServicios(month, j, cobranzaGrupoInversiones, capexQData[0].capexQ[i], obtenerIvaInversiones, assumpFinancierasData)
+
+          capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + 0 : 0
+        }
+      }
+    }
+  }
+
+  // de capexQData creo la propiedad let gastosAnualesInversiones que sera la suma de todos los volMeses de cada mes de cada año multiplicado por el IVA
+  let gastosAnualesInversiones = []
+  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
+    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
+      for (let month in capexQData[0].capexQ[i].años[j]) {
+        // si es un mes del año entonces obtengo su propiedad .volMeses, le calculo el IVA y lo sumo a gastosAnuales
+        if (MONTHS.includes(month)) {
+          gastosAnualesInversiones[j] = gastosAnualesInversiones[j] ? gastosAnualesInversiones[j] + (capexQData[0].capexQ[i].años[j][month].volMeses * (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1)) : (capexQData[0].capexQ[i].años[j][month].volMeses * (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1))
+        }
+      }
+    }
+  }
+
+  // de capexQData creo la propiedad let gastosAnualesPagadosInversiones que sera la suma de todos los cobrado de cada mes de cada año
+  let gastosAnualesPagadosInversiones = []
+  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
+    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
+      for (let month in capexQData[0].capexQ[i].años[j].cobrado) {
+        gastosAnualesPagadosInversiones[j] = gastosAnualesPagadosInversiones[j] ? gastosAnualesPagadosInversiones[j] + (capexQData[0].capexQ[i].años[j].cobrado[month]) : (capexQData[0].capexQ[i].años[j].cobrado[month])
+      }
+    }
+  }
+
+  // de capexQData creo la propiedad let gastosAnualesPorPagarInversiones que sera la resta de gastosAnualesInversiones - gastosAnualesPagadosInversiones
+  let gastosAnualesPorPagarInversiones = []
+  for (let i = 0; i < gastosAnualesInversiones.length; i++) {
+    gastosAnualesPorPagarInversiones.push(gastosAnualesInversiones[i] - gastosAnualesPagadosInversiones[i])
+  }
+
+
+
+  console.log('gastosAnualesPagadosInversiones: ', gastosAnualesPagadosInversiones)
+  console.log('gastosAnualesPorPagarInversiones: ', gastosAnualesPorPagarInversiones)
+  console.log('gastosAnualesInversiones: ', gastosAnualesInversiones)
+  console.log('capexQData: ', capexQData)
+
+
+
   console.log('costos: ', costos)
-  console.log('gastosPagadosAnuales: ', gastosPagadosAnuales)
+
+  // parte 1 //
+  console.log('gastosPorPagarAnualesProducto: ', gastosPorPagarAnualesProducto)
+  // parte 2 //
+  console.log('gastosPorPagarAnualesServicios: ', gastosPorPagarAnualesServicios)
 }
