@@ -1,18 +1,18 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+import MySpinner from 'components/shared/loaders/MySpinner';
 import {
     Button,
     FormContainer,
     FormItem,
     Input,
     Tooltip,
-  } from 'components/ui';
-  import { useEffect , useState, createContext} from 'react';
+} from 'components/ui';
+import { createContext, useEffect, useState } from 'react';
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
 import { useDispatch, useSelector } from 'react-redux';
-import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import { createPyL, getPyLInfo } from 'services/Requests';
-import MySpinner from 'components/shared/loaders/MySpinner';
 import { addResult } from 'store/netoResult/netoResultSlice';
+import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 
 const impGanancias = 20 
   function TablePyL(props) {
@@ -186,7 +186,8 @@ const impGanancias = 20
         if (EBITDA) {
             let resultado = [];
             for (let i = 0; i < EBITDA.length; i++) {
-                resultado.push(Number.isNaN(EBITDA[i] / vtasTot[i]) ? 0 : EBITDA[i] / vtasTot[i])
+                resultado.push(Number.isNaN(EBITDA[i] / vtasTot[i]) || 
+                !Number.isFinite(EBITDA[i] / vtasTot[i]) ? 0 : EBITDA[i] / vtasTot[i])
             }
              setEBITDAPorcentaje(resultado)
         }
@@ -197,7 +198,7 @@ const impGanancias = 20
         if (EBITDA && amortizaciones) {
             let resultado = [];
             for (let i = 0; i < EBITDA.length; i++) {
-                resultado.push(EBITDA[i] - amortizaciones[i])
+                resultado.push(Number.isNaN(EBITDA[i] - amortizaciones[i]) ? 0 : EBITDA[i] - amortizaciones[i])
             }
              setEBIT(resultado)
         }
@@ -219,7 +220,7 @@ const impGanancias = 20
         if (EBIT && intereses) {
             let resultado = [];
             for (let i = 0; i < EBIT.length; i++) {
-                resultado.push(EBIT[i] - intereses[i])
+                resultado.push(Number.isNaN(EBIT[i] - intereses[i]) ? 0 : EBIT[i] - intereses[i])
             }
              setBAT(resultado)
         }
@@ -254,7 +255,8 @@ const impGanancias = 20
         if (rdoNeto && vtasTot) {
             let resultado = [];
             for (let i = 0; i < rdoNeto.length; i++) {
-                resultado.push(Number.isNaN(rdoNeto[i] / vtasTot[i]) ? 0 : rdoNeto[i] / vtasTot[i])
+                resultado.push(Number.isNaN(rdoNeto[i] / vtasTot[i]) || !Number.isFinite(rdoNeto[i] / vtasTot[i]) 
+                ? 0 : rdoNeto[i] / vtasTot[i])
             }
              setRNPorcentaje(resultado)
              setTimeout(() => {
