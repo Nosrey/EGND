@@ -426,6 +426,9 @@ export const calcularCreditosPorVentas = (data, creditosVentas, setCreditosVenta
   // las ventasMesX se obtendran asi: ventasMesX = (volMesX * precioMesX)
   // primero usare getUser
 
+  // creo un array de 10 años y cada año con los 12 meses
+  let ivasGrupo = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
   function obtenerIva(assumpFinancierasData) {
     // obtendre el Iva de assumpFinancierasData
     let iva = 0;
@@ -805,6 +808,8 @@ export const calcularCreditosPorVentas = (data, creditosVentas, setCreditosVenta
   }
 
   let creditos = []
+  let ivaDeVentas = []
+
   const { volumenData, precioData, assumpFinancierasData } = data;
   let ventas = showMultiplicacionPxQ(volumenData, precioData);
   let cobranzasGrupo = assumpFinancierasData[0]?.cobranzas
@@ -848,6 +853,8 @@ export const calcularCreditosPorVentas = (data, creditosVentas, setCreditosVenta
               vol: ventas[i].stats[x].productos[j].años[t].volMeses[month],
               volConIva: ventas[i].stats[x].productos[j].años[t].volMeses[month] * (obtenerIva(assumpFinancierasData) / 100 + 1),
             }
+            // agrego a ivasGrupo su valor actual + el valor de (ventas[i].stats[x].productos[j].años[t].volMeses[month] * (obtenerIva(assumpFinancierasData) / 100)) para cada mes en cada año
+            ivasGrupo[t][month] = Number(ivasGrupo[t][month]) + Number((ventas[i].stats[x].productos[j].años[t].volMeses[month] * (obtenerIva(assumpFinancierasData) / 100)))
           }
           // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
           ventas[i].stats[x].productos[j].años[t].cobradoAnual = 0;
@@ -864,6 +871,7 @@ export const calcularCreditosPorVentas = (data, creditosVentas, setCreditosVenta
       }
     }
   }
+
   setCreditosVentas(creditos)
 
 }
@@ -1436,6 +1444,10 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
 
   const { volumenData, precioData, assumpFinancierasData, costoData, gastosPorCCData, capexPData, capexQData } = data;
 
+  let ivasGrupoProductos = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
+  let ivasGruposServicios = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
   function obtenerIva(assumpFinancierasData) {
     // obtendre el Iva de assumpFinancierasData
     let iva = 0;
@@ -1463,7 +1475,6 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
   }
 
   let compras = comprasProductos(data, stockInicialUser, obtenerIva)
-
 
 
   function agregarCobranza(mes, año, cobranzasGrupo, productosLista, obtenerIva, assumpFinancierasData) {
@@ -1883,6 +1894,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
               costos[i].stats[x].productos[j].años[t].cobroDeProducto[month] = {
                 cobrado: agregarCobranza(month, t, cobranzasGrupo, costos[i].stats[x].productos[j], obtenerIva, assumpFinancierasData),
               }
+              ivasGrupoProductos[t][month] = Number(ivasGrupoProductos[t][month]) + Number((costos[i].stats[x].productos[j].años[t].compras[month] * (obtenerIva(assumpFinancierasData) / 100)))
             }
             // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
             costos[i].stats[x].productos[j].años[t].cobradoAnual = 0;
@@ -2569,8 +2581,13 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
     resultadoGastosAnualesPorPagar.push(gastosPorPagarAnualesProducto[i] + gastosPorPagarAnualesServicios[i] + gastosAnualesPorPagarInversiones[i])
   }
 
-  console.log('resultadoGastosAnualesPorPagar: ', resultadoGastosAnualesPorPagar)
-
   setDeudasComerciales(resultadoGastosAnualesPorPagar)
+
+  console.log('costos', costos)
+  console.log('ivasGrupoProductos: ', ivasGrupoProductos)
+
   return resultadoGastosAnualesPorPagar
+}
+
+export const calcularDeudasFiscales = () => {
 }
