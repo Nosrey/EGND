@@ -230,7 +230,8 @@ const impGanancias = 20
         if (BAT && impGanancias) {
             let resultado = [];
             for (let i = 0; i < BAT.length; i++) {
-                const valor = BAT > 0 ? (BAT[i] * impGanancias / 100) : 0;
+                const batParticular = BAT[i]
+                const valor = batParticular > 0 ? (batParticular * impGanancias / 100) : 0;
                 resultado.push(valor)
             }
             setIIGG(resultado)
