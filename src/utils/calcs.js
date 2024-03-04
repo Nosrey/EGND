@@ -874,6 +874,8 @@ export const calcularCreditosPorVentas = (data, creditosVentas, setCreditosVenta
 
   setCreditosVentas(creditos)
 
+  return ivasGrupo
+
 }
 
 export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
@@ -1241,9 +1243,9 @@ export const calcularbienesDeUso = (data, setBienesDeUso) => {
 
 
 
-export const comprasProductos = (data, stockInicialUser, obtenerIva) => {
+export const comprasProductos = (data, obtenerIva) => {
   // lo vuelvo numero de serlo, si no lo cambio a 0
-  stockInicialUser = Number(stockInicialUser) || 0
+
 
   let costosFinal = []
   const { volumenData, costoData, assumpFinancierasData } = data;
@@ -1440,13 +1442,15 @@ export const comprasProductos = (data, stockInicialUser, obtenerIva) => {
 
 }
 
-export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComerciales) => {
+export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
 
   const { volumenData, precioData, assumpFinancierasData, costoData, gastosPorCCData, capexPData, capexQData } = data;
 
-  let ivasGrupoProductos = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+  let ivasCostosGrupoProductos = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
 
-  let ivasGruposServicios = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+  let ivasCostosGruposServicios = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
+  let ivasCostosGruposInversiones = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
 
   function obtenerIva(assumpFinancierasData) {
     // obtendre el Iva de assumpFinancierasData
@@ -1474,7 +1478,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
     return 0;
   }
 
-  let compras = comprasProductos(data, stockInicialUser, obtenerIva)
+  comprasProductos(data, obtenerIva)
 
 
   function agregarCobranza(mes, año, cobranzasGrupo, productosLista, obtenerIva, assumpFinancierasData) {
@@ -1894,7 +1898,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
               costos[i].stats[x].productos[j].años[t].cobroDeProducto[month] = {
                 cobrado: agregarCobranza(month, t, cobranzasGrupo, costos[i].stats[x].productos[j], obtenerIva, assumpFinancierasData),
               }
-              ivasGrupoProductos[t][month] = Number(ivasGrupoProductos[t][month]) + Number((costos[i].stats[x].productos[j].años[t].compras[month] * (obtenerIva(assumpFinancierasData) / 100)))
+              ivasCostosGrupoProductos[t][month] = Number(ivasCostosGrupoProductos[t][month]) + Number((costos[i].stats[x].productos[j].años[t].stockCalculos[month].consumo * (obtenerIva(assumpFinancierasData) / 100)))
             }
             // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
             costos[i].stats[x].productos[j].años[t].cobradoAnual = 0;
@@ -2045,6 +2049,8 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
                 ...deudasComercialesData[t][month],
                 costoServicios: deudasComercialesData[t][month].costoServicios ? Number(deudasComercialesData[t][month].costoServicios) + Number(costos[i].stats[x].productos[j].años[t].stockCalculos[month]) : Number(costos[i].stats[x].productos[j].años[t].stockCalculos[month]),
               }
+
+              ivasCostosGruposServicios[t][month] = Number(ivasCostosGruposServicios[t][month]) + Number((costos[i].stats[x].productos[j].años[t].stockCalculos[month] * (obtenerIvaServicios(assumpFinancierasData) / 100)))
             }
             for (let month in costos[i].stats[x].productos[j].años[t].comisionCalculos) {
               deudasComercialesData[t][month] = {
@@ -2531,6 +2537,7 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
           let P = capexPData[0].capexP[i].años[j].volMeses[month]
           let resultado = P * Q
           capexQData[0].capexQ[i].años[j][month] = { volMeses: resultado }
+          ivasCostosGruposInversiones[j][month] = Number(ivasCostosGruposInversiones[j][month]) + (resultado * (obtenerIvaInversiones(assumpFinancierasData) / 100))
 
           capexQData[0].capexQ[i].años[j].cobrado[month] = agregarCobranzaServicios(month, j, cobranzaGrupoInversiones, capexQData[0].capexQ[i], obtenerIvaInversiones, assumpFinancierasData)
 
@@ -2583,11 +2590,43 @@ export const calcularDeudasComerciales = (data, stockInicialUser, setDeudasComer
 
   setDeudasComerciales(resultadoGastosAnualesPorPagar)
 
-  console.log('costos', costos)
-  console.log('ivasGrupoProductos: ', ivasGrupoProductos)
+  // sumo los 3 grupos de ivas en un grupo (son 10 años con 12 meses cada uno)
+  let ivasCostosGrupoTotal = []
+  for (let i = 0; i < ivasCostosGrupoProductos.length; i++) {
+    // recorro cada año
+    ivasCostosGrupoTotal[i] = {}
+    for (let month in ivasCostosGrupoProductos[i]) {
+      ivasCostosGrupoTotal[i][month] = ivasCostosGrupoProductos[i][month] + ivasCostosGruposServicios[i][month] + ivasCostosGruposInversiones[i][month]
+    }
+  }
 
-  return resultadoGastosAnualesPorPagar
+  return ivasCostosGrupoTotal
 }
 
-export const calcularDeudasFiscales = () => {
+export const calcularDeudasFiscales = (ivasDF, ivasCF) => {
+  // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
+  let resultado = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, {SAF: 0, SAP: 0}])))
+
+  // recorro resultado año a año y mes a mes
+  for (let i = 0; i < resultado.length; i++) {
+    for (let month in resultado[i]) {
+      // sumo los ivas de ambos grupos
+      let añoAnterior = i === 0 ? 0 : i - 1
+      let monthAnterior = month === 'enero' ? 'diciembre' : MONTHS[MONTHS.indexOf(month) - 1]
+      let restaAnterior
+
+      if (i === 0 && month === 'enero') restaAnterior = 0
+      else restaAnterior = resultado[añoAnterior][monthAnterior].SAF
+
+      let resta = Number(ivasDF[i][month]) - (Number(ivasCF[i][month]) + Number(restaAnterior))
+      // si resta es negativo lo asigno a resultado[i][month].SAF = resta
+      if (resta < 0) {
+        resultado[i][month].SAF = resta * -1
+      } else {
+        resultado[i][month].SAP = resta
+      }
+    }
+  }
+
+  console.log('resultado: ', resultado)
 }
