@@ -12,7 +12,7 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales } from 'utils/calcs';
 import { set } from 'lodash';
 
 function TableBalance(props) {
@@ -35,6 +35,7 @@ function TableBalance(props) {
     const [timeoutId, setTimeoutId] = useState(null);
 
     const currentState = useSelector((state) => state.auth.user);
+    const IIGG = useSelector((state) => state.tableBalanceResult);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
@@ -70,7 +71,6 @@ function TableBalance(props) {
         //    copy.cajaYBancosAlCierre = Number.isNaN(CyB) ? "0" : CyB.toString();
         setinputsValues(copy)
     }
-
 
     // ***************** ACORDION ******************
 
@@ -132,19 +132,29 @@ function TableBalance(props) {
     }, [props]);
 
     useEffect(() => {
-        if (updateBienesDeCambio) {
-            getUser(currentState.id)
-                .then((data) => {
-                    setTimeout(() => {
-                        setShowLoader(false)
-                    }, 4000);
-                    calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
-                    calcularDeudasComerciales(data, inputsValues.BienesDeCambio, setDeudasComerciales)
-                })
-                .catch((error) => console.error(error));
-            setUpdateBienesDeCambio(false)
-        }
-    }, [updateBienesDeCambio]);
+        const delayDebounceFn = setTimeout(() => {
+            if (updateBienesDeCambio) {
+                getUser(currentState.id)
+                    .then((data) => {
+                        setTimeout(() => {
+                            setShowLoader(false)
+                        }, 4000);
+                        // hago una copia profunda de Data
+                        let dataCopy = JSON.parse(JSON.stringify(data))
+                        let dataCopy2 = JSON.parse(JSON.stringify(data))
+                        let ivasDF = calcularCreditosPorVentas(dataCopy, creditosPorVentas, setCreditosPorVentas)
+
+                        calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
+                        let ivasCF = calcularDeudasComerciales(data, setDeudasComerciales)
+                        calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales)
+                    })
+                    .catch((error) => console.error(error));
+                setUpdateBienesDeCambio(false)
+            }
+        }, 3000); // 2 seconds delay
+
+        return () => clearTimeout(delayDebounceFn); // This will clear the timeout if the component is unmounted before the 2 seconds delay
+    }, [updateBienesDeCambio, IIGG]);
 
     useEffect(() => {
         getUser(currentState.id)
@@ -152,8 +162,11 @@ function TableBalance(props) {
                 setTimeout(() => {
                     setShowLoader(false)
                 }, 4000);
-                // calcularCreditosPorVentas(currentState.id, creditosPorVentas, setCreditosPorVentas)
                 calcularCreditosPorVentas(data, creditosPorVentas, setCreditosPorVentas)
+
+                // let ivasCF = calcularDeudasComerciales(data, setDeudasComerciales)
+                // calcularCreditosPorVentas(currentState.id, creditosPorVentas, setCreditosPorVentas)
+
                 calcularbienesDeUso(data, setBienesDeUso)
             })
             .catch((error) => console.error(error));
