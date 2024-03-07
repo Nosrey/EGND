@@ -6,6 +6,7 @@ import locale from './locale/localeSlice'
 import icon from './icon/iconSlice'
 import netoResult from './netoResult/netoResultSlice'
 import cajaYBcoCierre from './cajaYBcoCierre/cajaYBcoCierreSlice'
+import tableBalanceResult from './tableBalanceResult/tableBalanceResultSlice'
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
     icon,
     netoResult,
     cajaYBcoCierre,
+    tableBalanceResult,
     ...asyncReducers,
   })
   return combinedReducer(state, action)

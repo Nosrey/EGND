@@ -1852,7 +1852,6 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
 
   let creditos = []
 
-  // let ventas = showMultiplicacionPxQ(volumenData, precioData);
   let cobranzasGrupo = assumpFinancierasData[0]?.pagoProducto
   // recorro cada pais
   for (let i = 0; i < costos.length; i++) {
@@ -2603,9 +2602,10 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
   return ivasCostosGrupoTotal
 }
 
-export const calcularDeudasFiscales = (ivasDF, ivasCF) => {
+export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRenta, setDeudasFiscales) => {
+  const { volumenData, precioData, costoData } = data
   // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
-  let resultado = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, {SAF: 0, SAP: 0}])))
+  let resultado = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, { SAF: 0, SAP: 0 }])))
 
   // recorro resultado año a año y mes a mes
   for (let i = 0; i < resultado.length; i++) {
@@ -2628,5 +2628,116 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF) => {
     }
   }
 
-  console.log('resultado: ', resultado)
+  // obtengo el SAF y el SAP de cada año al obtener dichos valores del mes de diciembre y el final lo guardo en un objeto {SAF: x, SAP: x} en un array de los 10 años
+  let resultadosAnualesIVA = Array.from({ length: 10 }, () => ({ SAF: 0, SAP: 0 }))
+
+  for (let i = 0; i < resultado.length; i++) {
+    resultadosAnualesIVA[i].SAF = resultado[i].diciembre.SAF
+    resultadosAnualesIVA[i].SAP = resultado[i].diciembre.SAP
+  }
+
+  console.log('resultadosAnualesIVA: ', resultadosAnualesIVA)
+
+  // ventas sera una copia profunda de volumenData pero con la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
+  let ventas = JSON.parse(JSON.stringify(volumenData))
+  // dentro de cada mes agrego la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
+
+  // recorro volumenData
+  for (let i = 0; i < volumenData.length; i++) {
+    // recorro cada canal
+    for (let x = 0; x < volumenData[i].stats.length; x++) {
+      // recorro cada producto
+      for (let j = 0; j < volumenData[i].stats[x].productos.length; j++) {
+        // recorro cada año
+        for (let t = 0; t < volumenData[i].stats[x].productos[j].años.length; t++) {
+          // recorro volMeses usando MONTHS
+          for (let month in volumenData[i].stats[x].productos[j].años[t].volMeses) {
+            // agrego la propiedad .vendido a cada mes
+            ventas[i].stats[x].productos[j].años[t] = {
+              ...ventas[i].stats[x].productos[j].años[t],
+              vendido: {
+                ...ventas[i].stats[x].productos[j].años[t].vendido,
+                [month]: (volumenData[i].stats[x].productos[j].años[t].volMeses[month] * precioData[i].stats[x].productos[j].años[t].volMeses[month]) * (costoData[i].stats[x].productos[j].impuesto / 100)
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ahora creo un array de 10 años con 12 meses llamado impuestosSobreLaVenta que sera la suma de todos los .vendido de cada mes de cada año
+  let impuestosSobreLaVenta = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+  // recorro ventas
+  for (let i = 0; i < ventas.length; i++) {
+    // recorro cada canal
+    for (let x = 0; x < ventas[i].stats.length; x++) {
+      // recorro cada producto
+      for (let j = 0; j < ventas[i].stats[x].productos.length; j++) {
+        // recorro cada año
+        for (let t = 0; t < ventas[i].stats[x].productos[j].años.length; t++) {
+          // recorro volMeses usando MONTHS
+          for (let month in ventas[i].stats[x].productos[j].años[t].vendido) {
+            // si es un mes del año entonces obtengo su propiedad .vendido y lo sumo a impuestosSobreLaVenta
+            if (MONTHS.includes(month)) {
+              impuestosSobreLaVenta[t][month] += ventas[i].stats[x].productos[j].años[t].vendido[month]
+            }
+          }
+        }
+      }
+    }
+  }
+
+  let otrosImpuestos = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
+  // a cada mes le asigno como valor el valor de impuestosSobreLaVenta pero del mes anterior, si es por ejemplo enero entonces le asigno el valor de diciembre del año anterior, si es enero del año 0 entonces le asigno 0, si es febrero del año 0 entonces le asigno el valor de enero del año 0
+  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+    for (let month in impuestosSobreLaVenta[i]) {
+      let añoAnterior = i === 0 ? 0 : i - 1
+      let monthAnterior = month === 'enero' ? 'diciembre' : MONTHS[MONTHS.indexOf(month) - 1]
+      if (i === 0 && month === 'enero') otrosImpuestos[i][month] = 0
+      else otrosImpuestos[i][month] = impuestosSobreLaVenta[añoAnterior][monthAnterior]
+    }
+  }
+  // vuelvo a recorrerlo y ahora tomo en cuenta que para diciembre unicamente le agrego el valor de impuestosSobreLaRenta y hago la misma logica de antes
+  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+    for (let month in impuestosSobreLaVenta[i]) {
+      if (month === 'enero' && i !== 0) {
+        let añoAnterior = i - 1
+        otrosImpuestos[i][month] += impuestosSobreLaRenta[añoAnterior]
+      }
+    }
+  }
+
+  let pagoOtrosImpuestos = []
+  // sumo los 12 meses de cada año y el valor resultante lo guardo en un array de 10 años en pagoOtrosImpuestos
+  for (let i = 0; i < otrosImpuestos.length; i++) {
+    let suma = 0
+    for (let month in otrosImpuestos[i]) {
+      suma += otrosImpuestos[i][month]
+    }
+    pagoOtrosImpuestos.push(suma)
+  }
+
+  let pendienteOtrosImpuestos = []
+  // obtengo el valor de impuestosSobreLaVenta de Diciembre de cada año y lo sumo al vañor de impuestosSobreLaRenta de ese indice y lo coloco en pendienteOtrosImpuestos
+  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+    pendienteOtrosImpuestos.push(impuestosSobreLaVenta[i].diciembre + impuestosSobreLaRenta[i])
+  }
+
+  let totalPendienteImpuestos = []
+
+  // sumo en un array de 10 el vañor de pendienteOtrosImpuestos[x] y el valor de resultadosAnualesIVA[x].SAP
+  for (let i = 0; i < pendienteOtrosImpuestos.length; i++) {
+    totalPendienteImpuestos.push(pendienteOtrosImpuestos[i] + resultadosAnualesIVA[i].SAP)
+  }
+
+  console.log('totalPendienteImpuestos: ', totalPendienteImpuestos)
+  console.log('otrosImpuestos: ', otrosImpuestos)
+  console.log('pendienteOtrosImpuestos: ', pendienteOtrosImpuestos)
+  console.log('impuestosSobreLaVenta: ', impuestosSobreLaVenta)
+  console.log('impuestosSobreLaRenta: ', impuestosSobreLaRenta)
+
+  setDeudasFiscales(totalPendienteImpuestos)
+
 }
