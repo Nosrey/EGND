@@ -2602,7 +2602,7 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
   return ivasCostosGrupoTotal
 }
 
-export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRenta, setDeudasFiscales) => {
+export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRenta, setDeudasFiscales, setShowLoader) => {
   const { volumenData, precioData, costoData } = data
   // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
   let resultado = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, { SAF: 0, SAP: 0 }])))
@@ -2739,5 +2739,6 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRen
   console.log('impuestosSobreLaRenta: ', impuestosSobreLaRenta)
 
   setDeudasFiscales(totalPendienteImpuestos)
+  setShowLoader(false)
 
 }

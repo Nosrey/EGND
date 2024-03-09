@@ -131,37 +131,37 @@ function TableBalance(props) {
 
     }, [props]);
 
-    useEffect(() => {
-        const delayDebounceFn = setTimeout(() => {
-            if (updateBienesDeCambio) {
-                getUser(currentState.id)
-                    .then((data) => {
-                        setTimeout(() => {
-                            setShowLoader(false)
-                        }, 4000);
-                        // hago una copia profunda de Data
-                        let dataCopy = JSON.parse(JSON.stringify(data))
-                        let dataCopy2 = JSON.parse(JSON.stringify(data))
-                        let ivasDF = calcularCreditosPorVentas(dataCopy, creditosPorVentas, setCreditosPorVentas)
+     useEffect(() => {
+        if (updateBienesDeCambio && Array.isArray(IIGG) && IIGG.length > 1) {
+            setTimeout(() => {
+            const fetchData = async () => {
+                try {
+                    const data = await getUser(currentState.id);
+                    let dataCopy = JSON.parse(JSON.stringify(data))
+                    let dataCopy2 = JSON.parse(JSON.stringify(data))
+                    let ivasDF = await calcularCreditosPorVentas(dataCopy, creditosPorVentas, setCreditosPorVentas)
 
-                        calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
-                        let ivasCF = calcularDeudasComerciales(data, setDeudasComerciales)
-                        calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales)
-                    })
-                    .catch((error) => console.error(error));
-                setUpdateBienesDeCambio(false)
-            }
-        }, 3000); // 2 seconds delay
-
-        return () => clearTimeout(delayDebounceFn); // This will clear the timeout if the component is unmounted before the 2 seconds delay
+                    await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
+                    let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
+                    console.log('soy el IIGG de prueba: ', IIGG)
+                    await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            fetchData();
+            setUpdateBienesDeCambio(false)
+            // de seg y medio
+        }, 1500)
+        }
     }, [updateBienesDeCambio, IIGG]);
 
     useEffect(() => {
         getUser(currentState.id)
             .then((data) => {
-                setTimeout(() => {
-                    setShowLoader(false)
-                }, 4000);
+                // setTimeout(() => {
+                //     setShowLoader(false)
+                // }, 4000);
                 calcularCreditosPorVentas(data, creditosPorVentas, setCreditosPorVentas)
 
                 // let ivasCF = calcularDeudasComerciales(data, setDeudasComerciales)
@@ -207,18 +207,18 @@ function TableBalance(props) {
         // })
     }
 
-    useEffect(() => {
-        setShowLoader(false);
-        // getCashflowIndirectoInfo(currentState.id)
-        //   .then((data) => {
-        //     console.log(data)
-        //     if (data.length !==0) {
-        //         setinputsValues(data[0])
-        //     } 
+    // useEffect(() => {
+    //     setShowLoader(false);
+    //     // getCashflowIndirectoInfo(currentState.id)
+    //     //   .then((data) => {
+    //     //     console.log(data)
+    //     //     if (data.length !==0) {
+    //     //         setinputsValues(data[0])
+    //     //     } 
 
-        //   })
-        //   .catch((error) => console.error(error));
-    }, []);
+    //     //   })
+    //     //   .catch((error) => console.error(error));
+    // }, []);
 
     return (<>
         {showLoader ? (
