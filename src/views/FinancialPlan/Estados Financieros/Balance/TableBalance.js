@@ -143,7 +143,6 @@ function TableBalance(props) {
 
                     await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
                     let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
-                    console.log('soy el IIGG de prueba: ', IIGG)
                     await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
                 } catch (error) {
                     console.error(error);
