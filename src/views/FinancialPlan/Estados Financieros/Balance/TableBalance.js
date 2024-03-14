@@ -12,7 +12,7 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales } from 'utils/calcs';
 import { set } from 'lodash';
 
 function TableBalance(props) {
@@ -35,6 +35,7 @@ function TableBalance(props) {
     const [timeoutId, setTimeoutId] = useState(null);
 
     const currentState = useSelector((state) => state.auth.user);
+    const IIGG = useSelector((state) => state.tableBalanceResult);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
@@ -70,7 +71,6 @@ function TableBalance(props) {
         //    copy.cajaYBancosAlCierre = Number.isNaN(CyB) ? "0" : CyB.toString();
         setinputsValues(copy)
     }
-
 
     // ***************** ACORDION ******************
 
@@ -131,29 +131,41 @@ function TableBalance(props) {
 
     }, [props]);
 
-    useEffect(() => {
-        if (updateBienesDeCambio) {
-            getUser(currentState.id)
-                .then((data) => {
-                    setTimeout(() => {
-                        setShowLoader(false)
-                    }, 4000);
-                    calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
-                    calcularDeudasComerciales(data, inputsValues.BienesDeCambio, setDeudasComerciales)
-                })
-                .catch((error) => console.error(error));
+     useEffect(() => {
+        if (updateBienesDeCambio && Array.isArray(IIGG) && IIGG.length > 1) {
+            setTimeout(() => {
+            const fetchData = async () => {
+                try {
+                    const data = await getUser(currentState.id);
+                    let dataCopy = JSON.parse(JSON.stringify(data))
+                    let dataCopy2 = JSON.parse(JSON.stringify(data))
+                    let ivasDF = await calcularCreditosPorVentas(dataCopy, creditosPorVentas, setCreditosPorVentas)
+
+                    await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
+                    let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
+                    await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+            fetchData();
             setUpdateBienesDeCambio(false)
+            // de seg y medio
+        }, 1500)
         }
-    }, [updateBienesDeCambio]);
+    }, [updateBienesDeCambio, IIGG]);
 
     useEffect(() => {
         getUser(currentState.id)
             .then((data) => {
-                setTimeout(() => {
-                    setShowLoader(false)
-                }, 4000);
-                // calcularCreditosPorVentas(currentState.id, creditosPorVentas, setCreditosPorVentas)
+                // setTimeout(() => {
+                //     setShowLoader(false)
+                // }, 4000);
                 calcularCreditosPorVentas(data, creditosPorVentas, setCreditosPorVentas)
+
+                // let ivasCF = calcularDeudasComerciales(data, setDeudasComerciales)
+                // calcularCreditosPorVentas(currentState.id, creditosPorVentas, setCreditosPorVentas)
+
                 calcularbienesDeUso(data, setBienesDeUso)
             })
             .catch((error) => console.error(error));
@@ -194,18 +206,18 @@ function TableBalance(props) {
         // })
     }
 
-    useEffect(() => {
-        setShowLoader(false);
-        // getCashflowIndirectoInfo(currentState.id)
-        //   .then((data) => {
-        //     console.log(data)
-        //     if (data.length !==0) {
-        //         setinputsValues(data[0])
-        //     } 
+    // useEffect(() => {
+    //     setShowLoader(false);
+    //     // getCashflowIndirectoInfo(currentState.id)
+    //     //   .then((data) => {
+    //     //     console.log(data)
+    //     //     if (data.length !==0) {
+    //     //         setinputsValues(data[0])
+    //     //     } 
 
-        //   })
-        //   .catch((error) => console.error(error));
-    }, []);
+    //     //   })
+    //     //   .catch((error) => console.error(error));
+    // }, []);
 
     return (<>
         {showLoader ? (
