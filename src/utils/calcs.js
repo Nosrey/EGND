@@ -2742,3 +2742,24 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRen
   setShowLoader(false)
 
 }
+
+export const calcularResultadosNoAsignados = (resultadosNoAsignadosInput, resultadosDelEjercicioInput, resultadosEjerciciosArray, setFinal) => {
+  // si resultadosNoAsignadosInput y resultadosDelEjercicioInput NO son numeros entonces sus valores seran 0
+  if (isNaN(resultadosNoAsignadosInput)) resultadosNoAsignadosInput = 0
+  if (isNaN(resultadosDelEjercicioInput)) resultadosDelEjercicioInput = 0
+  // hago un for de 10 elementos
+  let resultadosNoAsignados = []
+  for (let i = 0; i < 10; i++) {
+    if (i === 0) {
+      resultadosNoAsignados[i] = Number(resultadosNoAsignadosInput) + Number(resultadosDelEjercicioInput)
+    } else {
+      resultadosNoAsignados[i] = Number(resultadosEjerciciosArray[i - 1]) + Number(resultadosNoAsignados[i - 1])
+    }
+  }
+  console.log('resultadosNoAsignados: ', resultadosNoAsignados)
+  setFinal(resultadosNoAsignados)
+}
+
+export const calcularEquity = () => {
+  
+}
