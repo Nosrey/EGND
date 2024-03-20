@@ -4,7 +4,7 @@ export const netoResultSlice = createSlice({
   name: 'result',
   initialState: [],
   reducers: {
-    addIIGG: (state, action) => {
+    addCajaCierre: (state, action) => {
       // Clear the current state
       state.length = 0;
       // Add new items
@@ -13,6 +13,6 @@ export const netoResultSlice = createSlice({
   },
 })
 
-export const { addIIGG } = netoResultSlice.actions
+export const { addCajaCierre } = netoResultSlice.actions
 
 export default netoResultSlice.reducer

@@ -241,7 +241,7 @@ export const calculateMargenBrutoPorcentaje = (costoData, infoForm, volumenData)
 
     // Calcular el porcentaje de ganancia en relación con las ventas
     let porcentajeGanancia = (ganancia / ventas[i]) * 100;
-    resultado.push(Number.isNaN(redondearHaciaArribaConDosDecimales(porcentajeGanancia)) ? 0 :redondearHaciaArribaConDosDecimales(porcentajeGanancia) );
+    resultado.push(Number.isNaN(redondearHaciaArribaConDosDecimales(porcentajeGanancia)) ? 0 : redondearHaciaArribaConDosDecimales(porcentajeGanancia));
   }
   return resultado;
 }
@@ -2635,8 +2635,6 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRen
     resultadosAnualesIVA[i].SAP = resultado[i].diciembre.SAP
   }
 
-  console.log('resultadosAnualesIVA: ', resultadosAnualesIVA)
-
   // ventas sera una copia profunda de volumenData pero con la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
   let ventas = JSON.parse(JSON.stringify(volumenData))
   // dentro de cada mes agrego la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
@@ -2731,12 +2729,6 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRen
     totalPendienteImpuestos.push(pendienteOtrosImpuestos[i] + resultadosAnualesIVA[i].SAP)
   }
 
-  console.log('totalPendienteImpuestos: ', totalPendienteImpuestos)
-  console.log('otrosImpuestos: ', otrosImpuestos)
-  console.log('pendienteOtrosImpuestos: ', pendienteOtrosImpuestos)
-  console.log('impuestosSobreLaVenta: ', impuestosSobreLaVenta)
-  console.log('impuestosSobreLaRenta: ', impuestosSobreLaRenta)
-
   setDeudasFiscales(totalPendienteImpuestos)
   setShowLoader(false)
 
@@ -2755,10 +2747,29 @@ export const calcularResultadosNoAsignados = (resultadosNoAsignadosInput, result
       resultadosNoAsignados[i] = Number(resultadosEjerciciosArray[i - 1]) + Number(resultadosNoAsignados[i - 1])
     }
   }
-  console.log('resultadosNoAsignados: ', resultadosNoAsignados)
   setFinal(resultadosNoAsignados)
 }
 
-export const calcularEquity = () => {
-  
+export const calcularEquity = (array, setFinal, ResultadosNoAsignados, ResultadosDelEjercicio, setSuma) => {
+  let arrayFinal = []
+  console.log('ResultadosDelEjercicio: ', ResultadosDelEjercicio )
+
+  for (let i = 0; i < 10; i++) {
+    if (i === 0) {
+      arrayFinal[i] = (array[0] * -1) + (array[1] * -1)
+    } else {
+      arrayFinal[i] = arrayFinal[i - 1] + (array[i + 1] * -1)
+    }
+  }
+  setFinal(arrayFinal)
+
+  // sumo los 3 array de final, resultadosNoAsignados y resultadosDelEjercicio
+  let suma = []
+  for (let i = 0; i < 10; i++) {
+    // muestro los 3 valores y en i en un console.log
+    console.log('i: ', i, 'arrayFinal nro ' + i + ': ', arrayFinal[i], 'ResultadosNoAsignados nro ' + i + ': ', ResultadosNoAsignados[i], 'ResultadosDelEjercicio nro ' + i + ': ', ResultadosDelEjercicio[i])
+    suma[i] = Number(arrayFinal[i]) + Number(ResultadosNoAsignados[i]) + Number(ResultadosDelEjercicio[i])
+  }
+
+  setSuma(suma)
 }

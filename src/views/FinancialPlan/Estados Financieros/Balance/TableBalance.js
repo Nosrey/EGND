@@ -12,7 +12,7 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity } from 'utils/calcs';
 import { set } from 'lodash';
 
 function TableBalance(props) {
@@ -34,6 +34,7 @@ function TableBalance(props) {
     const [Equity, setEquity] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     const [ResultadosNoAsignados, setResultadosNoAsignados] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     const [ResultadosDelEjercicio, setResultadosDelEjercicio] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    const [totalPatrimonioNeto, setTotalPatrimonioNeto] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     const [updateBienesDeCambio, setUpdateBienesDeCambio] = useState(true);
     const [timeoutId, setTimeoutId] = useState(null);
@@ -42,6 +43,7 @@ function TableBalance(props) {
     const ResultadosDelEjercicioData = useSelector((state) => state.netoResult[0]);
 
     const IIGG = useSelector((state) => state.tableBalanceResult);
+    const cajaYBancosAlCierre = useSelector((state) => state.tableBalanceCajaCierre);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
@@ -56,6 +58,7 @@ function TableBalance(props) {
         deudasFinancieras: "0",
         otrasDeudas: "0",
         totPasivo: "0",
+        ResultadosNoAsignados: "0",
     });
 
     const handleChangeInputs = (key, value) => {
@@ -138,7 +141,7 @@ function TableBalance(props) {
     }, [props]);
 
     useEffect(() => {
-        if (updateBienesDeCambio && Array.isArray(IIGG) && IIGG.length > 1) {
+        if (updateBienesDeCambio && Array.isArray(IIGG) && IIGG.length > 1 && Array.isArray(cajaYBancosAlCierre) && cajaYBancosAlCierre.length > 1) {
             setTimeout(() => {
                 const fetchData = async () => {
                     try {
@@ -150,6 +153,7 @@ function TableBalance(props) {
                         await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
                         let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
                         await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
+                        await calcularEquity(cajaYBancosAlCierre, setEquity, ResultadosDelEjercicioData, ResultadosNoAsignados, setTotalPatrimonioNeto)
                     } catch (error) {
                         console.error(error);
                     }
@@ -181,7 +185,6 @@ function TableBalance(props) {
     useEffect(() => {
         setTimeout(() => {
             if (ResultadosDelEjercicioData?.length) {
-                console.log('hola entre')
                 calcularResultadosNoAsignados(inputsValues.ResultadosNoAsignados, inputsValues.ResultadosDelEjercicio, ResultadosDelEjercicioData, setResultadosNoAsignados)
             }
         }, 1500)
@@ -1219,8 +1222,8 @@ function TableBalance(props) {
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={inputsValues.totPasivo}
-                                                onChange={(e) => handleChangeInputs('totPasivo', e.target.value)}
+                                                value={0}
+                                                // onChange={(e) => handleChangeInputs('totalPatrimonioNeto', e.target.value)}
                                                 name="initial"
                                                 disabled
                                                 prefix={currency}
@@ -1228,7 +1231,7 @@ function TableBalance(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {totPasivo.map((año, indexYear) => (
+                                    {totalPatrimonioNeto.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
