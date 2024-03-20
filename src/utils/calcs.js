@@ -7,7 +7,6 @@
 /* eslint-disable prefer-destructuring */
 
 import { MONTHS, optionsBienes } from 'constants/forms.constants';
-import { getUser } from 'services/Requests';
 
 
 export const redondearHaciaArribaConDosDecimales = (numero) => {
@@ -242,7 +241,7 @@ export const calculateMargenBrutoPorcentaje = (costoData, infoForm, volumenData)
 
     // Calcular el porcentaje de ganancia en relación con las ventas
     let porcentajeGanancia = (ganancia / ventas[i]) * 100;
-    resultado.push(redondearHaciaArribaConDosDecimales(porcentajeGanancia));
+    resultado.push(Number.isNaN(redondearHaciaArribaConDosDecimales(porcentajeGanancia)) ? 0 :redondearHaciaArribaConDosDecimales(porcentajeGanancia) );
   }
   return resultado;
 }
