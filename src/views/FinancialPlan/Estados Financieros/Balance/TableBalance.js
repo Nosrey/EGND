@@ -16,7 +16,7 @@ import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPor
 import { set } from 'lodash';
 
 function TableBalance(props) {
-
+    const [cebo, setCebo] = useState(0);
     const [showLoader, setShowLoader] = useState(true);
     const [creditosPorVentas, setCreditosPorVentas] = useState([]);
     const [creditosFiscales, setCreditosFiscales] = useState([]);
@@ -28,7 +28,7 @@ function TableBalance(props) {
     const [deudasComerciales, setDeudasComerciales] = useState([]);
     const [deudasFiscales, setDeudasFiscales] = useState([]);
     const [deudasFinancieras, setDeudasFinancieras] = useState([]);
-    const [otrasDeudas, setOtrasDeudas] = useState([]);
+    const [otrasDeudas, setOtrasDeudas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     const [totPasivo, setTotPasivo] = useState([]);
 
     const [Equity, setEquity] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -152,14 +152,16 @@ function TableBalance(props) {
 
                         await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
                         let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
-                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
-                        await calcularEquity(cajaYBancosAlCierre, setEquity, ResultadosDelEjercicioData, ResultadosNoAsignados, setTotalPatrimonioNeto)
+                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setCebo)
+                        await calcularEquity(cajaYBancosAlCierre, setEquity, ResultadosDelEjercicioData, ResultadosNoAsignados, setTotalPatrimonioNeto, setShowLoader)
                     } catch (error) {
                         console.error(error);
                     }
                 };
                 fetchData();
-                setUpdateBienesDeCambio(false)
+                // setTimeout(() => {
+                //     setUpdateBienesDeCambio(false)
+                // }, 1000)
                 // de seg y medio
             }, 1500)
         }

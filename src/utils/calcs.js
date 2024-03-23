@@ -2750,9 +2750,9 @@ export const calcularResultadosNoAsignados = (resultadosNoAsignadosInput, result
   setFinal(resultadosNoAsignados)
 }
 
-export const calcularEquity = (array, setFinal, ResultadosNoAsignados, ResultadosDelEjercicio, setSuma) => {
+export const calcularEquity = (array, setFinal, ResultadosNoAsignados, ResultadosDelEjercicio, setSuma, setShowLoader) => {
   let arrayFinal = []
-  console.log('ResultadosDelEjercicio: ', ResultadosDelEjercicio )
+  console.log('ResultadosDelEjercicio: ', ResultadosDelEjercicio)
 
   for (let i = 0; i < 10; i++) {
     if (i === 0) {
@@ -2772,4 +2772,5 @@ export const calcularEquity = (array, setFinal, ResultadosNoAsignados, Resultado
   }
 
   setSuma(suma)
+  setShowLoader(false)
 }
