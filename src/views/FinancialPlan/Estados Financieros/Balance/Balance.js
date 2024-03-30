@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableBalance from './TableBalance';
 import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
+import Prestamos from '../../Prestamos/Prestamos';
 
 function Balance() {
   // const rn = useContext(MiContexto);
@@ -37,6 +38,7 @@ function Balance() {
         </Alert>
       )}
       <div className='oculto'>
+        <Prestamos />
         <CashflowIndirecto />
       </div>
       <div />

@@ -2627,7 +2627,7 @@ export const calcularDeudasFiscales = (ivasDF, ivasCF, data, impuestosSobreLaRen
     }
   }
 
-  // obtengo el SAF y el SAP de cada año al obtener dichos valores del mes de diciembre y el final lo guardo en un objeto {SAF: x, SAP: x} en un array de los 10 años
+  // obtengo el SAF y el SAP de cada año al obtener dichos valores del mes de diciembre y el prestamoscalculados lo guardo en un objeto {SAF: x, SAP: x} en un array de los 10 años
   let resultadosAnualesIVA = Array.from({ length: 10 }, () => ({ SAF: 0, SAP: 0 }))
 
   for (let i = 0; i < resultado.length; i++) {
@@ -2752,7 +2752,6 @@ export const calcularResultadosNoAsignados = (resultadosNoAsignadosInput, result
 
 export const calcularEquity = (array, setFinal, ResultadosNoAsignados, ResultadosDelEjercicio, setSuma, setShowLoader) => {
   let arrayFinal = []
-  console.log('ResultadosDelEjercicio: ', ResultadosDelEjercicio)
 
   for (let i = 0; i < 10; i++) {
     if (i === 0) {
@@ -2766,11 +2765,117 @@ export const calcularEquity = (array, setFinal, ResultadosNoAsignados, Resultado
   // sumo los 3 array de final, resultadosNoAsignados y resultadosDelEjercicio
   let suma = []
   for (let i = 0; i < 10; i++) {
-    // muestro los 3 valores y en i en un console.log
-    console.log('i: ', i, 'arrayFinal nro ' + i + ': ', arrayFinal[i], 'ResultadosNoAsignados nro ' + i + ': ', ResultadosNoAsignados[i], 'ResultadosDelEjercicio nro ' + i + ': ', ResultadosDelEjercicio[i])
     suma[i] = Number(arrayFinal[i]) + Number(ResultadosNoAsignados[i]) + Number(ResultadosDelEjercicio[i])
   }
 
   setSuma(suma)
+  setShowLoader(false)
+}
+
+const calcCapitalMensual = (monto, tasaAnual, plazo) =>
+  calcPagoMensual(monto, tasaAnual, plazo) -
+  calcInteresMensual(monto, tasaAnual, plazo) || 0;
+
+export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
+  let prestamoscalculados = []
+  for (let i = 0; i < prestamos.length; i++) {
+    prestamoscalculados[i] = {
+      titulo: (prestamos[i]?.titulo ? prestamos[i]?.titulo : ''),
+      monto: (prestamos[i]?.monto ? prestamos[i]?.monto : 0),
+      plazo: (prestamos[i]?.plazo ? prestamos[i]?.plazo : 0),
+      tasaAnual: (prestamos[i]?.tasaAnual ? prestamos[i]?.tasaAnual : 0),
+      mesInicio: (prestamos[i]?.mesInicio ? prestamos[i]?.mesInicio : 0),
+      yearInicio: (prestamos[i]?.yearInicio ? prestamos[i]?.yearInicio : 0),
+      // calcTasaMensual(cta.tasaAnual)
+      tasaMensual: (prestamos[i]?.tasaAnual ? calcTasaMensual(prestamos[i]?.tasaAnual) : 0),
+      // calcPagoMensual(cta.monto, cta.tasaAnual, cta.plazo),
+      pagoMensual: (prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo ? calcPagoMensual(prestamos[i]?.monto, prestamos[i]?.tasaAnual, prestamos[i]?.plazo) : 0),
+      // calcCapitalMensual(cta.monto, cta.tasaAnual, cta.plazo,),
+      capitalMensual: (prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo ? calcCapitalMensual(prestamos[i]?.monto, prestamos[i]?.tasaAnual, prestamos[i]?.plazo) : 0),
+      interesMensual: (prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo ? calcInteresMensual(prestamos[i]?.monto, prestamos[i]?.tasaAnual, prestamos[i]?.plazo) : 0),
+      // calcInteresTotal(cta.monto, cta.tasaAnual, cta.plazo),
+      interesTotal: (prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo ? calcInteresTotal(prestamos[i]?.monto, prestamos[i]?.tasaAnual, prestamos[i]?.plazo) : 0),
+      capInt: (prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo ? calcCapInt(prestamos[i]?.monto, prestamos[i]?.tasaAnual, prestamos[i]?.plazo) : 0),
+    }
+  }
+
+  // creo un array de 10 años con 12 meses llamado prestamos
+  let prestamosArray = Array.from({ length: 10 }, () => Object.fromEntries(MONTHS.map(month => [month, 0])))
+
+  // recorro prestamoscalculados que es donde estan los prestamos y reviso su propiedad .mesInicio, .yearInicio y .monto para saber en que mes y año comienzan y los agrego a prestamosArray en la propiedad .ingreso tomando el .monto
+  for (let i = 0; i < prestamoscalculados.length; i++) {
+    // en minuscula
+    let mesInicio = prestamoscalculados[i].mesInicio.toLowerCase()
+    let yearInicio = Number(prestamoscalculados[i].yearInicio)
+    let monto = Number(prestamoscalculados[i].monto)
+    let plazo = Number(prestamoscalculados[i].plazo)
+    let capitalMensual = Number(prestamoscalculados[i].capitalMensual)
+    let interesMensual = Number(prestamoscalculados[i].interesMensual)
+    let pagoMensual = Number(prestamoscalculados[i].pagoMensual)
+
+    // recorro los 10 años
+    for (let j = 0; j < 10; j++) {
+      // si el año es igual al año de inicio entonces agrego el monto a prestamosArray
+      if (j === yearInicio) {
+        prestamosArray[j][mesInicio] = { ...prestamosArray[j][mesInicio], ingreso: prestamosArray[j][mesInicio].ingreso ? prestamosArray[j][mesInicio].ingreso + monto : monto }
+      }
+
+    }
+
+    // ubicado en el mes siguiente al mes de inicio agrego la propiedad pagoCapital a prestamosArray con el valor de capitalMensual la cantidad de veces igual a plazo
+    let mesInicioUbicado = MONTHS.indexOf(mesInicio)
+    let añoTemp = yearInicio
+    for (let j = 0; j < plazo; j++) {
+      mesInicioUbicado += 1
+      if (mesInicioUbicado >= MONTHS.length) {
+        mesInicioUbicado = 0
+        añoTemp += 1
+      }
+      if (añoTemp < 10) {
+        let mes = MONTHS[mesInicioUbicado]
+        prestamosArray[añoTemp][mes] = {
+          ...prestamosArray[añoTemp][mes],
+          pagoCapital: prestamosArray[añoTemp][mes].pagoCapital ? prestamosArray[añoTemp][mes].pagoCapital + capitalMensual : capitalMensual,
+
+          pagoIntereses: prestamosArray[añoTemp][mes].pagoIntereses ? prestamosArray[añoTemp][mes].pagoIntereses + interesMensual : interesMensual,
+
+          pagos: prestamosArray[añoTemp][mes].pagos ? prestamosArray[añoTemp][mes].pagos + pagoMensual : pagoMensual,
+        }
+      }
+      if (mesInicioUbicado === 0) console.log('estoy en enero y soy: ', prestamoscalculados[i].titulo, ' y el año es: ', añoTemp)
+    }
+  }
+
+  let prestamosAnuales = []
+  // en un objeto {} guardo el .pagoCapital, el .pagoIntereses y el .pagos de cada mes de cada año y lo sumo en un array de 10 años
+  for (let i = 0; i < prestamosArray.length; i++) {
+    let pagos = 0
+    let pagoCapital = 0
+    let pagoIntereses = 0
+    let ingresos = 0
+    for (let month in prestamosArray[i]) {
+      pagos += (prestamosArray[i][month].pagos ? prestamosArray[i][month].pagos : 0)
+      pagoCapital += (prestamosArray[i][month].pagoCapital ? prestamosArray[i][month].pagoCapital : 0)
+      pagoIntereses += (prestamosArray[i][month].pagoIntereses ? prestamosArray[i][month].pagoIntereses : 0)
+      ingresos += (prestamosArray[i][month].ingreso ? prestamosArray[i][month].ingreso : 0)
+    }
+    prestamosAnuales.push({ pagos, pagoCapital, pagoIntereses, ingresos })
+  }
+
+  let final = []
+  // para el primer elemento del array final, obtengo el .ingreso de ese año en prestamosAnuales y le resto el .pagoCapital de ese año en prestamosAnuales, para los demas elementos sumo el resultado de final anterior y aplico la misma logica
+  for (let i = 0; i < prestamosAnuales.length; i++) {
+    if (i === 0) {
+      final[i] = prestamosAnuales[i].ingresos - prestamosAnuales[i].pagoCapital
+    } else {
+      final[i] = final[i - 1] + (prestamosAnuales[i].ingresos - prestamosAnuales[i].pagoCapital)
+    }
+  }
+
+  console.log('prestamosArray: ', prestamosArray)
+  console.log('prestamosAnuales: ', prestamosAnuales)
+  console.log('final: ', final)
+
+  setFinal(final)
   setShowLoader(false)
 }

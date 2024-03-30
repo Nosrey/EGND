@@ -8,6 +8,7 @@ import netoResult from './netoResult/netoResultSlice'
 import cajaYBcoCierre from './cajaYBcoCierre/cajaYBcoCierreSlice'
 import tableBalanceResult from './tableBalanceResult/tableBalanceResultSlice'
 import tableBalanceCajaCierre from './tableBalanceCajaCierre/tableBalanceCajaCierreSlice'
+import tableBalancePrestamos from './tableBalancePrestamos/tableBalancePrestamosSlice'
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
     icon,
     netoResult,
     cajaYBcoCierre,
+    tableBalancePrestamos,
     tableBalanceResult,
     tableBalanceCajaCierre,
     ...asyncReducers,
