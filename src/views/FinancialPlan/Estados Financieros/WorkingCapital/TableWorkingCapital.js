@@ -11,8 +11,10 @@ import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createWorkingCapital, getWorkingCapitalInfo, getUser } from 'services/Requests';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularDeudasFiscales, calcularDeudasComerciales } from 'utils/calcs';
+import MySpinner from 'components/shared/loaders/MySpinner';
 
 function TableWorkingCapital(props) {
+    const [showLoader, setShowLoader] = useState(true);
     const [creditosVentas, setCreditosVentas] = useState([]);
     const [bienesDeCambio, setBienesDeCambio] = useState([]);
     const [updateBienesDeCambio, setUpdateBienesDeCambio] = useState(true);
@@ -64,7 +66,7 @@ function TableWorkingCapital(props) {
                     calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.bienesDeCambio)
                 })
                 .catch((error) => console.error(error));
-            setUpdateBienesDeCambio(false)
+            // setUpdateBienesDeCambio(false)
         }
     }, [updateBienesDeCambio]);
 
@@ -87,9 +89,9 @@ function TableWorkingCapital(props) {
             let resultado = [];
             for (let i = 0; i < 11; i++) {
                 if (i === 0) {
-                    resultado.push(0)
+                    resultado.push(Number(inputsValues.creditosVentas) + Number(inputsValues.bienesDeCambio) - Number(inputsValues.deudasComerciales))
                 } else {
-                    resultado.push(creditosVentas[i - 1] + bienesDeCambio[i - 1] - deudasComerciales[i - 1])
+                    resultado.push(Number(creditosVentas[i - 1]) + Number(bienesDeCambio[i - 1]) - Number(deudasComerciales[i - 1]))
                 }
             }
             setPosicionAlCierre(resultado)
@@ -129,14 +131,16 @@ function TableWorkingCapital(props) {
 
                         await calcularBienesDeCambio(data, setCebo, 0)
                         let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales2)
-                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales2, setCebo)
+                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales2, setShowLoader)
 
                     } catch (error) {
                         console.error("algo fallo: ", error);
                     }
                 };
                 fetchData();
-                setUpdateBienesDeCambio(false)
+                setTimeout(() => {
+                    // setUpdateBienesDeCambio(false)
+                }, 1000)
                 // de seg y medio
             }, 1500)
         } else {
@@ -149,13 +153,13 @@ function TableWorkingCapital(props) {
         if (deudasFiscales2.length > 0 && deudasComerciales2.length > 0) {
             let resultado = [];
             for (let i = 0; i < 10; i++) {
-            resultado[i] = deudasFiscales2[i] + deudasComerciales2[i]
+                resultado[i] = deudasFiscales2[i] + deudasComerciales2[i]
 
-        }
-        setDeudasComerciales(resultado)
-        console.log('actualizado!!!: ', resultado)
-        console.log('deudasFiscales2: ', deudasFiscales2)
-        console.log('deudasComerciales2: ', deudasComerciales2)
+            }
+            setDeudasComerciales(resultado)
+            console.log('actualizado!!!: ', resultado)
+            console.log('deudasFiscales2: ', deudasFiscales2)
+            console.log('deudasComerciales2: ', deudasComerciales2)
         } else {
             console.log('fracase bro')
         }
@@ -202,338 +206,348 @@ function TableWorkingCapital(props) {
             })
             .catch((error) => console.error(error));
     }, []);
-    return (
-        <>
-            {
-                <FormContainer>
-                    <section className="contenedor pl-[25px] pr-[35px]">
+    return (<>
+        {showLoader ? (
+            <div style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }} >
+                <MySpinner />
 
-                        {/** *********** Créditos por Ventas  ************ */}
-                        <div
-                            className="flex  gap-x-3 gap-y-3  mb-6 "
-                        >
-                            <div className='iconDesplegable' />
-                            <FormItem className=" mb-1 w-[240px] mt-[49px]">
-                                <Input
-                                    disabled
-                                    type="text"
-                                    className="capitalize"
-                                    value='Créditos por Ventas'
-                                />
-                            </FormItem>
-                            <div className="flex flex-col" >
-                                <div className="titleRow w-[130px]">
-                                    <p className="cursor-default"> Año 0</p>
-                                </div>
-                                <FormItem
-                                    className="mb-0"
+            </div>
+        ) :
+            (
+                <>
+                    {
+                        <FormContainer>
+                            <section className="contenedor pl-[25px] pr-[35px]">
+
+                                {/** *********** Créditos por Ventas  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <Input
-                                        className="w-[130px]"
-                                        type="text"
-                                        value={inputsValues.creditosVentas}
-                                        onChange={(e) => handleChangeInputs('creditosVentas', e.target.value)}
-                                        name="initial"
-                                        prefix='$'
+                                    <div className='iconDesplegable' />
+                                    <FormItem className=" mb-1 w-[240px] mt-[49px]">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize"
+                                            value='Créditos por Ventas'
+                                        />
+                                    </FormItem>
+                                    <div className="flex flex-col" >
+                                        <div className="titleRow w-[130px]">
+                                            <p className="cursor-default"> Año 0</p>
+                                        </div>
+                                        <FormItem
+                                            className="mb-0"
+                                        >
+                                            <Input
+                                                className="w-[130px]"
+                                                type="text"
+                                                value={inputsValues.creditosVentas}
+                                                onChange={(e) => handleChangeInputs('creditosVentas', e.target.value)}
+                                                name="initial"
+                                                prefix='$'
 
-                                    />
-                                </FormItem>
-                            </div>
-                            {creditosVentas.map((año, indexYear) => (
-                                <div className="flex flex-col" key={indexYear}>
-                                    <div className="titleRow w-[130px]">
-                                        <p className="cursor-default"> Año {indexYear + 1}</p>
+                                            />
+                                        </FormItem>
                                     </div>
-                                    <FormItem
-                                        className="mb-0"
-                                    >
-                                        {año.toString().length > 5 ? (
-                                            <Tooltip
-                                                placement="top-end"
-                                                title={currency + formatNumberPrestamos(año)}
+                                    {creditosVentas.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <div className="titleRow w-[130px]">
+                                                <p className="cursor-default"> Año {indexYear + 1}</p>
+                                            </div>
+                                            <FormItem
+                                                className="mb-0"
                                             >
-                                                <Input
-                                                    className="w-[130px] "
-                                                    type="text"
-                                                    value={formatNumberPrestamos(año)}
-                                                    name="year"
-                                                    disabled
-                                                    prefix={currency}
+                                                {año.toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] "
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
 
-                                                />
-                                            </Tooltip>
-                                        ) : (
-                                            <Input
-                                                className="w-[130px]"
-                                                type="text"
-                                                value={formatNumberPrestamos(año)}
-                                                name="year"
-                                                prefix={currency}
-                                                disabled
-                                            />
-                                        )}
-                                    </FormItem>
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px]"
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        prefix={currency}
+                                                        disabled
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-                        {/** *********** Bienes de Cambio  ************ */}
-                        <div
-                            className="flex  gap-x-3 gap-y-3  mb-6 "
-                        >
-                            <div className='iconDesplegable' />
-                            <FormItem className=" mb-1 w-[240px] mt-[0px]">
-                                <Input
-                                    disabled
-                                    type="text"
-                                    className="capitalize"
-                                    value='Bienes de Cambio'
-                                />
-                            </FormItem>
-                            <div className="flex flex-col" >
-
-                                <FormItem
-                                    className="mb-0"
+                                {/** *********** ****************  ************ */}
+                                {/** *********** Bienes de Cambio  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <Input
-                                        className="w-[130px]"
-                                        type="text"
-                                        value={inputsValues.bienesDeCambio}
-                                        onChange={(e) => handleBienesDeCambio(e.target.value)}
-                                        name="initial"
-                                        prefix='$'
+                                    <div className='iconDesplegable' />
+                                    <FormItem className=" mb-1 w-[240px] mt-[0px]">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize"
+                                            value='Bienes de Cambio'
+                                        />
+                                    </FormItem>
+                                    <div className="flex flex-col" >
 
-                                    />
-                                </FormItem>
-                            </div>
-                            {bienesDeCambio.map((año, indexYear) => (
-                                <div className="flex flex-col" key={indexYear}>
-                                    <FormItem
-                                        className="mb-0"
-                                    >
-                                        {año.toString().length > 5 ? (
-                                            <Tooltip
-                                                placement="top-end"
-                                                title={currency + formatNumberPrestamos(año)}
-                                            >
-                                                <Input
-                                                    className="w-[130px] "
-                                                    type="text"
-                                                    value={formatNumberPrestamos(año)}
-                                                    name="year"
-                                                    disabled
-                                                    prefix={currency}
-
-                                                />
-                                            </Tooltip>
-                                        ) : (
+                                        <FormItem
+                                            className="mb-0"
+                                        >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año)}
-                                                name="year"
-                                                prefix={currency}
-                                                disabled
+                                                value={inputsValues.bienesDeCambio}
+                                                onChange={(e) => handleBienesDeCambio(e.target.value)}
+                                                name="initial"
+                                                prefix='$'
+
                                             />
-                                        )}
-                                    </FormItem>
+                                        </FormItem>
+                                    </div>
+                                    {bienesDeCambio.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <FormItem
+                                                className="mb-0"
+                                            >
+                                                {año.toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] "
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
+
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px]"
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        prefix={currency}
+                                                        disabled
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
+                                {/** *********** ****************  ************ */}
 
-                        {/** *********** Deudas Comerciales  ************ */}
-                        <div
-                            className="flex  gap-x-3 gap-y-3  mb-6 "
-                        >
-                            <div className='iconDesplegable' />
-                            <FormItem className=" mb-1 w-[240px] mt-[0px]">
-                                <Input
-                                    disabled
-                                    type="text"
-                                    className="capitalize"
-                                    value='Deudas Comerciales'
-                                />
-                            </FormItem>
-                            <div className="flex flex-col" >
-
-                                <FormItem
-                                    className="mb-0"
+                                {/** *********** Deudas Comerciales  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <Input
-                                        className="w-[130px]"
-                                        type="text"
-                                        value={inputsValues.deudasComerciales}
-                                        onChange={(e) => handleChangeInputs('deudasComerciales', e.target.value)}
-                                        name="initial"
-                                        prefix='$'
+                                    <div className='iconDesplegable' />
+                                    <FormItem className=" mb-1 w-[240px] mt-[0px]">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize"
+                                            value='Deudas Comerciales'
+                                        />
+                                    </FormItem>
+                                    <div className="flex flex-col" >
 
-                                    />
-                                </FormItem>
-                            </div>
-                            {deudasComerciales.map((año, indexYear) => (
-                                <div className="flex flex-col" key={indexYear}>
-                                    <FormItem
-                                        className="mb-0"
-                                    >
-                                        {año.toString().length > 5 ? (
-                                            <Tooltip
-                                                placement="top-end"
-                                                title={currency + formatNumberPrestamos(año)}
-                                            >
-                                                <Input
-                                                    className="w-[130px] "
-                                                    type="text"
-                                                    value={formatNumberPrestamos(año)}
-                                                    name="year"
-                                                    disabled
-                                                    prefix={currency}
-
-                                                />
-                                            </Tooltip>
-                                        ) : (
+                                        <FormItem
+                                            className="mb-0"
+                                        >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año)}
-                                                name="year"
-                                                prefix={currency}
-                                                disabled
+                                                value={inputsValues.deudasComerciales}
+                                                onChange={(e) => handleChangeInputs('deudasComerciales', e.target.value)}
+                                                name="initial"
+                                                prefix='$'
+
                                             />
-                                        )}
-                                    </FormItem>
-                                </div>
-                            ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-
-                        {/** *********** Posición al Cierre  ************ */}
-                        <div
-                            className="flex  gap-x-3 gap-y-3  mb-6 "
-                        >
-                            <div className='iconDesplegable' />
-
-                            <FormItem className=" mb-1 w-[240px] ">
-                                <Input
-                                    disabled
-                                    type="text"
-                                    className="capitalize font-bold bg-blue-100"
-                                    value='Posición al Cierre'
-                                />
-                            </FormItem>
-                            {posicionAlCierre.map((año, indexYear) => (
-                                <div className="flex flex-col" key={indexYear}>
-                                    <FormItem
-                                        className="mb-0"
-                                    >
-                                        {Math.round(año).toString().length > 5 ? (
-                                            <Tooltip
-                                                placement="top-end"
-                                                title={currency + formatNumberPrestamos(año)}
+                                        </FormItem>
+                                    </div>
+                                    {deudasComerciales.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <FormItem
+                                                className="mb-0"
                                             >
-                                                <Input
-                                                    className="w-[130px] font-bold text-base"
-                                                    type="text"
-                                                    value={formatNumberPrestamos(año)}
-                                                    name="year"
-                                                    disabled
-                                                    prefix={currency}
-                                                />
-                                            </Tooltip>
-                                        ) : (
-                                            <Input
-                                                className="w-[130px] font-bold "
-                                                type="text"
-                                                value={formatNumberPrestamos(año)}
-                                                name="year"
-                                                disabled
-                                                prefix={currency}
-                                            />
-                                        )}
-                                    </FormItem>
+                                                {año.toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] "
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
+
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px]"
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        prefix={currency}
+                                                        disabled
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
+                                {/** *********** ****************  ************ */}
 
-                        {/** *********** Variación WC  ************ */}
-                        <div
-                            className="flex  gap-x-3 gap-y-3  mb-6 "
-                        >
-                            <div className='iconDesplegable' />
-                            <FormItem className=" mb-1 w-[240px] mt-[0px]">
-                                <Input
-                                    disabled
-                                    type="text"
-                                    className="capitalize"
-                                    value='Variación WC'
-                                />
-                            </FormItem>
-                            <div className="flex flex-col" >
 
-                                <FormItem
-                                    className="mb-0"
+                                {/** *********** Posición al Cierre  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <Input
-                                        className="w-[130px]"
-                                        type="text"
-                                        disabled
-                                        name="initial"
+                                    <div className='iconDesplegable' />
 
-                                    />
-                                </FormItem>
-                            </div>
-                            {variacion.map((año, indexYear) => (
-                                <div className="flex flex-col" key={indexYear}>
-                                    <FormItem
-                                        className="mb-0"
-                                    >
-                                        {año.toString().length > 5 ? (
-                                            <Tooltip
-                                                placement="top-end"
-                                                title={currency + formatNumberPrestamos(año)}
+                                    <FormItem className=" mb-1 w-[240px] ">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize font-bold bg-blue-100"
+                                            value='Posición al Cierre'
+                                        />
+                                    </FormItem>
+                                    {posicionAlCierre.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <FormItem
+                                                className="mb-0"
                                             >
-                                                <Input
-                                                    className="w-[130px] "
-                                                    type="text"
-                                                    value={formatNumberPrestamos(año)}
-                                                    name="year"
-                                                    disabled
-                                                    prefix={currency}
+                                                {Math.round(año).toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] font-bold text-base"
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px] font-bold "
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        disabled
+                                                        prefix={currency}
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
+                                </div>
+                                {/** *********** ****************  ************ */}
 
-                                                />
-                                            </Tooltip>
-                                        ) : (
+                                {/** *********** Variación WC  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
+                                >
+                                    <div className='iconDesplegable' />
+                                    <FormItem className=" mb-1 w-[240px] mt-[0px]">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize"
+                                            value='Variación WC'
+                                        />
+                                    </FormItem>
+                                    <div className="flex flex-col" >
+
+                                        <FormItem
+                                            className="mb-0"
+                                        >
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={formatNumberPrestamos(año)}
-                                                name="year"
-                                                prefix={currency}
                                                 disabled
+                                                name="initial"
+
                                             />
-                                        )}
-                                    </FormItem>
+                                        </FormItem>
+                                    </div>
+                                    {variacion.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <FormItem
+                                                className="mb-0"
+                                            >
+                                                {año.toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] "
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
+
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px]"
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        prefix={currency}
+                                                        disabled
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
+                                {/** *********** ****************  ************ */}
 
-                    </section>
-                </FormContainer>
+                            </section>
+                        </FormContainer>
 
-            }
-            <Button
-                className="border mt-6b btnSubmitTable mt-[40px]"
-                variant="solid"
-                type="submit"
-                onClick={submitInfoForm}
-            >
-                Guardar
-            </Button>
-        </>
-    );
+                    }
+                    <Button
+                        className="border mt-6b btnSubmitTable mt-[40px]"
+                        variant="solid"
+                        type="submit"
+                        onClick={submitInfoForm}
+                    >
+                        Guardar
+                    </Button>
+                </>
+            )
+        }
+    </>
+    )
 }
 
 export default TableWorkingCapital;

@@ -12,11 +12,11 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity } from 'utils/calcs';
+import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity, calcularPrestamos } from 'utils/calcs';
 import { set } from 'lodash';
 
 function TableBalance(props) {
-
+    const [cebo, setCebo] = useState(0);
     const [showLoader, setShowLoader] = useState(true);
     const [creditosPorVentas, setCreditosPorVentas] = useState([]);
     const [creditosFiscales, setCreditosFiscales] = useState([]);
@@ -28,13 +28,14 @@ function TableBalance(props) {
     const [deudasComerciales, setDeudasComerciales] = useState([]);
     const [deudasFiscales, setDeudasFiscales] = useState([]);
     const [deudasFinancieras, setDeudasFinancieras] = useState([]);
-    const [otrasDeudas, setOtrasDeudas] = useState([]);
+    const [otrasDeudas, setOtrasDeudas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     const [totPasivo, setTotPasivo] = useState([]);
 
     const [Equity, setEquity] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     const [ResultadosNoAsignados, setResultadosNoAsignados] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     const [ResultadosDelEjercicio, setResultadosDelEjercicio] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     const [totalPatrimonioNeto, setTotalPatrimonioNeto] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    const [totalPnYPasivo, setTotalPnYPasivo] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     const [updateBienesDeCambio, setUpdateBienesDeCambio] = useState(true);
     const [timeoutId, setTimeoutId] = useState(null);
@@ -44,6 +45,7 @@ function TableBalance(props) {
 
     const IIGG = useSelector((state) => state.tableBalanceResult);
     const cajaYBancosAlCierre = useSelector((state) => state.tableBalanceCajaCierre);
+    const prestamos = useSelector((state) => state.tableBalancePrestamos);
 
     // ***************** INPUTS ANIO 0 ******************
     const [inputsValues, setinputsValues] = useState({
@@ -58,7 +60,11 @@ function TableBalance(props) {
         deudasFinancieras: "0",
         otrasDeudas: "0",
         totPasivo: "0",
+        equity: "0",
         ResultadosNoAsignados: "0",
+        resultadosDelEjercicio: "0",
+        totPatNeto: "0",
+        totPnYPasivo: "0",
     });
 
     const handleChangeInputs = (key, value) => {
@@ -152,18 +158,39 @@ function TableBalance(props) {
 
                         await calcularBienesDeCambio(data, setBienesDeCambio, inputsValues.BienesDeCambio)
                         let ivasCF = await calcularDeudasComerciales(data, setDeudasComerciales)
-                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setShowLoader)
-                        await calcularEquity(cajaYBancosAlCierre, setEquity, ResultadosDelEjercicioData, ResultadosNoAsignados, setTotalPatrimonioNeto)
+                        await calcularDeudasFiscales(ivasDF, ivasCF, dataCopy2, IIGG, setDeudasFiscales, setCebo)
+                        await calcularEquity(cajaYBancosAlCierre, setEquity, ResultadosDelEjercicioData, ResultadosNoAsignados, setTotalPatrimonioNeto, setCebo)
+                        await calcularPrestamos(prestamos, setDeudasFinancieras, setShowLoader)
                     } catch (error) {
                         console.error(error);
                     }
                 };
                 fetchData();
-                setUpdateBienesDeCambio(false)
+                // setTimeout(() => {
+                //     setUpdateBienesDeCambio(false)
+                // }, 1000)
                 // de seg y medio
             }, 1500)
         }
     }, [updateBienesDeCambio, IIGG, inputsValues.BienesDeCambio]);
+
+    // un useEffect que reacciona si se editan algunas de las Deudas Comerciales Deudas Fiscales Deudas Financieras y Otras Deudas y suma el total del pasivo
+    useEffect(() => {
+        if (deudasComerciales && deudasFiscales && deudasFinancieras && otrasDeudas) {
+            // console.log a los 4 con su nombre y valor
+            console.log('deudasComerciales', deudasComerciales, 'deudasFiscales', deudasFiscales, 'deudasFinancieras', deudasFinancieras, 'otrasDeudas', otrasDeudas)
+
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                resultado.push((deudasComerciales[i] + deudasFiscales[i] + deudasFinancieras[i] + otrasDeudas[i]))
+            }
+            setTotPasivo(resultado)
+            // seteo inputsValues.totPasivo
+            let copy = { ...inputsValues }
+            copy.totPasivo = Number(copy.deudasComerciales) + Number(copy.deudasFiscales) + Number(copy.deudasFinancieras) + Number(copy.otrasDeudas)
+            setinputsValues(copy)
+        }
+    }, [deudasComerciales, deudasFiscales, deudasFinancieras, otrasDeudas, inputsValues.deudasComerciales, inputsValues.deudasFiscales, inputsValues.deudasFinancieras, inputsValues.otrasDeudas]);
 
     useEffect(() => {
         getUser(currentState.id)
@@ -182,13 +209,38 @@ function TableBalance(props) {
 
     }, []);
 
+    // un useEffect que reacciona si cambia totalPatrimonioNeto y totPasivo y suma el total del pasivo y patrimonio neto en totalPnYPasivo
+    useEffect(() => {
+        if (totalPatrimonioNeto && totPasivo) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                resultado.push((totalPatrimonioNeto[i] + totPasivo[i]))
+            }
+            setTotalPnYPasivo(resultado)
+        }
+        if (inputsValues.totPatNeto && inputsValues.totPasivo) {
+            let copy = { ...inputsValues }
+            copy.totPnYPasivo = Number(copy.totPatNeto) + Number(copy.totPasivo)
+            setinputsValues(copy)
+        }
+    }, [totalPatrimonioNeto, totPasivo, inputsValues.totPatNeto, inputsValues.totPasivo]);
+
+    // un useEffect que reacciona si cambia inputValues.equity, inputsValues.ResultadosNoAsignados y inputsValues.resultadosDelEjercicio y suma el total del patrimonio neto en inputsValues.totPatNeto
+    useEffect(() => {
+        if (inputsValues.equity && inputsValues.ResultadosNoAsignados && inputsValues.resultadosDelEjercicio) {
+            let copy = { ...inputsValues }
+            copy.totPatNeto = Number(copy.equity) + Number(copy.ResultadosNoAsignados) + Number(copy.resultadosDelEjercicio)
+            setinputsValues(copy)
+        }
+    }, [inputsValues.equity, inputsValues.ResultadosNoAsignados, inputsValues.resultadosDelEjercicio]);
+
     useEffect(() => {
         setTimeout(() => {
             if (ResultadosDelEjercicioData?.length) {
-                calcularResultadosNoAsignados(inputsValues.ResultadosNoAsignados, inputsValues.ResultadosDelEjercicio, ResultadosDelEjercicioData, setResultadosNoAsignados)
+                calcularResultadosNoAsignados(inputsValues.ResultadosNoAsignados, inputsValues.resultadosDelEjercicio, ResultadosDelEjercicioData, setResultadosNoAsignados)
             }
         }, 1500)
-    }, [inputsValues.ResultadosNoAsignados, inputsValues.ResultadosDelEjercicio, ResultadosDelEjercicioData]);
+    }, [inputsValues.ResultadosNoAsignados, inputsValues.resultadosDelEjercicio, ResultadosDelEjercicioData]);
 
     useEffect(() => {
         if (cajaYBancos && creditosPorVentas && creditosFiscales && bienesDeCambio && bienesDeUso) {
@@ -689,15 +741,15 @@ function TableBalance(props) {
                                                 <Input
                                                     className="w-[130px]"
                                                     type="text"
-                                                    value={inputsValues.cajaYBancos}
-                                                    onChange={(e) => handleChangeInputs('cajaYBancos', e.target.value)}
+                                                    value={inputsValues.deudasComerciales}
+                                                    onChange={(e) => handleChangeInputs('deudasComerciales', e.target.value)}
                                                     name="initial"
                                                     prefix='$'
 
                                                 />
                                             </FormItem>
                                         </div>
-                                        {Equity.map((año, indexYear) => (
+                                        {deudasComerciales.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -886,7 +938,7 @@ function TableBalance(props) {
                                                     className="w-[130px]"
                                                     type="text"
                                                     value={inputsValues.otrasDeudas}
-                                                    // onChange={(e) => handleBienesDeCambio(e.target.value)}
+                                                    onChange={(e) => handleChangeInputs('otrasDeudas', e.target.value)}
                                                     name="initial"
                                                     prefix='$'
 
@@ -1021,8 +1073,8 @@ function TableBalance(props) {
                                                 <Input
                                                     className="w-[130px]"
                                                     type="text"
-                                                    value={0}
-                                                    // onChange={(e) => handleChangeInputs('cajaYBancos', e.target.value)}
+                                                    value={inputsValues.equity}
+                                                    onChange={(e) => handleChangeInputs('equity', e.target.value)}
                                                     name="initial"
                                                     prefix='$'
 
@@ -1088,7 +1140,6 @@ function TableBalance(props) {
                                                     className="w-[130px]"
                                                     type="text"
                                                     value={inputsValues.ResultadosNoAsignados}
-                                                    // onChange={(e) => handleChangeInputs('deudasFiscales', e.target.value)}
                                                     onChange={(e) => handleChangeInputs('ResultadosNoAsignados', e.target.value)}
                                                     name="initial"
                                                     prefix='$'
@@ -1153,8 +1204,8 @@ function TableBalance(props) {
                                                 <Input
                                                     className="w-[130px]"
                                                     type="text"
-                                                    value={0}
-                                                    // onChange={(e) => handleChangeInputs('deudasFinancieras', e.target.value)}
+                                                    value={inputsValues.resultadosDelEjercicio}
+                                                    onChange={(e) => handleChangeInputs('resultadosDelEjercicio', e.target.value)}
                                                     name="initial"
                                                     prefix='$'
 
@@ -1222,8 +1273,8 @@ function TableBalance(props) {
                                             <Input
                                                 className="w-[130px]"
                                                 type="text"
-                                                value={0}
-                                                // onChange={(e) => handleChangeInputs('totalPatrimonioNeto', e.target.value)}
+                                                value={inputsValues.totPatNeto}
+                                                onChange={(e) => handleChangeInputs('totPatNeto', e.target.value)}
                                                 name="initial"
                                                 disabled
                                                 prefix={currency}
@@ -1265,6 +1316,75 @@ function TableBalance(props) {
                                     ))}
                                 </div>
                                 {/** *********** ****************  ************ */}
+
+
+
+                                <span className="block  pl-3  mb-3 ">Total patrimonio neto + pasivo</span>
+                                {/** *********** TOTAL PN + PASIVO  ************ */}
+                                <div
+                                    className="flex  gap-x-3 gap-y-3  mb-6 "
+                                >
+                                    <div className='iconDesplegable' onClick={() => playAccordion(2)}>
+
+                                    </div>
+                                    <FormItem className=" mb-1 w-[240px] ">
+                                        <Input
+                                            disabled
+                                            type="text"
+                                            className="capitalize font-bold bg-blue-100"
+                                            value='TOTAL PN + PASIVO'
+                                        />
+                                    </FormItem>
+                                    <div className="flex flex-col" >
+
+                                        <FormItem
+                                            className="mb-0"
+                                        >
+                                            <Input
+                                                className="w-[130px]"
+                                                type="text"
+                                                value={inputsValues.totPnYPasivo}
+                                                onChange={(e) => handleChangeInputs('totPnYPasivo', e.target.value)}
+                                                name="initial"
+                                                disabled
+                                                prefix={currency}
+
+                                            />
+                                        </FormItem>
+                                    </div>
+                                    {totalPnYPasivo.map((año, indexYear) => (
+                                        <div className="flex flex-col" key={indexYear}>
+                                            <FormItem
+                                                className="mb-0"
+                                            >
+                                                {Math.round(año).toString().length > 5 ? (
+                                                    <Tooltip
+                                                        placement="top-end"
+                                                        title={currency + formatNumberPrestamos(año)}
+                                                    >
+                                                        <Input
+                                                            className="w-[130px] font-bold text-base"
+                                                            type="text"
+                                                            value={formatNumberPrestamos(año)}
+                                                            name="year"
+                                                            disabled
+                                                            prefix={currency}
+                                                        />
+                                                    </Tooltip>
+                                                ) : (
+                                                    <Input
+                                                        className="w-[130px] font-bold "
+                                                        type="text"
+                                                        value={formatNumberPrestamos(año)}
+                                                        name="year"
+                                                        disabled
+                                                        prefix={currency}
+                                                    />
+                                                )}
+                                            </FormItem>
+                                        </div>
+                                    ))}
+                                </div>
 
 
                             </section>
