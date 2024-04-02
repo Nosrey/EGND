@@ -16,7 +16,7 @@ import formatNumber from 'utils/formatTotalsValues';
 import { useMedia } from 'utils/hooks/useMedia';
 
 function DashboardVentas() {
-    const media = useMedia();
+  const media = useMedia();
 
   const [volumenData, setVolumenData] = useState();
   const currentState = useSelector((state) => state.auth.user);
@@ -249,14 +249,14 @@ function DashboardVentas() {
     Number(
       formatNumber(
         data.años[indexY].volMeses[MONTHS[indexMes]] /
+        dataAssump.canales[indexChannel].items[indexProd].volumen -
+        (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
           dataAssump.canales[indexChannel].items[indexProd].volumen -
-          (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
-            dataAssump.canales[indexChannel].items[indexProd].volumen -
-            ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
-              dataAssump.canales[indexChannel].items[indexProd].volumen) *
-              dataAssump.churns[indexChannel].items[indexProd]
-                .porcentajeChurn) /
-              100),
+          ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
+            dataAssump.canales[indexChannel].items[indexProd].volumen) *
+            dataAssump.churns[indexChannel].items[indexProd]
+              .porcentajeChurn) /
+          100),
       ),
     );
 
@@ -274,16 +274,16 @@ function DashboardVentas() {
                     if (periodoSelected.month || periodoSelected.month === 0) {
                       if (periodoSelected.month === 0 && indexMes === 0) {
                         tot += Math.floor(
-                            a.volMeses[MONTHS[indexMes]] /
-                              dataAssump.canales[indexChannel].items[indexProd]
-                                .volumen,
-                          )
+                          a.volMeses[MONTHS[indexMes]] /
+                          dataAssump.canales[indexChannel].items[indexProd]
+                            .volumen,
+                        )
                       } else if (periodoSelected.month === 4) {
                         if (indexMes === 2) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                              dataAssump.canales[indexChannel].items[indexProd]
-                                .volumen,
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
                           );
                         }
                         if (indexMes < 3) {
@@ -291,19 +291,19 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                  p,
-                                  indexY,
-                                  indexMes,
-                                  indexChannel,
-                                  indexProd,
-                                );
+                                p,
+                                indexY,
+                                indexMes,
+                                indexChannel,
+                                indexProd,
+                              );
                         }
                       } else if (periodoSelected.month === 6) {
                         if (indexMes === 5) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                              dataAssump.canales[indexChannel].items[indexProd]
-                                .volumen,
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
                           );
                         }
                         if (indexMes < 6) {
@@ -311,20 +311,20 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                  p,
-                                  indexY,
-                                  indexMes,
-                                  indexChannel,
-                                  indexProd,
-                                );
+                                p,
+                                indexY,
+                                indexMes,
+                                indexChannel,
+                                indexProd,
+                              );
                         }
                       } else if (periodoSelected.month === 12) {
-                       
+
                         if (indexMes === 11) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                              dataAssump.canales[indexChannel].items[indexProd]
-                                .volumen,
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
                           );
                         }
                         if (indexMes > 5) {
@@ -332,12 +332,12 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                  p,
-                                  indexY,
-                                  indexMes,
-                                  indexChannel,
-                                  indexProd,
-                                );
+                                p,
+                                indexY,
+                                indexMes,
+                                indexChannel,
+                                indexProd,
+                              );
                         }
                       }
                     } else {
@@ -345,25 +345,25 @@ function DashboardVentas() {
                       if (indexMes === 11) {
                         tot += Math.floor(
                           a.volMeses[MONTHS[indexMes]] /
-                            dataAssump.canales[indexChannel].items[indexProd]
-                              .volumen,
+                          dataAssump.canales[indexChannel].items[indexProd]
+                            .volumen,
                         );
                       }
                       newC +=
                         indexMes === 0
                           ? 0
                           : calcNewClients(
-                              p,
-                              indexY,
-                              indexMes,
-                              indexChannel,
-                              indexProd,
-                            );
+                            p,
+                            indexY,
+                            indexMes,
+                            indexChannel,
+                            indexProd,
+                          );
                     }
                   });
                 }
               } else {
-                
+
                 MONTHS.map((o, indexMes) => {
                   if (indexMes === 11) {
                     tot +=
@@ -374,12 +374,12 @@ function DashboardVentas() {
                     indexMes === 0
                       ? 0
                       : calcNewClients(
-                          p,
-                          indexY,
-                          indexMes,
-                          indexChannel,
-                          indexProd,
-                        );
+                        p,
+                        indexY,
+                        indexMes,
+                        indexChannel,
+                        indexProd,
+                      );
                 });
               }
             });
@@ -421,7 +421,7 @@ function DashboardVentas() {
           // seteo la info delvolumen para usar par alos cliente sporque si uso info form estoy usando el valor de ventas
           const datosPrecargadosVol = {};
           let volDataOrdenada = JSON.parse(localStorage.getItem("volumenData")).sort((a, b) =>
-          a.countryName.localeCompare(b.countryName),
+            a.countryName.localeCompare(b.countryName),
           );
           for (let i = 0; i < volDataOrdenada.length; i++) {
             datosPrecargadosVol[volDataOrdenada[i].countryName] =
@@ -429,9 +429,9 @@ function DashboardVentas() {
           }
           setInfoVolToCalculateClient(() => ({ ...datosPrecargadosVol }));
           // **********************************
-           // **********************************
+          // **********************************
 
-        // Seteo la info de ventas PxQ
+          // Seteo la info de ventas PxQ
           const datosPrecargados = {};
           let dataVentas = showMultiplicacionPxQ(
             data?.volumenData.sort((a, b) =>
@@ -445,9 +445,10 @@ function DashboardVentas() {
             datosPrecargados[dataVentas[i].countryName] = dataVentas[i].stats;
           }
           setInfoForm(() => ({ ...datosPrecargados }));
+          console.log("infoForm", infoForm);
           // **********************************
-           // **********************************
-         
+          // **********************************
+
 
           calcTotals();
           calcCacr(data?.volumenData);
@@ -541,7 +542,7 @@ function DashboardVentas() {
                   />
                 </div>
                 {infoForm && (
-                  <div className={`flex justify-center gap-[50px] mt-[50px] mb-[40px] ${media === "mobile" ? "flex-col" :"" } `}>
+                  <div className={`flex justify-center gap-[50px] mt-[50px] mb-[40px] ${media === "mobile" ? "flex-col" : ""} `}>
                     <div className={` ${media === "mobile" ? "w-[100%]" : "w-[50%]"} `}>
                       {yearSelected.value === 'todo' ? (
                         <h5 className="mb-[30px]">
@@ -573,13 +574,12 @@ function DashboardVentas() {
                 )}
                 {infoForm && (
                   <div
-                    className={`flex ${
-                      yearSelected.value === 'año 1' ||
-                      yearSelected.value === '' ||
-                      yearSelected.value === 'todo'
+                    className={`flex ${yearSelected.value === 'año 1' ||
+                        yearSelected.value === '' ||
+                        yearSelected.value === 'todo'
                         ? ''
                         : 'justify-between'
-                    } gap-[50px] mb-[40px]
+                      } gap-[50px] mb-[40px]
                     ${media === "mobile" ? "flex-col" : ""}`}
                   >
                     {dataAssump.length !== 0 && (

@@ -288,7 +288,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {cajaYBancosAlCierre.map((año, indexYear) => (
+                                    {cajaYBancosAlCierre?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <div className="titleRow w-[130px]">
                                                 <p className="cursor-default"> Año {indexYear + 1}</p>
@@ -359,7 +359,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {resultadoNeto.map((año, indexYear) => (
+                                    {resultadoNeto?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
@@ -426,7 +426,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {amortizaciones.map((año, indexYear) => (
+                                        {amortizaciones?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -491,7 +491,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {interesesPagados.map((año, indexYear) => (
+                                        {interesesPagados?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -557,7 +557,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {variacion.map((año, indexYear) => (
+                                        {variacion?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -625,7 +625,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {FEOperativas.map((año, indexYear) => (
+                                    {FEOperativas?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
@@ -692,7 +692,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {inversiones.map((año, indexYear) => (
+                                        {inversiones?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -760,7 +760,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {inversiones.map((año, indexYear) => (
+                                    {inversiones?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
@@ -826,7 +826,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {financiacion.map((año, indexYear) => (
+                                        {financiacion?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -890,7 +890,7 @@ function TableCashflowIndirecto(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {pagoPrestamos.map((año, indexYear) => (
+                                        {pagoPrestamos?.map((año, indexYear) => (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
                                                     className="mb-0"
@@ -958,7 +958,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {FEfinanciacion.map((año, indexYear) => (
+                                    {FEfinanciacion?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
@@ -1024,7 +1024,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {variacionCajaYBco.map((año, indexYear) => (
+                                    {variacionCajaYBco?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"
@@ -1090,7 +1090,7 @@ function TableCashflowIndirecto(props) {
                                             />
                                         </FormItem>
                                     </div>
-                                    {cajaYBancosAlCierre.map((año, indexYear) => (
+                                    {cajaYBancosAlCierre?.map((año, indexYear) => (
                                         <div className="flex flex-col" key={indexYear}>
                                             <FormItem
                                                 className="mb-0"

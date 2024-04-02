@@ -218,11 +218,9 @@ function TableBalance(props) {
             }
             setTotalPnYPasivo(resultado)
         }
-        if (inputsValues.totPatNeto && inputsValues.totPasivo) {
-            let copy = { ...inputsValues }
-            copy.totPnYPasivo = Number(copy.totPatNeto) + Number(copy.totPasivo)
-            setinputsValues(copy)
-        }
+        let copy = { ...inputsValues }
+        copy.totPnYPasivo = Number(copy.totPatNeto) + Number(copy.totPasivo)
+        setinputsValues(copy)
     }, [totalPatrimonioNeto, totPasivo, inputsValues.totPatNeto, inputsValues.totPasivo]);
 
     // un useEffect que reacciona si cambia inputValues.equity, inputsValues.ResultadosNoAsignados y inputsValues.resultadosDelEjercicio y suma el total del patrimonio neto en inputsValues.totPatNeto
