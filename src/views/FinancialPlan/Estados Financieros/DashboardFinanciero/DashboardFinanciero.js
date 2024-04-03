@@ -51,7 +51,7 @@ function DashboardFinanciero() {
             <div>
               <div className="border-b-2 mb-8 pb-1">
                 <h4 className="cursor-default">
-                  Balance
+                  Dashboard Financiero
                 </h4>
                 <span className="cursor-default">Estados Financieros</span>
               </div>

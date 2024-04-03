@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable arrow-body-style */
 import {
     Button,
     FormContainer,
@@ -342,7 +343,7 @@ function TableBalance(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {isNaN(cajaYBancos[0]) ? [] : cajaYBancos.map((año, indexYear) => {
+                                        {Number.isNaN(cajaYBancos[0]) ? [] : cajaYBancos.map((año, indexYear) => {
                                             return (
                                                 <div className="flex flex-col" key={indexYear}>
                                                     <div className="titleRow w-[130px]">
@@ -478,7 +479,7 @@ function TableBalance(props) {
                                                 />
                                             </FormItem>
                                         </div>
-                                        {isNaN(creditosFiscales[0]) ? [] : creditosFiscales.map((año, indexYear) => {
+                                        {Number.isNaN(creditosFiscales[0]) ? [] : creditosFiscales.map((año, indexYear) => {
                                             return (
                                                 <div className="flex flex-col" key={indexYear}>
                                                     <FormItem
@@ -679,7 +680,7 @@ function TableBalance(props) {
                                         </FormItem>
                                     </div>
 
-                                    {isNaN(totActivo[0]) ? [] : totActivo.map((año, indexYear) => {
+                                    {Number.isNaN(totActivo[0]) ? [] : totActivo.map((año, indexYear) => {
                                         return (
                                             <div className="flex flex-col" key={indexYear}>
                                                 <FormItem
@@ -1317,14 +1318,13 @@ function TableBalance(props) {
 
 
 
-                                <span className="block  pl-3  mb-3 ">Total patrimonio neto + pasivo</span>
+                                <span className="block  pl-3  mb-3 ">Total Patrimonio Neto + Pasivo</span>
                                 {/** *********** TOTAL PN + PASIVO  ************ */}
                                 <div
                                     className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <div className='iconDesplegable' onClick={() => playAccordion(2)}>
+                                    <div className='iconDesplegable' onClick={() => playAccordion(2)}/>
 
-                                    </div>
                                     <FormItem className=" mb-1 w-[240px] ">
                                         <Input
                                             disabled

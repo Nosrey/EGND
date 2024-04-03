@@ -308,4 +308,12 @@ export const protectedRoutes = [
     ),
     authority: [],
   },
+  {
+    key: 'DashboardFinanciero',
+    path: '/dashboard-financiero',
+    component: React.lazy(() =>
+      import('views/FinancialPlan/Estados Financieros/DashboardFinanciero/DashboardFinanciero'),
+    ),
+    authority: [],
+  },
 ];

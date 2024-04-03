@@ -460,7 +460,7 @@ const navigationConfig = [
           },
           {
             key: 'collapseEstadosFinancieros.item6',
-            path: '/',
+            path: '/dashboard-financiero',
             title: 'Dashboard Financiero',
             translateKey: 'nav.collapseEstadosFinancieros.item6',
             icon: '',
