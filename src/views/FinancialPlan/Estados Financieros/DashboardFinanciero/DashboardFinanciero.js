@@ -11,14 +11,11 @@ import { useEffect, useState, } from 'react';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
-import TableBalance from './TableBalance';
+import TableDashboardFinanciero from './TableDashboardFinanciero';
 import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 import Prestamos from '../../Prestamos/Prestamos';
 
-// este es el componente para el dashboard financiero
-import TableDashboardFinanciero from '../DashboardFinanciero/TableDashboardFinanciero';
-
-function Balance() {
+function DashboardFinanciero() {
   // const rn = useContext(MiContexto);
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
@@ -62,7 +59,7 @@ function Balance() {
                 <FormContainer className="cont-countries">
                   <ContainerScrollable
                     contenido={
-                      <TableBalance
+                      <TableDashboardFinanciero
                         cajaYBancos={myResult[0]} // ver
                         creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
 
@@ -72,16 +69,6 @@ function Balance() {
                         }
                         showAlertError={(boolean) => setShowErrorAlert(boolean)}
                       />
-                      // <TableBalance
-                      //   cajaYBancos={myResult[0]} // ver
-                      //   creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
-
-
-                      //   showAlertSuces={(boolean) =>
-                      //     setShowSuccessAlert(boolean)
-                      //   }
-                      //   showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                      // />
                     }
                   />
                 </FormContainer>
@@ -96,4 +83,4 @@ function Balance() {
   );
 }
 
-export default Balance;
+export default DashboardFinanciero;
