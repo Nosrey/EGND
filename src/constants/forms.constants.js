@@ -413,5 +413,18 @@ export const mesesPrestamos = [
   { value: 'Septiembre', label: 'Septiembre' },
   { value: 'Octubre', label: 'Octubre' },
   { value: 'Noviembre', label: 'Noviembre' },
-  { value: 'Diciembre', label: 'Diciembre' }
+  { value: 'Diciembre', label: 'Diciembre' },
+];
+
+export const anosPrestamos = [
+  { value: '1', label: 'Año 1' },
+  { value: '2', label: 'Año 2' },
+  { value: '3', label: 'Año 3' },
+  { value: '4', label: 'Año 4' },
+  { value: '5', label: 'Año 5' },
+  { value: '6', label: 'Año 6' },
+  { value: '7', label: 'Año 7' },
+  { value: '8', label: 'Año 8' },
+  { value: '9', label: 'Año 9' },
+  { value: '10', label: 'Año 10' },
 ];

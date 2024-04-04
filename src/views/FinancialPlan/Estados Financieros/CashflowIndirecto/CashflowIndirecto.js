@@ -4,16 +4,23 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
 
-
 import ContainerScrollable from 'components/shared/ContainerScrollable';
-import MySpinner from 'components/shared/loaders/MySpinner'; 
+import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
-import { useEffect, useState, useContext } from 'react';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
+import { EMPTY_TOTALES } from 'constants/forms.constants';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { getUser } from 'services/Requests';
-import TableCashflowIndirecto from './TableCashflowIndirecto';
+import {
+  calcAmortizaciones,
+  calcFinanciacionDeTerceros,
+  calcInteresesPagadosPorAnio,
+  calcInversiones,
+  multiplicacionPxQCapex,
+} from 'utils/calcs';
 import PyL from '../PyL/PyL';
+import TableCashflowIndirecto from './TableCashflowIndirecto';
 
 function CashflowIndirecto() {
   // const rn = useContext(MiContexto);
@@ -24,28 +31,32 @@ function CashflowIndirecto() {
   const [capexPData, setCapexPData] = useState();
   const [capexQData, setCapexQData] = useState();
   const [prestamosData, setPrestamosData] = useState();
-  const myResult = useSelector(state => state.netoResult)
+  const myResult = useSelector((state) => state.netoResult);
 
-
-
-  // INFO A MOSTRAR EN LA TABLA 
-const [amortizaciones, setAmortizaciones] = useState();
-const [intereses, setIntereses] = useState();
-const [inversiones, setInversiones] = useState();
-const [financiacion, setFinanciacion] = useState();
+  // INFO A MOSTRAR EN LA TABLA
+  const [amortizaciones, setAmortizaciones] = useState();
+  const [intereses, setIntereses] = useState();
+  const [inversiones, setInversiones] = useState();
+  const [financiacion, setFinanciacion] = useState();
 
   useEffect(() => {
-    if (capexPData && capexPData.length !== 0  && capexQData && capexQData.length !== 0 && !amortizaciones) {
-      const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData)
-      setAmortizaciones(calcAmortizaciones(PxQCapex))
-      setInversiones(calcInversiones(PxQCapex))
+    if (
+      capexPData &&
+      capexPData.length !== 0 &&
+      capexQData &&
+      capexQData.length !== 0 &&
+      !amortizaciones
+    ) {
+      const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData);
+      setAmortizaciones(calcAmortizaciones(PxQCapex));
+      setInversiones(calcInversiones(PxQCapex));
     }
   }, [capexPData, capexQData]);
 
   useEffect(() => {
-    if (prestamosData ) {
-      setIntereses(calcInteresesPagadosPorAnio(prestamosData) )
-      setFinanciacion(calcFinanciacionDeTerceros(prestamosData))
+    if (prestamosData) {
+      setIntereses(calcInteresesPagadosPorAnio(prestamosData));
+      setFinanciacion(calcFinanciacionDeTerceros(prestamosData));
     }
   }, [prestamosData]);
 
@@ -54,23 +65,21 @@ const [financiacion, setFinanciacion] = useState();
       .then((data) => {
         if (data?.capexPData[0]?.length !== 0) {
           setCapexPData(data?.capexPData[0]?.capexP);
-        }else {
-          console.log("Falta completar info en Costo Inversiones")
+        } else {
+          setCapexPData(EMPTY_TOTALES);
         }
 
         if (data?.capexQData[0]?.length !== 0) {
           setCapexQData(data?.capexQData[0]?.capexQ);
-        }else {
-          console.log("Falta completar info en Volumen de Inversiones")
+        } else {
+          setCapexQData(EMPTY_TOTALES);
         }
 
         if (data?.prestamos?.length !== 0) {
           setPrestamosData(data?.prestamos);
-        }else {
-          console.log("Falta completar info en la sección de Préstamos")
         }
         setTimeout(() => {
-          setShowLoader(false)
+          setShowLoader(false);
         }, 4000);
       })
       .catch((error) => console.error(error));
@@ -78,7 +87,7 @@ const [financiacion, setFinanciacion] = useState();
 
   return (
     <>
-     {showSuccessAlert && (
+      {showSuccessAlert && (
         <Alert className="mb-4" type="success" showIcon>
           Los datos se guardaron satisfactoriamente.
         </Alert>
@@ -88,48 +97,57 @@ const [financiacion, setFinanciacion] = useState();
           No se pudieron guardar los datos.
         </Alert>
       )}
-      <div className='oculto'>
-        <PyL/>
-        </div>
-        <div/>
+      <div className="oculto">
+        <PyL />
+      </div>
+      <div />
       {showLoader ? (
         <MySpinner />
+      ) : !prestamosData ? (
+        <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]  mt-[30px] ml-[30px] mr-[30px]">
+          <span className="cursor-default">
+            Para acceder a este formulario primero debe completar el formulario
+            de{' '}
+            {!prestamosData && (
+              <Link className="text-indigo-700 underline" to="/prestamos">
+                Prestamos
+              </Link>
+            )}
+          </span>
+        </div>
       ) : (
         <>
-        { 
-        // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
-          <div>
-          <div className="border-b-2 mb-8 pb-1">
-            <h4 className="cursor-default">
-              Cashflow Indirecto
-            </h4>
-            <span className="cursor-default">Estados Financieros</span>
-          </div>
-          <div className="container-countries">
-            <FormContainer className="cont-countries">
-              <ContainerScrollable
-                contenido={
-                  <TableCashflowIndirecto
-                    resultadoNeto={myResult[0]}
-                    variacion={[100, 340, 444, 230, 140, 30, 499, 670, 190, 300]}
-
-                    amortizaciones={amortizaciones || []}
-                    interesesPagados={intereses || []}
-                    inversiones={inversiones || []}
-                    financiacion={financiacion || []}
-                    showAlertSuces={(boolean) =>
-                      setShowSuccessAlert(boolean)
+          {
+            // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
+            <div>
+              <div className="border-b-2 mb-8 pb-1">
+                <h4 className="cursor-default">Cashflow Indirecto</h4>
+                <span className="cursor-default">Estados Financieros</span>
+              </div>
+              <div className="container-countries">
+                <FormContainer className="cont-countries">
+                  <ContainerScrollable
+                    contenido={
+                      <TableCashflowIndirecto
+                        resultadoNeto={myResult[0]}
+                        variacion={[
+                          100, 340, 444, 230, 140, 30, 499, 670, 190, 300,
+                        ]}
+                        amortizaciones={amortizaciones || []}
+                        interesesPagados={intereses || []}
+                        inversiones={inversiones || []}
+                        financiacion={financiacion || []}
+                        showAlertSuces={(boolean) =>
+                          setShowSuccessAlert(boolean)
+                        }
+                        showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                      />
                     }
-                    showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                    />
-                }
-              />
-            </FormContainer>
-          </div>
-
-        </div>
-        }
-          
+                  />
+                </FormContainer>
+              </div>
+            </div>
+          }
         </>
       )}
     </>
