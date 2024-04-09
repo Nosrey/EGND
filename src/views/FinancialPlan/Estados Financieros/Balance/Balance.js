@@ -18,7 +18,10 @@ import Prestamos from '../../Prestamos/Prestamos';
 // este es el componente para el dashboard financiero
 import TableDashboardFinanciero from '../DashboardFinanciero/TableDashboardFinanciero';
 
-function Balance() {
+function Balance({
+  setGraph05Data = () => { },
+  setGraph06Data = () => { },
+}) {
   // const rn = useContext(MiContexto);
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
@@ -61,17 +64,18 @@ function Balance() {
               <div className="container-countries">
                 <FormContainer className="cont-countries">
                   <ContainerScrollable
-                    contenido={
-                      <TableBalance
-                        cajaYBancos={myResult[0]} // ver
-                        creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+                      contenido={
+                        <TableBalance
+                          cajaYBancos={myResult[0]} // ver
+                          creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+                          setGraph05Data={setGraph05Data}
+                          setGraph06Data={setGraph06Data}
 
-
-                        showAlertSuces={(boolean) =>
-                          setShowSuccessAlert(boolean)
-                        }
-                        showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                      />
+                          showAlertSuces={(boolean) =>
+                            setShowSuccessAlert(boolean)
+                          }
+                          showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                        />
                       // <TableBalance
                       //   cajaYBancos={myResult[0]} // ver
                       //   creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}

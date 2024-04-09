@@ -15,7 +15,9 @@ import { getUser } from 'services/Requests';
 import TableCashflowIndirecto from './TableCashflowIndirecto';
 import PyL from '../PyL/PyL';
 
-function CashflowIndirecto() {
+function CashflowIndirecto({
+  setGraph04Data = () => { },
+}) {
   // const rn = useContext(MiContexto);
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
@@ -121,6 +123,7 @@ const [financiacion, setFinanciacion] = useState();
                       setShowSuccessAlert(boolean)
                     }
                     showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                    setGraph04Data={setGraph04Data}
                     />
                 }
               />

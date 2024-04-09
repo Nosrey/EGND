@@ -187,8 +187,8 @@ function TablePyL(props) {
         if (EBITDA) {
             let resultado = [];
             for (let i = 0; i < EBITDA.length; i++) {
-                resultado.push(Number.isNaN(EBITDA[i] / vtasTot[i]) || 
-                !Number.isFinite(EBITDA[i] / vtasTot[i]) ? 0 : EBITDA[i] / vtasTot[i])
+                resultado.push(Number.isNaN(EBITDA[i] / vtasTot[i]) ||
+                    !Number.isFinite(EBITDA[i] / vtasTot[i]) ? 0 : EBITDA[i] / vtasTot[i])
             }
             setEBITDAPorcentaje(resultado)
         }
@@ -258,8 +258,8 @@ function TablePyL(props) {
         if (rdoNeto && vtasTot) {
             let resultado = [];
             for (let i = 0; i < rdoNeto.length; i++) {
-                resultado.push(Number.isNaN(rdoNeto[i] / vtasTot[i]) || !Number.isFinite(rdoNeto[i] / vtasTot[i]) 
-                ? 0 : rdoNeto[i] / vtasTot[i])
+                resultado.push(Number.isNaN(rdoNeto[i] / vtasTot[i]) || !Number.isFinite(rdoNeto[i] / vtasTot[i])
+                    ? 0 : rdoNeto[i] / vtasTot[i])
             }
             setRNPorcentaje(resultado)
             setTimeout(() => {
@@ -269,6 +269,79 @@ function TablePyL(props) {
         }
 
     }, [rdoNeto, vtasTot]);
+
+    useEffect(() => {
+        if (MBPorcentaje.map((año) => parseFloat(año.toFixed(2))) !== props?.mbPorcentaje) {
+            props.setCmgbruta(MBPorcentaje.map((año) => parseFloat(año.toFixed(2))))
+        }
+    }, [MBPorcentaje])
+
+    useEffect(() => {
+        if (EBITDAPorcentaje.map((año) => parseFloat(año.toFixed(2))) !== props?.ebitda) {
+            props.setEbitda(EBITDAPorcentaje.map((año) => parseFloat(año.toFixed(2))))
+        }
+    }, [EBITDAPorcentaje])
+
+    useEffect(() => {
+        if (EBITPorcentaje.map((año) => parseFloat(año.toFixed(2)) !== props?.ebit)) {
+            props.setEbit(EBITPorcentaje.map((año) => parseFloat(año.toFixed(2))))
+        }
+    }, [EBITPorcentaje])
+
+    useEffect(() => {
+        if (RNPorcentaje.map((año) => parseFloat(año.toFixed(2)) !== props?.rdoNeto)) {
+            props.setRdoNetoValue(RNPorcentaje.map((año) => parseFloat(año.toFixed(2))))
+        }
+    }, [RNPorcentaje])
+
+    // Resultado Neto
+    useEffect(() => {
+        props.setRdoNetoValue(rdoNeto.map((año) => parseFloat(año.toFixed(2))))
+
+        // luego creo un array igual de largo que rdoNeto donde calculo el crecimiento respecto al valor anterior (por lo tanto el elemento 0 es 0) si entonces el valor 1 era 100 y el valor 2 es 200 el crecimiento es del 100%
+        let crecimiento = [0]
+        for (let i = 1; i < rdoNeto.length; i++) {
+            // calculo el crecimiento, si el valor anterior era 100 y el actual es 300 el crecimiento es del 200%, asi que el valor que pusheare al array es 200
+            crecimiento.push((((rdoNeto[i] - rdoNeto[i - 1]) / rdoNeto[i - 1]) * 100).toFixed(2))
+        }
+        props.setGrowth(crecimiento)
+    }, [rdoNeto])
+
+    useEffect(() => {
+        props.setGraph03Data([
+            {
+                name: 'Ventas',
+                data: vtasTot.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'Total Costos',
+                data: costoTotales.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'CMG Bruta',
+                data: MBPesos.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'Gastos de estructura',
+                data: gastoEnCtasTotal.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'EBITDA',
+                data: EBITDA.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'Rdo Neto',
+                data: rdoNeto.map((año) => parseFloat(año.toFixed(2)))
+            }
+        ])
+    }, [
+        vtasTot,
+        costoTotales,
+        MBPesos,
+        gastoEnCtasTotal,
+        EBITDA,
+        rdoNeto
+    ])
 
     const submitInfoForm = () => {
         const value = { ...inputsValues, idUser: localStorage.getItem('userId') }

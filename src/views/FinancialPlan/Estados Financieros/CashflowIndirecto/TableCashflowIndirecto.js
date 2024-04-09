@@ -129,7 +129,6 @@ function TableCashflowIndirecto(props) {
 
 
     useEffect(() => {
-        // console.log(props)
         setResultadoNeto(props.resultadoNeto)
         setAmortizaciones(props.amortizaciones)
         setInteresesPagados(props.interesesPagados)
@@ -193,7 +192,6 @@ function TableCashflowIndirecto(props) {
                     resultado.push(parseInt(variacionCajaYBco[i]) + parseInt(resultado[i - 1]))
                 }
             }
-            //  console.log(resultado)
             setCajaYBancosAlCierre(resultado)
             if (!Number.isNaN(resultado[0])) dispatch(addCajaCierre([inputsValues.cajaYBancosAlCierre, ...resultado]));
             dispatch(addResult([resultado]));
@@ -237,6 +235,30 @@ function TableCashflowIndirecto(props) {
             })
             .catch((error) => console.error(error));
     }, []);
+
+    useEffect(() => {
+        // [
+        //     {
+        //         name: 'Variación de caja y bancos',
+        //         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        //     },
+        //     {
+        //         name: 'Caja y bancos al cierre',
+        //         data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        //     },
+        // ]
+        props.setGraph04Data([
+            {
+                name: 'Variación de caja y bancos',
+                // hago que tenga maximo 2 decimales
+                data: variacionCajaYBco.map((año) => parseFloat(año.toFixed(2)))
+            },
+            {
+                name: 'Caja y bancos al cierre',
+                data: cajaYBancosAlCierre.map((año) => parseFloat(año.toFixed(2)))
+            },
+        ])
+    }, [cajaYBancosAlCierre, variacionCajaYBco]);
 
     return (<>
         {showLoader ? (

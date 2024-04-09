@@ -922,3 +922,29 @@ export const getCashflowIndirectoInfo = async (id = idUser) => {
     throw new Error('No se pudo obtener los datos del usuario.');
   }
 };
+
+export const createBalance = async (values) => { //VALUES DEBE TENER LA ESTRUCTURA DEL OBJETO QUE TE ENVIE ANTES
+  try {
+    const response = await fetch(`${URL_API}/api/balance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
+export const getBalance = async (id = idUser) => {
+  try {
+    const resp = await fetch(`${URL_API}/api/balance/${id}`);
+    const data = await resp.json();
+    return data.response;
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('No se pudo obtener los datos del usuario.');
+  }
+};

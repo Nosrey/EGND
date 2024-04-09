@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser } from 'services/Requests';
+import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser, getBalance, createBalance } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity, calcularPrestamos } from 'utils/calcs';
@@ -178,9 +178,6 @@ function TableBalance(props) {
     // un useEffect que reacciona si se editan algunas de las Deudas Comerciales Deudas Fiscales Deudas Financieras y Otras Deudas y suma el total del pasivo
     useEffect(() => {
         if (deudasComerciales && deudasFiscales && deudasFinancieras && otrasDeudas) {
-            // console.log a los 4 con su nombre y valor
-            console.log('deudasComerciales', deudasComerciales, 'deudasFiscales', deudasFiscales, 'deudasFinancieras', deudasFinancieras, 'otrasDeudas', otrasDeudas)
-
             let resultado = [];
             for (let i = 0; i < 10; i++) {
                 resultado.push((deudasComerciales[i] + deudasFiscales[i] + deudasFinancieras[i] + otrasDeudas[i]))
@@ -253,33 +250,70 @@ function TableBalance(props) {
 
     }, [cajaYBancos, creditosPorVentas, creditosFiscales, bienesDeCambio, bienesDeUso]);
 
+    useEffect(() => {
+        // seteamos props.graph05Data al dividir el array de tot pasivo / tot neto
+        if (totalPatrimonioNeto && totPasivo) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                // reviso si es un numero o no, si no lo es lo seteo en 0
+                if (Number.isNaN(totalPatrimonioNeto[i] / totPasivo[i])) {
+                    resultado.push(0)
+                } else {
+                    resultado.push((totalPatrimonioNeto[i] / totPasivo[i]))
+                }
+            }
+            props.setGraph05Data([{ name: 'Endeudamiento', data: resultado.map((año) => parseFloat(año.toFixed(2))) }])
+        }
+    }, [totalPatrimonioNeto, totPasivo]);
+
+    // igual peron con tot activo / tot pasivo para setear props.graph06Data
+    useEffect(() => {
+        if (totActivo && totPasivo) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                // reviso si es un numero o no, si no lo es lo seteo en 0
+                if (Number.isNaN(totActivo[i] / totPasivo[i])) {
+                    resultado.push(0)
+                } else {
+                    resultado.push((totActivo[i] / totPasivo[i]))
+                }
+            }
+            props.setGraph06Data([{ name: 'Solvencia', data: resultado.map((año) => parseFloat(año.toFixed(2))) }])
+        }
+    }, [totActivo, totPasivo]);
+
     const submitInfoFormBalance = () => {
         const value = { ...inputsValues, idUser: localStorage.getItem('userId') }
-        console.log(value)
+        // createBalance(value)
+
+        // getBalance(localStorage.getItem('userId')).then((data) => {
+        // }).catch((error) => {
+        //     console.error(error)
+        // })
+
         // delete value.bienesDeCambio;
         // delete value.creditosVentas;
         // delete value.deudasComerciales;
-        // createCashflowIndirecto(value).then((resp) =>{
-        //     window.scrollTo({ top: 0, behavior: 'smooth' });
-        //     props.showAlertSuces(true);
-        //     setTimeout(() => {
-        //       props.showAlertSuces(false);
-        //     }, 5000);
-        // }).catch ((error) => {
-        //     console.error(error)
-        //     window.scrollTo({ top: 0, behavior: 'smooth' });
-        //     props.showAlertError(true);
-        //     setTimeout(() => {
-        //       props.showAlertError(false);
-        //     }, 5000);
-        // })
+        createBalance(value).then((resp) =>{
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            props.showAlertSuces(true);
+            setTimeout(() => {
+              props.showAlertSuces(false);
+            }, 5000);
+        }).catch ((error) => {
+            console.error(error)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            props.showAlertError(true);
+            setTimeout(() => {
+              props.showAlertError(false);
+            }, 5000);
+        })
     }
 
     // useEffect(() => {
     //     setShowLoader(false);
     //     // getCashflowIndirectoInfo(currentState.id)
     //     //   .then((data) => {
-    //     //     console.log(data)
     //     //     if (data.length !==0) {
     //     //         setinputsValues(data[0])
     //     //     } 
