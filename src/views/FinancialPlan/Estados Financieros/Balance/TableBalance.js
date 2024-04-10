@@ -15,6 +15,7 @@ import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity, calcularPrestamos } from 'utils/calcs';
 import { set } from 'lodash';
+import { setIn } from 'formik';
 
 function TableBalance(props) {
     const [cebo, setCebo] = useState(0);
@@ -123,6 +124,11 @@ function TableBalance(props) {
         }
 
     }, [hiddenItems]);
+
+    // un useEffect que se ejecute al inicio
+    useEffect(() => {
+        getBalance(localStorage.getItem('userId'), setinputsValues)
+    }, []);
     // **********************************************
     // **********************************************
 

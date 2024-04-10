@@ -2842,7 +2842,6 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
           pagos: prestamosArray[añoTemp][mes].pagos ? prestamosArray[añoTemp][mes].pagos + pagoMensual : pagoMensual,
         }
       }
-      if (mesInicioUbicado === 0) console.log('estoy en enero y soy: ', prestamoscalculados[i].titulo, ' y el año es: ', añoTemp)
     }
   }
 
@@ -2871,10 +2870,6 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
       final[i] = final[i - 1] + (prestamosAnuales[i].ingresos - prestamosAnuales[i].pagoCapital)
     }
   }
-
-  console.log('prestamosArray: ', prestamosArray)
-  console.log('prestamosAnuales: ', prestamosAnuales)
-  console.log('final: ', final)
 
   setFinal(final)
   setShowLoader(false)
