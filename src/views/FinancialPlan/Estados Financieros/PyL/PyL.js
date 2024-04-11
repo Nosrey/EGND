@@ -30,7 +30,18 @@ import {
 } from 'utils/calcs';
 import TablePyL from './TablePyL';
 
-function PyL() {
+function PyL({ setCmgbruta = () => { },
+  cmgBruta = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ebitda = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ebit = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  rn = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  setEbitda = () => { },
+  setEbit = () => { },
+  setRn = () => { },
+  setRdoNetoValue = () => { },
+  setGrowth = () => { },
+  setGraph03Data = () => { },
+}) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [infoForm, setInfoForm] = useState();
@@ -159,7 +170,7 @@ function PyL() {
 
           if (data?.costoData.length !== 0) {
             setCostoData(data?.costoData);
-          } 
+          }
         } else {
           setVolumenData(EMPTY_TOTALES);
         }
@@ -212,21 +223,21 @@ function PyL() {
             Para acceder a este formulario primero debe completar el formulario
             de{' '}
             {
-              !infoCuentas &&             
+              !infoCuentas &&
               <Link className="text-indigo-700 underline" to="/gastos-por-cc">
                 Supuesto de Gasto de Estructura{', '}
               </Link>
             }
 
             {
-              !prestamosData &&             
+              !prestamosData &&
               <Link className="text-indigo-700 underline" to="/prestamos">
                 Prestamos {', '}
               </Link>
             }
 
             {
-              !costoData &&             
+              !costoData &&
               <Link className="text-indigo-700 underline" to="/costos-unitarios">
                 Costos unitarios{' '}
               </Link>
@@ -270,6 +281,17 @@ function PyL() {
                           setShowSuccessAlert(boolean)
                         }
                         showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                        setCmgbruta={setCmgbruta}
+                        setEbitda={setEbitda}
+                        setEbit={setEbit}
+                        setRn={setRn}
+                        setRdoNetoValue={setRdoNetoValue}
+                        setGrowth={setGrowth}
+                        setGraph03Data={setGraph03Data}
+                        cmgBruta={cmgBruta}
+                        ebitda={ebitda}
+                        ebit={ebit}
+                        rn={rn}
                       />
                     }
                   />

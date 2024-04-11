@@ -922,3 +922,50 @@ export const getCashflowIndirectoInfo = async (id = idUser) => {
     throw new Error('No se pudo obtener los datos del usuario.');
   }
 };
+
+export const createBalance = async (values) => { //VALUES DEBE TENER LA ESTRUCTURA DEL OBJETO QUE TE ENVIE ANTES
+  try {
+    const response = await fetch(`${URL_API}/api/balance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
+export const getBalance = async (id = idUser, setinputsValues) => {
+  try {
+    const resp = await fetch(`${URL_API}/api/balance/${id}`);
+    const data = await resp.json();
+    let objeto = {
+      cajaYBancos: data.response[0]?.cajaYBancos ? data.response[0]?.cajaYBancos : 0,
+      creditosPorVentas: data.response[0]?.creditosPorVentas ? data.response[0]?.creditosPorVentas : 0,
+      creditosFiscales: data.response[0]?.creditosFiscales ? data.response[0]?.creditosFiscales : 0,
+      BienesDeCambio: data.response[0]?.BienesDeCambio ? data.response[0]?.BienesDeCambio : 0,
+      BienesDeUso: data.response[0]?.BienesDeUso ? data.response[0]?.BienesDeUso : 0,
+      totActivo: data.response[0]?.totActivo ? data.response[0]?.totActivo : 0,
+      deudasComerciales: data.response[0]?.deudasComerciales ? data.response[0]?.deudasComerciales : 0,
+      deudasFiscales: data.response[0]?.deudasFiscales ? data.response[0]?.deudasFiscales : 0,
+      deudasFinancieras: data.response[0]?.deudasFinancieras ? data.response[0]?.deudasFinancieras : 0,
+      otrasDeudas: data.response[0]?.otrasDeudas ? data.response[0]?.otrasDeudas : 0,
+      totPasivo: data.response[0]?.totPasivo ? data.response[0]?.totPasivo : 0,
+      equity: data.response[0]?.equity ? data.response[0]?.equity : 0,
+      ResultadosNoAsignados: data.response[0]?.ResultadosNoAsignados ? data.response[0]?.ResultadosNoAsignados : 0,
+      resultadosDelEjercicio: data.response[0]?.resultadosDelEjercicio ? data.response[0]?.resultadosDelEjercicio : 0,
+      totPatNeto: data.response[0]?.totPatNeto ? data.response[0]?.totPatNeto : 0,
+      totPnYPasivo: data.response[0]?.totPnYPasivo ? data.response[0]?.totPnYPasivo : 0,
+    }
+
+    
+    setinputsValues(objeto);
+    return objeto;
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('No se pudo obtener los datos del usuario.');
+  }
+};

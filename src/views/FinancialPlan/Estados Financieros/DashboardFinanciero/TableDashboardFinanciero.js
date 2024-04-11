@@ -1,9 +1,15 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import GraficoDashed from 'components/shared/dashboard/GraficoDashed';
+import GraficoDashFinanc01 from 'components/shared/dashboard/GraficoDashFinanc01';
+import GraficoDashFinanc02 from 'components/shared/dashboard/GraficoDashFinanc02';
+import GraficoDashFinanc03 from 'components/shared/dashboard/GraficoDashFinanc03';
+import GraficoDashFinanc04 from 'components/shared/dashboard/GraficoDashFinanc04';
+import GraficoDashFinanc05 from 'components/shared/dashboard/GraficoDashFinanc05';
+import GraficoDashFinanc06 from 'components/shared/dashboard/GraficoDashFinanc06';
 import GraficoDeBarra from 'components/shared/dashboard/GraficoDeBarra';
 import GraficoDeBarraHeadcountThree from 'components/shared/dashboard/GraficoDeBarraHeadcountThree';
 
-function TableDashboardFinanciero() {
+function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, growth, graph03Data, graph04Data, graph05Data, graph06Data }) {
     const infoForm = {
         "argentina": [
             {
@@ -6567,6 +6573,25 @@ function TableDashboardFinanciero() {
         }
     ]
 
+    const graph01Data = [
+        {
+            name: 'CMG BRUTA %',
+            data: cmgBruta,
+        },
+        {
+            name: 'EBITDA %',
+            data: ebitda,
+        },
+        {
+            name: 'EBIT %',
+            data: ebit,
+        },
+        {
+            name: 'RN %',
+            data: rn,
+        },
+    ];
+
     const typeView = [
         "Ene",
         "Feb",
@@ -6581,17 +6606,21 @@ function TableDashboardFinanciero() {
             <div className="border-solid border-2 border-#e5e7eb rounded-lg 
                 px-4 py-5
             ">
+                <h2 className="mb-[30px]">
+                    P&L
+                </h2>
                 {/* Grafico 1 */}
                 <div className="mt-[40px]">
-                    <h5>GM%, EBITDA % , EBIT % y NI%</h5>
-                    <GraficoDashed />
+                    <h5>CMG BRUTA %, EBITDA % , EBIT % y RN %</h5>
+                    <GraficoDashFinanc01 data={graph01Data} />
                 </div>
 
                 {/* Grafico 2 */}
                 <div className="mt-[40px] mb-[20px]">
-                    <h5>Net Income y growth</h5>
-                    <GraficoDeBarra
-                        data={infoForm}
+                    <h5>Resultado Neto y Growth</h5>
+                    <GraficoDashFinanc02
+                        rdoNeto={rdoNetoValue}
+                        growth={growth}
                         yearSelected={yearSelected}
                         periodoSelected={periodoSelected}
                     />
@@ -6599,48 +6628,52 @@ function TableDashboardFinanciero() {
 
                 {/* Grafico 3 */}
                 <div className="mt-[40px]">
-                    <h5>Ventas, COGS, GM, SG&A, EBITDA…</h5>
-                    <GraficoDashed />
+                    <h5>Ventas, Total costos, CMG Bruta, Gastos de estructura, EBITDA, Rdo Neto</h5>
+                    <GraficoDashFinanc03 graph03Data={graph03Data} />
                 </div>
+
+                <h2 className="mb-[30px]">
+                    CASHFLOW
+                </h2>
 
                 {/* Grafico 4 */}
                 <div className="mt-[40px] mb-[20px]">
-                    <h5>Variacion de caja y bancos y Caja y bancos al cierre del periodo</h5>
-                    <GraficoDeBarra
-                        data={infoForm}
+                    <h5>Variacion de caja/bancos y Caja/bancos al cierre del periodo</h5>
+                    <GraficoDashFinanc04
+                        props={graph04Data}
                         yearSelected={yearSelected}
                         periodoSelected={periodoSelected}
                     />
                 </div>
 
-                {/* Grafico 5 */}
+                {/* Grafico 5
                 <div className="mt-[40px]">
                     <h5>Max y Min Flujo de Fondos </h5>
                     <GraficoDashed />
-                </div>
+                </div> */}
 
                 {/* Grafico 6 */}
-                <div className="mt-[40px] mb-[20px]">
+                {/* <div className="mt-[40px] mb-[20px]">
                     <h5>Cash Runway</h5>
                     <GraficoDeBarra
                         data={infoForm}
                         yearSelected={yearSelected}
                         periodoSelected={periodoSelected}
                     />
-                </div>
+                </div> */}
 
                 {/* Grafico 7 */}
-                <div className="mt-[40px] mb-[20px]">
+                {/* <div className="mt-[40px] mb-[20px]">
                     <h5>Gross Burn Rate</h5>
                     <GraficoDeBarra
                         data={infoForm}
                         yearSelected={yearSelected}
                         periodoSelected={periodoSelected}
                     />
-                </div>
+                </div> */}
 
                 {/* Grafico 8 */}
-                <div className="mt-[40px] mb-[20px]">
+                {/* <div className="mt-[40px] mb-[20px]">
                     <h5>Net Burn Rate</h5>
                     <GraficoDeBarra
                         data={infoForm}
@@ -6649,9 +6682,14 @@ function TableDashboardFinanciero() {
                     />
                 </div>
 
+                <h2 className="mb-[30px]">
+                    KPI
+                </h2> */}
+
                 {/* Grafico 9 */}
                 <h5 className="cursor-default">Endeudamiento</h5>
-                <GraficoDeBarraHeadcountThree
+                <GraficoDashFinanc05
+                    data={graph05Data}
                     typeView={typeView}
                     dataHeadcount={dataHeadcount}
                     periodoSelected={periodoSelected}
@@ -6660,7 +6698,8 @@ function TableDashboardFinanciero() {
 
                 {/* Grafico 10 */}
                 <h5 className="cursor-default">Solvencia</h5>
-                <GraficoDeBarraHeadcountThree
+                <GraficoDashFinanc06
+                    data={graph06Data}
                     typeView={typeView}
                     dataHeadcount={dataHeadcount}
                     periodoSelected={periodoSelected}
@@ -6668,13 +6707,13 @@ function TableDashboardFinanciero() {
                 />
 
                 {/* Grafico 11 */}
-                <h5 className="cursor-default">Apalancamiento</h5>
+                {/* <h5 className="cursor-default">Apalancamiento</h5>
                 <GraficoDeBarraHeadcountThree
                     typeView={typeView}
                     dataHeadcount={dataHeadcount}
                     periodoSelected={periodoSelected}
                     yearSelected={yearSelected}
-                />
+                /> */}
 
             </div>
         </div>
