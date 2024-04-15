@@ -236,6 +236,16 @@ function TableBalance(props) {
         }
     }, [inputsValues.equity, inputsValues.ResultadosNoAsignados, inputsValues.resultadosDelEjercicio]);
 
+    // un useEffect para totActivo
+    // useEffect(() => {
+    //     if (inputsValues.BienesDeCambio && inputsValues.creditosFiscales && inputsValues.creditosPorVentas && inputsValues.BienesDeUso && inputsValues.cajaYBancos) {
+    //         let copy = { ...inputsValues }
+    //         copy.totActivo = Number(copy.BienesDeCambio) + Number(copy.creditosFiscales) + Number(copy.creditosPorVentas) + Number(copy.BienesDeUso) + Number(copy.cajaYBancos)
+    //         setinputsValues(copy)
+    //         console.log('prueba de test')
+    //     }
+    // }, [inputsValues]);
+
     useEffect(() => {
         setTimeout(() => {
             if (ResultadosDelEjercicioData?.length) {
@@ -287,6 +297,25 @@ function TableBalance(props) {
             props.setGraph06Data([{ name: 'Solvencia', data: resultado.map((año) => parseFloat(año.toFixed(2))) }])
         }
     }, [totActivo, totPasivo]);
+
+    // (Caja y Bancos + Creditos por Ventas + Bienes de Cambio  anio anterior)/tot pasivo del anio anterior 
+    useEffect(() => {
+        if (cajaYBancos && creditosPorVentas && bienesDeCambio && totPasivo) {
+            let resultado = [];
+            for (let i = 0; i < 10; i++) {
+                // reviso si es un numero o no, si no lo es lo seteo en 0
+                // if (Number.isNaN((cajaYBancos[i] + creditosPorVentas[i] + bienesDeCambio[i]) / totPasivo[i])) {
+                if (i === 0) {
+                    resultado.push(0)
+                } else if (Number.isNaN((cajaYBancos[i - 1] + creditosPorVentas[i - 1] + bienesDeCambio[i - 1]) / totPasivo[i - 1])) {
+                    resultado.push(0)
+                } else {
+                    resultado.push((cajaYBancos[i - 1] + creditosPorVentas[i - 1] + bienesDeCambio[i - 1]) / totPasivo[i - 1])
+                }
+            }
+            props.setGraph07Data([{ name: 'Liquidez', data: resultado.map((año) => parseFloat(año.toFixed(2))) }])
+        }
+    }, [cajaYBancos, creditosPorVentas, bienesDeCambio, totPasivo]);
 
     const submitInfoFormBalance = () => {
         const value = { ...inputsValues, idUser: localStorage.getItem('userId') }

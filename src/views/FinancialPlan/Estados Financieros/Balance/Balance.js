@@ -21,6 +21,7 @@ import TableDashboardFinanciero from '../DashboardFinanciero/TableDashboardFinan
 function Balance({
   setGraph05Data = () => { },
   setGraph06Data = () => { },
+  setGraph07Data = () => { },
 }) {
   // const rn = useContext(MiContexto);
   const [showLoader, setShowLoader] = useState(false);
@@ -70,6 +71,7 @@ function Balance({
                           creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
                           setGraph05Data={setGraph05Data}
                           setGraph06Data={setGraph06Data}
+                          setGraph07Data={setGraph07Data}
 
                           showAlertSuces={(boolean) =>
                             setShowSuccessAlert(boolean)
