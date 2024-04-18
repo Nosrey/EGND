@@ -14,7 +14,7 @@ import { createCashflowIndirecto, getCashflowIndirectoInfo, getUser, getBalance,
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex, calcularCreditosPorVentas, calcularBienesDeCambio, calcularbienesDeUso, calcularDeudasComerciales, calcularDeudasFiscales, calcularResultadosNoAsignados, calcularEquity, calcularPrestamos } from 'utils/calcs';
-import { set } from 'lodash';
+import { result, set } from 'lodash';
 import { setIn } from 'formik';
 
 function TableBalance(props) {
@@ -318,7 +318,26 @@ function TableBalance(props) {
     }, [cajaYBancos, creditosPorVentas, bienesDeCambio, totPasivo]);
 
     const submitInfoFormBalance = () => {
-        const value = { ...inputsValues, idUser: localStorage.getItem('userId') }
+        const value = {
+            cajaYBancos: inputsValues.cajaYBancos,
+            creditosPorVentas: inputsValues.creditosPorVentas,
+            creditosFiscales: inputsValues.creditosFiscales,
+            bienesDeCambio: inputsValues.BienesDeCambio,
+            bienesDeUso: inputsValues.BienesDeUso,
+            deudasComerciales: inputsValues.deudasComerciales,
+            deudasFiscales: inputsValues.deudasFiscales,
+            deudasFinancieras: inputsValues.deudasFinancieras,
+            otrasDeudas: inputsValues.otrasDeudas,
+            equity: inputsValues.equity,
+            resultadosNoAsignados: inputsValues.ResultadosNoAsignados,
+            resultadosDelEjercicio: inputsValues.resultadosDelEjercicio,
+            totActivo: inputsValues.totActivo,
+            totPasivo: inputsValues.totPasivo,
+            totPatNeto: inputsValues.totPatNeto,
+            totPnYPasivo: inputsValues.totPnYPasivo,
+            idUser: localStorage.getItem('userId')
+        }
+        console.log('value: ', value)
         // createBalance(value)
 
         // getBalance(localStorage.getItem('userId')).then((data) => {
@@ -329,18 +348,18 @@ function TableBalance(props) {
         // delete value.bienesDeCambio;
         // delete value.creditosVentas;
         // delete value.deudasComerciales;
-        createBalance(value).then((resp) =>{
+        createBalance(value).then((resp) => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             props.showAlertSuces(true);
             setTimeout(() => {
-              props.showAlertSuces(false);
+                props.showAlertSuces(false);
             }, 5000);
-        }).catch ((error) => {
+        }).catch((error) => {
             console.error(error)
             window.scrollTo({ top: 0, behavior: 'smooth' });
             props.showAlertError(true);
             setTimeout(() => {
-              props.showAlertError(false);
+                props.showAlertError(false);
             }, 5000);
         })
     }
@@ -1392,7 +1411,7 @@ function TableBalance(props) {
                                 <div
                                     className="flex  gap-x-3 gap-y-3  mb-6 "
                                 >
-                                    <div className='iconDesplegable' onClick={() => playAccordion(2)}/>
+                                    <div className='iconDesplegable' onClick={() => playAccordion(2)} />
 
                                     <FormItem className=" mb-1 w-[240px] ">
                                         <Input
