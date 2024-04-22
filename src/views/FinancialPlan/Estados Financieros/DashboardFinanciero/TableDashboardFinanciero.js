@@ -6,10 +6,11 @@ import GraficoDashFinanc03 from 'components/shared/dashboard/GraficoDashFinanc03
 import GraficoDashFinanc04 from 'components/shared/dashboard/GraficoDashFinanc04';
 import GraficoDashFinanc05 from 'components/shared/dashboard/GraficoDashFinanc05';
 import GraficoDashFinanc06 from 'components/shared/dashboard/GraficoDashFinanc06';
+import GraficoDashFinanc07 from 'components/shared/dashboard/GraficoDashFinanc07';
 import GraficoDeBarra from 'components/shared/dashboard/GraficoDeBarra';
 import GraficoDeBarraHeadcountThree from 'components/shared/dashboard/GraficoDeBarraHeadcountThree';
 
-function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, growth, graph03Data, graph04Data, graph05Data, graph06Data }) {
+function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, growth, graph03Data, graph04Data, graph05Data, graph06Data, graph07Data }) {
     const infoForm = {
         "argentina": [
             {
@@ -6686,6 +6687,10 @@ function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, gr
                     KPI
                 </h2> */}
 
+                <h2 className="mb-[30px]">
+                    KPI
+                </h2>
+
                 {/* Grafico 9 */}
                 <h5 className="cursor-default">Endeudamiento</h5>
                 <GraficoDashFinanc05
@@ -6707,13 +6712,14 @@ function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, gr
                 />
 
                 {/* Grafico 11 */}
-                {/* <h5 className="cursor-default">Apalancamiento</h5>
-                <GraficoDeBarraHeadcountThree
+                <h5 className="cursor-default">Liquidez</h5>
+                <GraficoDashFinanc07
+                    data={graph07Data}
                     typeView={typeView}
                     dataHeadcount={dataHeadcount}
                     periodoSelected={periodoSelected}
                     yearSelected={yearSelected}
-                /> */}
+                />
 
             </div>
         </div>

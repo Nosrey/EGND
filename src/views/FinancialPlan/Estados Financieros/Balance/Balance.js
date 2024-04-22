@@ -7,21 +7,17 @@
 import ContainerScrollable from 'components/shared/ContainerScrollable';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
-import { useEffect, useState } from 'react';
-import {
-  calcAmortizaciones,
-  calcFinanciacionDeTerceros,
-  calcInteresesPagadosPorAnio,
-  calcInversiones,
-  multiplicacionPxQCapex,
-} from 'utils/calcs';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getUser } from 'services/Requests';
 import TableBalance from './TableBalance';
 import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 import Prestamos from '../../Prestamos/Prestamos';
 
-function Balance({ setGraph05Data = () => {}, setGraph06Data = () => {} }) {
+function Balance({
+  setGraph05Data = () => {},
+  setGraph06Data = () => {},
+  setGraph07Data = () => {},
+}) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -54,9 +50,39 @@ function Balance({ setGraph05Data = () => {}, setGraph06Data = () => {} }) {
       ) : (
         <>
           <div>
-            <div className="border-b-2 mb-8 pb-1">
-              <h4 className="cursor-default">Balance</h4>
-              <span className="cursor-default">Estados Financieros</span>
+            <div>
+              <div className="border-b-2 mb-8 pb-1">
+                <h4 className="cursor-default">Balance</h4>
+                <span className="cursor-default">Estados Financieros</span>
+              </div>
+              <div className="container-countries">
+                <FormContainer className="cont-countries">
+                  <ContainerScrollable
+                    contenido={
+                      <TableBalance
+                        cajaYBancos={myResult[0]} // ver
+                        creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+                        setGraph05Data={setGraph05Data}
+                        setGraph06Data={setGraph06Data}
+                        setGraph07Data={setGraph07Data}
+                        showAlertSuces={(boolean) =>
+                          setShowSuccessAlert(boolean)
+                        }
+                        showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                      />
+                      // <TableBalance
+                      //   cajaYBancos={myResult[0]} // ver
+                      //   creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+
+                      //   showAlertSuces={(boolean) =>
+                      //     setShowSuccessAlert(boolean)
+                      //   }
+                      //   showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                      // />
+                    }
+                  />
+                </FormContainer>
+              </div>
             </div>
             <div className="container-countries">
               <FormContainer className="cont-countries">

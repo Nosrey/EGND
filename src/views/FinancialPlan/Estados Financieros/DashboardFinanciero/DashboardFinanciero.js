@@ -78,6 +78,14 @@ function DashboardFinanciero() {
     },
   ]);
 
+  const [graph07Data, setGraph07Data] = useState([
+    // liquidez
+    {
+      name: 'Liquidez',
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    }
+  ])
+
   return (
     <div>
       <div className="oculto">
@@ -98,6 +106,7 @@ function DashboardFinanciero() {
         <Balance
           setGraph05Data={setGraph05Data}
           setGraph06Data={setGraph06Data}
+          setGraph07Data={setGraph07Data}
         />
       </div>
       <div className="border-b-2 mb-8 pb-1">
@@ -119,6 +128,7 @@ function DashboardFinanciero() {
                 graph04Data={graph04Data}
                 graph05Data={graph05Data}
                 graph06Data={graph06Data}
+                graph07Data={graph07Data}
               />
             }
           />

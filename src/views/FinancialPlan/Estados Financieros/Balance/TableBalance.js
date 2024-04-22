@@ -4,21 +4,10 @@ import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import {
-  createCashflowIndirecto,
-  getCashflowIndirectoInfo,
-  getUser,
-  getBalance,
-  createBalance,
-} from 'services/Requests';
+import { getUser, getBalance, createBalance } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import {
-  calcAmortizaciones,
-  calcFinanciacionDeTerceros,
-  calcInteresesPagadosPorAnio,
-  calcInversiones,
-  multiplicacionPxQCapex,
   calcularCreditosPorVentas,
   calcularBienesDeCambio,
   calcularbienesDeUso,
@@ -28,8 +17,6 @@ import {
   calcularEquity,
   calcularPrestamos,
 } from 'utils/calcs';
-import { set } from 'lodash';
-import { setIn } from 'formik';
 
 function TableBalance(props) {
   const [cebo, setCebo] = useState(0);
@@ -112,7 +99,6 @@ function TableBalance(props) {
     copy.totActivo = Number.isNaN(valorTotActivo)
       ? '0'
       : valorTotActivo.toString();
-
     setinputsValues(copy);
   };
 
@@ -151,6 +137,7 @@ function TableBalance(props) {
     }
   }, [hiddenItems]);
 
+  // un useEffect que se ejecute al inicio
   useEffect(() => {
     getBalance(localStorage.getItem('userId'), setinputsValues);
   }, []);
@@ -173,7 +160,10 @@ function TableBalance(props) {
 
   useEffect(() => {
     setCajaYBancos(props.cajaYBancos);
+    //    setCreditosPorVentas(props.creditosPorVentas)
     setCreditosFiscales(props.creditosFiscales);
+    //    setBienesDeCambio(props.bienesDeCambio)
+    // setBienesDeUso(props.bienesDeUso)
   }, [props]);
 
   useEffect(() => {
@@ -235,7 +225,7 @@ function TableBalance(props) {
     }
   }, [updateBienesDeCambio, IIGG, inputsValues.BienesDeCambio]);
 
-  // useEffect que reacciona si se editan algunas de las Deudas Comerciales Deudas Fiscales Deudas Financieras y Otras Deudas y suma el total del pasivo
+  // un useEffect que reacciona si se editan algunas de las Deudas Comerciales Deudas Fiscales Deudas Financieras y Otras Deudas y suma el total del pasivo
   useEffect(() => {
     if (
       deudasComerciales &&
@@ -390,10 +380,12 @@ function TableBalance(props) {
     }
   }, [totalPatrimonioNeto, totPasivo]);
 
+  // igual peron con tot activo / tot pasivo para setear props.graph06Data
   useEffect(() => {
     if (totActivo && totPasivo) {
       let resultado = [];
       for (let i = 0; i < 10; i++) {
+        // reviso si es un numero o no, si no lo es lo seteo en 0
         if (Number.isNaN(totActivo[i] / totPasivo[i])) {
           resultado.push(0);
         } else {
@@ -409,8 +401,62 @@ function TableBalance(props) {
     }
   }, [totActivo, totPasivo]);
 
+  // (Caja y Bancos + Creditos por Ventas + Bienes de Cambio  anio anterior)/tot pasivo del anio anterior
+  useEffect(() => {
+    if (cajaYBancos && creditosPorVentas && bienesDeCambio && totPasivo) {
+      let resultado = [];
+      for (let i = 0; i < 10; i++) {
+        // reviso si es un numero o no, si no lo es lo seteo en 0
+        if (i === 0) {
+          resultado.push(0);
+        } else if (
+          Number.isNaN(
+            (cajaYBancos[i - 1] +
+              creditosPorVentas[i - 1] +
+              bienesDeCambio[i - 1]) /
+              totPasivo[i - 1],
+          )
+        ) {
+          resultado.push(0);
+        } else {
+          resultado.push(
+            (cajaYBancos[i - 1] +
+              creditosPorVentas[i - 1] +
+              bienesDeCambio[i - 1]) /
+              totPasivo[i - 1],
+          );
+        }
+      }
+      props.setGraph07Data([
+        {
+          name: 'Liquidez',
+          data: resultado.map((año) => parseFloat(año.toFixed(2))),
+        },
+      ]);
+    }
+  }, [cajaYBancos, creditosPorVentas, bienesDeCambio, totPasivo]);
+
   const submitInfoFormBalance = () => {
-    const value = { ...inputsValues, idUser: localStorage.getItem('userId') };
+    const value = {
+      cajaYBancos: inputsValues.cajaYBancos,
+      creditosPorVentas: inputsValues.creditosPorVentas,
+      creditosFiscales: inputsValues.creditosFiscales,
+      bienesDeCambio: inputsValues.BienesDeCambio,
+      bienesDeUso: inputsValues.BienesDeUso,
+      deudasComerciales: inputsValues.deudasComerciales,
+      deudasFiscales: inputsValues.deudasFiscales,
+      deudasFinancieras: inputsValues.deudasFinancieras,
+      otrasDeudas: inputsValues.otrasDeudas,
+      equity: inputsValues.equity,
+      resultadosNoAsignados: inputsValues.ResultadosNoAsignados,
+      resultadosDelEjercicio: inputsValues.resultadosDelEjercicio,
+      totActivo: inputsValues.totActivo,
+      totPasivo: inputsValues.totPasivo,
+      totPatNeto: inputsValues.totPatNeto,
+      totPnYPasivo: inputsValues.totPnYPasivo,
+      idUser: localStorage.getItem('userId'),
+    };
+    console.log('value: ', value);
     createBalance(value)
       .then((resp) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
