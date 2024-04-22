@@ -61,9 +61,6 @@ function TablePuestosPxQ(props) {
 
             if (arrayvalores[j].values[s] >= 0) {
               arrayvalores[j].values[s] += valor;
-              // arrayvalores[j].values[s] = Number(
-              //   arrayvalores[j].values[s],
-              // )
             } else {
               arrayvalores[j].values.push(valor);
             }
@@ -172,8 +169,6 @@ function TablePuestosPxQ(props) {
     const nuevoNum = inputNumero.toLocaleString('es-AR');
     return nuevoNum;
   };
-
-  console.log('[INFO]', infoForm);
 
   return (
     <>

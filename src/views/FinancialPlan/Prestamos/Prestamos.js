@@ -106,6 +106,7 @@ export default function Prestamos() {
             plazo: 0,
             tasaAnual: 0,
             mesInicio: '',
+            yearInicio: '',
           });
         }
         setShowLoader(false);

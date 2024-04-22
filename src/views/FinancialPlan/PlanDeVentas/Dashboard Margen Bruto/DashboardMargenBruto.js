@@ -237,7 +237,6 @@ function DashboardMargenBruto() {
                         }
                       } else if (periodoSelected.month === 4) {
                         if (indexM < 3) {
-                          console.log('ACA');
                           tot += Math.round(
                             getMargenBrutoResult(
                               indexCountry,
@@ -442,7 +441,6 @@ function DashboardMargenBruto() {
       ) *
         100) /
       getVentasResult(indexCountry, indexCanal, indexP, indexYear, indexMes);
-    // console.log("PORECNTAJE",percent)
     if (percent === -Infinity) {
       percent = -100;
     }

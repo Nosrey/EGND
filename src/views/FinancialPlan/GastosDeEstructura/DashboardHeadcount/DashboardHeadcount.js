@@ -204,7 +204,6 @@ function DashboardHeadcount() {
         }
       } else {
         div = Math.floor(cantPers / 12);
-        // setFte(totalVentas / div);
         return totalVentas / div;
       }
     } else {

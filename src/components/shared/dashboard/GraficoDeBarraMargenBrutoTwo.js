@@ -89,7 +89,6 @@ function GraficoDeBarraMargenBrutoTwo({
     indexYear,
     indexMes,
   ) => {
-    // margen bruto x 100 / ventas
     let percent =
       (getMargenBrutoResult(
         indexCountry,

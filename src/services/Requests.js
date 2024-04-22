@@ -1,15 +1,27 @@
+/* eslint-disable default-param-last */
 import { AÑOS } from 'constants/forms.constants';
 import { puestos } from 'constants/puestos.constant';
 import store from '../store/index';
 
 const app = store.getState();
 
-// const ls = JSON.parse(window.localStorage.getItem('admin'));
-// const auth = JSON.parse(ls.auth);
+// const URL_API = 'http://localhost:8080';
 
 const URL_API = 'https://api.egndfinance.com';
-// const idUser = app.auth.user.id && app.auth.user.id;
 const idUser = localStorage.getItem('userId');
+
+export const activateAccount = async (token) => {
+  try {
+    const response = await fetch(`${URL_API}/api/confirm-email/${token}`, {
+      method: 'POST',
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
 
 const compareChannelsInfo = (newChannel, oldChannel) => {
   let updatedChannel = { ...newChannel };
@@ -599,9 +611,6 @@ const updateGastosPorCCData = (estructura, centroDeGastos) => {
     localStorage.getItem('gastosPorCCData'),
   );
   if (oldGastosPorCCData.length !== 0) {
-    console.log(oldGastosPorCCData[0].centroDeCostos);
-    console.log('estructura', estructura);
-    console.log(centroDeGastos);
     const newData = oldGastosPorCCData[0].centroDeCostos.map((item) => {
       const nuevoItem = {};
       Object.keys(item).forEach((key) => {
@@ -638,8 +647,6 @@ export const createGastosGeneral = async ({
     let estructura = {};
     Object.keys(centroDeGastos).map((cc, index) => {
       let heads = [];
-      // console.log("para ", cc)
-      // console.log( puestos[0][cc])
       if (puestos[0][cc]) {
         for (let i = 0; i < puestos[0][cc]?.length; i++) {
           let head = {};
@@ -823,13 +830,11 @@ export const createMercado = async (
 
   if (response.ok) {
     const data = await response.json();
-    console.log(data);
     return data;
   }
 
   throw new Error('Error en la petición POST');
 };
-
 
 export const createPyL = async (values) => {
   try {
@@ -877,6 +882,125 @@ export const getWorkingCapitalInfo = async (id = idUser) => {
     const resp = await fetch(`${URL_API}/api/workingcapital/${id}`);
     const data = await resp.json();
     return data.response;
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('No se pudo obtener los datos del usuario.');
+  }
+};
+
+export const createCashflowIndirecto = async (values) => {
+  try {
+    const response = await fetch(`${URL_API}/api/cashflowindirecto`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
+export const getCashflowIndirectoInfo = async (id = idUser) => {
+  try {
+    const resp = await fetch(`${URL_API}/api/cashflowindirecto/${id}`);
+    const data = await resp.json();
+    return data.response;
+  } catch (error) {
+    console.error('Error:', error);
+    throw new Error('No se pudo obtener los datos del usuario.');
+  }
+};
+
+export const createBalance = async (values) => {
+  // VALUES DEBE TENER LA ESTRUCTURA DEL OBJETO QUE TE ENVIE ANTES
+  try {
+    const response = await fetch(`${URL_API}/api/balance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error', error);
+    throw error;
+  }
+};
+
+export const getBalance = async (id = idUser, setinputsValues) => {
+  try {
+    const resp = await fetch(`${URL_API}/api/balance/${id}`);
+    const data = await resp.json();
+    console.log('value de entrada: ', data);
+    let objeto = {
+      cajaYBancos: data.response[0]?.cajaYBancos
+        ? data.response[0]?.cajaYBancos
+        : 0,
+      creditosPorVentas: data.response[0]?.creditosPorVentas
+        ? data.response[0]?.creditosPorVentas
+        : 0,
+      creditosFiscales: data.response[0]?.creditosFiscales
+        ? data.response[0]?.creditosFiscales
+        : 0,
+      BienesDeCambio: data.response[0]?.bienesDeCambio
+        ? data.response[0]?.bienesDeCambio
+        : 0,
+      BienesDeUso: data.response[0]?.bienesDeUso
+        ? data.response[0]?.bienesDeUso
+        : 0,
+      deudasComerciales: data.response[0]?.deudasComerciales
+        ? data.response[0]?.deudasComerciales
+        : 0,
+      deudasFiscales: data.response[0]?.deudasFiscales
+        ? data.response[0]?.deudasFiscales
+        : 0,
+      deudasFinancieras: data.response[0]?.deudasFinancieras
+        ? data.response[0]?.deudasFinancieras
+        : 0,
+      otrasDeudas: data.response[0]?.otrasDeudas
+        ? data.response[0]?.otrasDeudas
+        : 0,
+      equity: data.response[0]?.equity ? data.response[0]?.equity : 0,
+      ResultadosNoAsignados: data.response[0]?.resultadosNoAsignados
+        ? data.response[0]?.resultadosNoAsignados
+        : 0,
+      resultadosDelEjercicio: data.response[0]?.resultadosDelEjercicio
+        ? data.response[0]?.resultadosDelEjercicio
+        : 0,
+
+      totActivo:
+        (Number(data.response[0]?.bienesDeCambio) || 0) +
+        (Number(data.response[0]?.bienesDeUso) || 0) +
+        (Number(data.response[0]?.creditosFiscales) || 0) +
+        (Number(data.response[0]?.creditosPorVentas) || 0) -
+        (Number(data.response[0]?.cajaYBancos) || 0),
+
+      totPasivo:
+        (Number(data.response[0]?.deudasComerciales) || 0) +
+        (Number(data.response[0]?.deudasFiscales) || 0) +
+        (Number(data.response[0]?.deudasFinancieras) || 0) +
+        (Number(data.response[0]?.otrasDeudas) || 0),
+
+      totPatNeto:
+        (Number(data.response[0]?.equity) || 0) +
+        (Number(data.response[0]?.resultadosNoAsignados) || 0) +
+        (Number(data.response[0]?.resultadosDelEjercicio) || 0),
+
+      totPnYPasivo:
+        (Number(data.response[0]?.equity) || 0) +
+        (Number(data.response[0]?.resultadosNoAsignados) || 0) +
+        (Number(data.response[0]?.resultadosDelEjercicio) || 0) +
+        ((Number(data.response[0]?.deudasComerciales) || 0) +
+          (Number(data.response[0]?.deudasFiscales) || 0) +
+          (Number(data.response[0]?.deudasFinancieras) || 0) +
+          (Number(data.response[0]?.otrasDeudas) || 0)),
+    };
+
+    setinputsValues(objeto);
+    return objeto;
   } catch (error) {
     console.error('Error:', error);
     throw new Error('No se pudo obtener los datos del usuario.');

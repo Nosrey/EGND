@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
 
 function GraficoDashedLTVCAC(props) {
-  const [ltvcac, setLtvCac ]= useState(props.ltvcac);
+  const [ltvcac, setLtvCac] = useState(props.ltvcac);
   const data = [
     {
       name: 'LTV / CAC',
@@ -20,7 +20,6 @@ function GraficoDashedLTVCAC(props) {
             enabled: false,
           },
         },
-        // colors: [...COLORS],
         dataLabels: {
           enabled: false,
         },

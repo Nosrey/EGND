@@ -2,6 +2,8 @@
 
 import numeral from 'numeral';
 
+import currency from 'currency.js';
+
 export default function formatNumber(value) {
   const number = parseFloat(value);
   if (!Number.isNaN(number)) {
@@ -17,35 +19,13 @@ export const formatearNumero = (numero) => {
   return esNegativo ? `-${nuevoNum}` : nuevoNum;
 };
 
-// export const formatNumberPrestamos = (number) => { // FALLA PARA VALORES CON MILLONES O BILLONES
-//   const myNumeral = numeral(number);
-//   const currencyString = myNumeral.format('0.0,');
-
-//   const fraseActF = currencyString.toString().replace(',', '.');
-
-//   let count = 0;
-//   let another = '';
-
-//   for (let i = 0; i < fraseActF.length; i++) {
-//     if (fraseActF[i] === '.') {
-//       count++;
-//     }
-
-//     if (fraseActF[i] === '.' && count > 1) {
-//       another += ',';
-//     } else {
-//       another += fraseActF[i];
-//     }
-//   }
-//   return another;
-// };
-
 export const formatNumberPrestamos = (numero) => {
-  // Aseguramos que el número tenga exactamente 2 decimales
-  numero = parseFloat(numero).toFixed(2);
+  const newNumberr = currency(numero, {
+    symbol: '',
+    pattern: '# !',
+    separator: '.',
+    decimal: ',',
+  });
 
-  // Formateamos el número con separadores de miles y coma para decimales
-  let numeroFormateado = parseFloat(numero).toLocaleString('es-ES');
-
-  return numeroFormateado;
-}
+  return newNumberr.format();
+};

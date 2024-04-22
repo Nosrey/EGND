@@ -301,9 +301,7 @@ function TableCapexQ(props) {
                     width: '47%',
                   }}
                   className=" flex justify-center items-center"
-                  // variant="solid"
                   variant="twoTone"
-                  // color="blue-600"
                   color="red-600"
                   onClick={() => {
                     setShowRemoveProd(!showRemoveProd);
@@ -325,7 +323,6 @@ function TableCapexQ(props) {
                   width: '47%',
                 }}
                 className=" flex justify-center items-center"
-                // variant="solid"
                 variant="twoTone"
                 type="button"
                 onClick={() => {

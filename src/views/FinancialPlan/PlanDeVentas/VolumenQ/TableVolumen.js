@@ -106,7 +106,6 @@ function TableVolumen(props) {
         }
         setInfoProducts(() => [...copy]);
       }
-      console.log([...arrayCanales]);
       setTotalesCanales(() => [...arrayCanales]);
     }
   };
@@ -148,7 +147,7 @@ function TableVolumen(props) {
       for (let mes in newMeses) {
         if (currentMonth >= producto.inicioMes) {
           newMeses[mes] = Math.round(volumenActual);
-          volTotal += Math.round(volumenActual)
+          volTotal += Math.round(volumenActual);
           volumenActual *= 1 + producto.tasa / 100;
         } else {
           newMeses[mes] = 0;
@@ -190,10 +189,10 @@ function TableVolumen(props) {
     indexYear,
   ) => {
     let inputNumero;
-    if (typeof newValue === "string") {
+    if (typeof newValue === 'string') {
       inputNumero = Number(newValue.replace(/\D/g, ''));
     } else {
-      inputNumero = newValue
+      inputNumero = newValue;
     }
 
     const newData = { ...infoForm };
@@ -393,7 +392,7 @@ function TableVolumen(props) {
                           {producto.años.map((año, indexYear) => (
                             <div className="flex flex-col" key={indexYear}>
                               <div className="titleRow min-w-[62px]">
-                                <p className='cursor-default'> Año {año.año}</p>
+                                <p className="cursor-default"> Año {año.año}</p>
                                 <div
                                   className="iconYear"
                                   onClick={() => hideYear(indexYear)}
@@ -555,7 +554,10 @@ function TableVolumen(props) {
                     <div className="flex flex-col" key={indexYear}>
                       {index === 0 && (
                         <div className="titleRowR min-w-[62px]">
-                          <p className='cursor-default '> Año {indexYear + 1}</p>
+                          <p className="cursor-default ">
+                            {' '}
+                            Año {indexYear + 1}
+                          </p>
                           <div
                             className="iconYear"
                             onClick={() => hideYear(indexYear)}

@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 
 function GraficoDashed(props) {
   const [cac, setCac] = useState(props.cac);
-  const [ltv, setLtv ]= useState(props.ltv);
+  const [ltv, setLtv] = useState(props.ltv);
   const data = [
     {
       name: 'CAC',
@@ -25,7 +25,6 @@ function GraficoDashed(props) {
             enabled: false,
           },
         },
-        // colors: [...COLORS],
         dataLabels: {
           enabled: false,
         },

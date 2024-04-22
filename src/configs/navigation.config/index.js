@@ -116,16 +116,6 @@ const navigationConfig = [
             authority: [],
             subMenu: [],
           },
-          // {
-          //   key: 'collapsePlanVentas.item6',
-          //   path: '/clientestotaltes',
-          //   title: 'Clientes Totales',
-          //   translateKey: 'nav.collapsePlanVentas.item6',
-          //   icon: '',
-          //   type: NAV_ITEM_TYPE_ITEM,
-          //   authority: [],
-          //   subMenu: [],
-          // },
           {
             key: 'collapsePlanVentas.item7',
             path: '/dashboardventas',
@@ -429,16 +419,6 @@ const navigationConfig = [
             subMenu: [],
           },
           {
-            key: 'collapseEstadosFinancieros.item3',
-            path: '/cashflow-directo',
-            title: 'Cashflow Directo',
-            translateKey: 'nav.collapseEstadosFinancieros.item3',
-            icon: '',
-            type: NAV_ITEM_TYPE_ITEM,
-            authority: [],
-            subMenu: [],
-          },
-          {
             key: 'collapseEstadosFinancieros.item4',
             path: '/balance',
             title: 'Balance',
@@ -460,7 +440,7 @@ const navigationConfig = [
           },
           {
             key: 'collapseEstadosFinancieros.item6',
-            path: '/',
+            path: '/dashboard-financiero',
             title: 'Dashboard Financiero',
             translateKey: 'nav.collapseEstadosFinancieros.item6',
             icon: '',

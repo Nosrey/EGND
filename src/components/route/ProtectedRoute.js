@@ -14,7 +14,7 @@ function ProtectedRoute() {
   if (!authenticated) {
     return (
       <Navigate
-        to={`${unAuthenticatedEntryPath}?${REDIRECT_URL_KEY}=${location.pathname}`}
+        to={location.pathname.includes('activar-cuenta') ? `${location.pathname}` :`${unAuthenticatedEntryPath}?${REDIRECT_URL_KEY}=${location.pathname}`}
         replace
       />
     )

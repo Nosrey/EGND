@@ -13,26 +13,12 @@ const validationSchema = Yup.object().shape({
   mercado: Yup.string()
     .min(3, '¡Demasiado corto!')
     .max(100, '¡Demasiado largo!'),
-    // .required('Requerido'),
   definicion: Yup.string()
     .min(3, '¡Demasiado corto!')
     .max(100, '¡Demasiado largo!'),
-    // .required('Requerido'),
-  // valorTam: Yup.string().required('Requerido'),
-  tam: Yup.string()
-    .min(3, '¡Demasiado corto!')
-    .max(100, '¡Demasiado largo!'),
-    // .required('Requerido'),
-  // valorSam: Yup.string().required('Requerido'),
-  sam: Yup.string()
-    .min(3, '¡Demasiado corto!')
-    .max(100, '¡Demasiado largo!'),
-    // .required('Requerido'),
-  // valorSom: Yup.string().required('Requerido'),
-  som: Yup.string()
-    .min(3, '¡Demasiado corto!')
-    .max(100, '¡Demasiado largo!'),
-    // .required('Requerido'),
+  tam: Yup.string().min(3, '¡Demasiado corto!').max(100, '¡Demasiado largo!'),
+  sam: Yup.string().min(3, '¡Demasiado corto!').max(100, '¡Demasiado largo!'),
+  som: Yup.string().min(3, '¡Demasiado corto!').max(100, '¡Demasiado largo!'),
 });
 
 function Mercado() {
@@ -46,25 +32,29 @@ function Mercado() {
 
   const [valueForm, setValueForm] = useState({});
   const [isInitialValuesSet, setIsInitialValuesSet] = useState(false);
-  const [percentSam, setPercentSam] = useState()
-  const [percentSom, setPercentSom] = useState()
-  const [valorTam, setValorTam] = useState(0)
-  const [valorSam, setValorSam] = useState(0)
-  const [valorSom, setValorSom] = useState(0)
+  const [percentSam, setPercentSam] = useState();
+  const [percentSom, setPercentSom] = useState();
+  const [valorTam, setValorTam] = useState(0);
+  const [valorSam, setValorSam] = useState(0);
+  const [valorSom, setValorSom] = useState(0);
 
-  
   useEffect(() => {
     getUser(currentState)
       .then((data) => {
         if (data.mercadoData.length !== 0) {
           setValueForm(data.mercadoData[0]);
-          setValorTam(data.mercadoData[0].valorTam)
-          setValorSam(data.mercadoData[0].valorSam)
-          setValorSom(data.mercadoData[0].valorSom)
-          setPercentSam(Number(data.mercadoData[0].valorSam) * 100 / Number(data.mercadoData[0].valorTam));
-          setPercentSom(Number(data.mercadoData[0].valorSom) * 100 / Number(data.mercadoData[0].valorTam));
+          setValorTam(data.mercadoData[0].valorTam);
+          setValorSam(data.mercadoData[0].valorSam);
+          setValorSom(data.mercadoData[0].valorSom);
+          setPercentSam(
+            (Number(data.mercadoData[0].valorSam) * 100) /
+              Number(data.mercadoData[0].valorTam),
+          );
+          setPercentSom(
+            (Number(data.mercadoData[0].valorSom) * 100) /
+              Number(data.mercadoData[0].valorTam),
+          );
 
-      
           setIsInitialValuesSet(true);
         }
       })
@@ -76,39 +66,39 @@ function Mercado() {
   const removePunctuation = (value) => value?.replace(/[.,]/g, '');
 
   const calculatePercent = (value, type) => {
-    if (typeof(value) === "string") {
+    if (typeof value === 'string') {
       value = Number(removePunctuation(value));
     }
-    let tam
-    if (typeof(valorTam) === "string") {
+    let tam;
+    if (typeof valorTam === 'string') {
       tam = Number(removePunctuation(valorTam));
     } else {
       tam = valorTam;
     }
-    if (valorTam !== 0 ) {
-      let rdo = value * 100 / tam;
+    if (valorTam !== 0) {
+      let rdo = (value * 100) / tam;
       rdo = Number.isNaN(rdo) || rdo === Infinity ? 0 : rdo;
       switch (type) {
-        case "sam":
-          setPercentSam(rdo)
+        case 'sam':
+          setPercentSam(rdo);
           break;
-        case "som":
-          setPercentSom(rdo)
+        case 'som':
+          setPercentSom(rdo);
 
-        break;
+          break;
         default:
           break;
       }
     }
-  }
+  };
 
   useEffect(() => {
     if (valorTam) {
-      calculatePercent(valorSam, "sam");
-      calculatePercent(valorSom, "som");
+      calculatePercent(valorSam, 'sam');
+      calculatePercent(valorSom, 'som');
     }
-  }, [valorTam])
-  
+  }, [valorTam]);
+
   return (
     <div>
       {showSuccessAlert && (
@@ -188,15 +178,20 @@ function Mercado() {
                     setShowErrorAlert(false);
                   }, 5000);
                 });
-              
             }}
           >
-            {({ touched, errors, resetForm, values,setFieldValue }) => (
+            {({ touched, errors, resetForm, values, setFieldValue }) => (
               <Form>
                 <FormContainer>
-                  <div className={`flex ${media === "mobile" ?  "flex-col" : ""} gap-[16px]`}>
+                  <div
+                    className={`flex ${
+                      media === 'mobile' ? 'flex-col' : ''
+                    } gap-[16px]`}
+                  >
                     <FormItem
-                      className={`${media === "mobile" ?  "w-[100%]" : "w-[40%]"}   max-w-[480px] `}
+                      className={`${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[40%]'
+                      }   max-w-[480px] `}
                       label="Mercado"
                       invalid={errors.mercado && touched.mercado}
                       errorMessage={errors.mercado}
@@ -211,7 +206,9 @@ function Mercado() {
                     </FormItem>
 
                     <FormItem
-                      className={`${media === "mobile" ?  "w-[100%]" : "w-[40%]"}   max-w-[480px] `}
+                      className={`${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[40%]'
+                      }   max-w-[480px] `}
                       label="Definición de Mercado Target"
                       invalid={errors.definicion && touched.definicion}
                       errorMessage={errors.definicion}
@@ -233,13 +230,20 @@ function Mercado() {
 
                   <h4 className="mt-[20px]">Tamaño de Mercado</h4>
 
-                  <div className={`flex ${media === "mobile" ?  "flex-col-reverse" : ""}   gap-[50px] items-center mt-[20px]`}>
-                    <div className={`${media === "mobile" ?  "w-[100%]" : "w-[50%]"}`}>
+                  <div
+                    className={`flex ${
+                      media === 'mobile' ? 'flex-col-reverse' : ''
+                    }   gap-[50px] items-center mt-[20px]`}
+                  >
+                    <div
+                      className={`${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                      }`}
+                    >
                       <div>
                         <span className="cursor-default">TAM</span>
                         <div className="flex gap-[16px] mt-2.5 w-[100%]">
                           <FormItem
-                            // className="max-w-[100px]"
                             className="w-[30%]"
                             invalid={errors.valorTam && touched.valorTam}
                             errorMessage={errors.valorTam}
@@ -254,13 +258,12 @@ function Mercado() {
                               value={formatearNumero(values?.valorTam)}
                               onChange={(e) => {
                                 const newValue = e.target.value;
-                                setValorTam(newValue)
+                                setValorTam(newValue);
                                 setFieldValue('valorTam', newValue);
                               }}
                             />
                           </FormItem>
                           <FormItem
-                            // className="max-w-sm"
                             className="w-[80%]"
                             invalid={errors.tam && touched.tam}
                             errorMessage={errors.tam}
@@ -276,7 +279,12 @@ function Mercado() {
                         </div>
                       </div>
                       <div>
-                        <span className="cursor-default">SAM</span> {valorTam !== 0 && <span className=' inline-block bg-[#f4f4f4] rounded-lg pt-[2px] pb-[2px] px-[8px] ml-[20px] text-[#5A8EC7] text-xs font-bold'>{Math.round(percentSam)}%</span>}
+                        <span className="cursor-default">SAM</span>{' '}
+                        {valorTam !== 0 && (
+                          <span className=" inline-block bg-[#f4f4f4] rounded-lg pt-[2px] pb-[2px] px-[8px] ml-[20px] text-[#5A8EC7] text-xs font-bold">
+                            {Math.round(percentSam)}%
+                          </span>
+                        )}
                         <div className="flex gap-[16px] mt-2.5 w-[100%]">
                           <FormItem
                             className="w-[30%]"
@@ -293,8 +301,11 @@ function Mercado() {
                               value={formatearNumero(values?.valorSam)}
                               onChange={(e) => {
                                 const newValue = e.target.value;
-                                setValorSam(newValue)
-                                calculatePercent(Number(removePunctuation(newValue)), "sam")
+                                setValorSam(newValue);
+                                calculatePercent(
+                                  Number(removePunctuation(newValue)),
+                                  'sam',
+                                );
                                 setFieldValue('valorSam', newValue);
                               }}
                             />
@@ -315,7 +326,12 @@ function Mercado() {
                         </div>
                       </div>
                       <div>
-                        <span className="cursor-default">SOM</span> {valorTam !== 0 &&<span  className=' inline-block bg-[#f4f4f4] rounded-lg pt-[2px] pb-[2px] px-[8px] ml-[20px] text-[#5A8EC7] text-xs font-bold'>{Math.round(percentSom)}%</span>}
+                        <span className="cursor-default">SOM</span>{' '}
+                        {valorTam !== 0 && (
+                          <span className=" inline-block bg-[#f4f4f4] rounded-lg pt-[2px] pb-[2px] px-[8px] ml-[20px] text-[#5A8EC7] text-xs font-bold">
+                            {Math.round(percentSom)}%
+                          </span>
+                        )}
                         <div className="flex gap-[16px] mt-2.5 w-[100%]">
                           <FormItem
                             className="w-[30%]"
@@ -332,9 +348,12 @@ function Mercado() {
                               value={formatearNumero(values?.valorSom)}
                               onChange={(e) => {
                                 const newValue = e.target.value;
-                                setValorSom(newValue)
+                                setValorSom(newValue);
 
-                                calculatePercent(Number(removePunctuation(newValue)), "som")
+                                calculatePercent(
+                                  Number(removePunctuation(newValue)),
+                                  'som',
+                                );
                                 setFieldValue('valorSom', newValue);
                               }}
                             />
@@ -355,7 +374,11 @@ function Mercado() {
                         </div>
                       </div>
                     </div>
-                    <div className={`${media === "mobile" ?  "w-[100%] mt-[30px]" : "w-[50%]"} relative`}>
+                    <div
+                      className={`${
+                        media === 'mobile' ? 'w-[100%] mt-[30px]' : 'w-[50%]'
+                      } relative`}
+                    >
                       <img
                         className="w-[100%] max-w-[860px] "
                         src={ImageMercado}
@@ -410,9 +433,6 @@ function Mercado() {
         </div>
       </div>
     </div>
-
-
-
   );
 }
 

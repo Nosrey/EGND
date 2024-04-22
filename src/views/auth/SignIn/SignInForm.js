@@ -71,7 +71,6 @@ function SignInForm(props) {
         </Alert>
       )}
       <Formik
-        // Remove this initial value
         initialValues={{
           email: '',
           password: '',
@@ -118,8 +117,11 @@ function SignInForm(props) {
                 />
               </FormItem>
               <div className="flex justify-end mb-[35px]">
-                <ActionLink to={forgotPasswordUrl} className="text-[#292929] text-[14px] mt-[-18px]">
-                ¿Olvidaste la contraseña?
+                <ActionLink
+                  to={forgotPasswordUrl}
+                  className="text-[#292929] text-[14px] mt-[-18px]"
+                >
+                  ¿Olvidaste la contraseña?
                 </ActionLink>
               </div>
               <Button

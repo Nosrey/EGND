@@ -1,5 +1,4 @@
 function ShortNumberNotation({ numero }) {
-  // Convertir el número de entrada a un tipo numérico
   let num;
   if (typeof numero === 'string') {
     num = parseInt(numero.replace(/\./g, ''));
@@ -23,11 +22,13 @@ function ShortNumberNotation({ numero }) {
     exp += 3;
   }
 
-  // Formatear el número con dos decimales si es igual o mayor a 1000
   const numeroFormateado = exp >= 3 ? num.toFixed(2) : num.toFixed(0);
 
-  return <span className="cursor-default">{`${numero < 0 ? ' -' : ''}${Math.abs(numeroFormateado)} ${sufijos[exp]}`}</span>;
-
+  return (
+    <span className="cursor-default">{`${numero < 0 ? ' -' : ''}${Math.abs(
+      numeroFormateado,
+    )} ${sufijos[exp]}`}</span>
+  );
 }
 
 export default ShortNumberNotation;

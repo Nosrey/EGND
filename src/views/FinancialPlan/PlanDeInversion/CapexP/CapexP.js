@@ -32,9 +32,6 @@ function CapexP() {
       })
       .catch((error) => console.error(error));
   }, []);
-
-  console.log('info', bienes);
-
   return (
     <div>
       {showSuccessAlert && (
