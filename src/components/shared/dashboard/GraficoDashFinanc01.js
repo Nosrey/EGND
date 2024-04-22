@@ -2,21 +2,6 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 
 function GraficoDashed({ data }) {
-  // const data = [
-  //   {
-  //     name: 'Session Duration',
-  //     data: [45, 52, 38, 24, 33, 26, 21, 20, 6, 8, 15, 10],
-  //   },
-  //   {
-  //     name: 'Page Views',
-  //     data: [35, 41, 62, 42, 13, 18, 29, 37, 36, 51, 32, 35],
-  //   },
-  //   {
-  //     name: 'Total Visits',
-  //     data: [87, 57, 74, 99, 75, 38, 62, 47, 82, 56, 45, 47],
-  //   },
-  // ];
-
   return (
     <Chart
       options={{
@@ -27,7 +12,6 @@ function GraficoDashed({ data }) {
             enabled: false,
           },
         },
-        // colors: [...COLORS],
         dataLabels: {
           enabled: false,
         },
@@ -38,7 +22,8 @@ function GraficoDashed({ data }) {
         },
         legend: {
           tooltipHoverFormatter: (val, opts) =>
-            `${val} - ${opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex]
+            `${val} - ${
+              opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex]
             }`,
         },
         markers: {
@@ -63,16 +48,6 @@ function GraficoDashed({ data }) {
         },
         tooltip: {
           y: [
-            // {
-            //   title: {
-            //     formatter: (val) => `${val} (mins)`,
-            //   },
-            // },
-            // {
-            //   title: {
-            //     formatter: (val) => `${val} per session`,
-            //   },
-            // },
             {
               title: {
                 formatter: (val) => `${val}`,

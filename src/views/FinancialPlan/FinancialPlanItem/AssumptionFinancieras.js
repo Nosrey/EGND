@@ -7,8 +7,6 @@ import { getUser } from 'services/Requests';
 import { useMedia } from 'utils/hooks/useMedia';
 import TableFinancieras from './TableFinancieras';
 
-// const { Tr, Td, TBody } = Table;
-
 const plazos = {
   contado: '',
   treintaDias: '',
@@ -28,7 +26,7 @@ const plazos = {
 };
 
 const defaultState = {
-  impGanancias: "",
+  impGanancias: '',
   cobranzas: plazos,
   pagoProducto: plazos,
   pagoServicio: plazos,
@@ -74,16 +72,15 @@ function AssumptionsFinancieras() {
   }, [setDataFinanciera]);
 
   const setFormValues = (index, campo, value) => {
-    if (index !== 'stock' && index !== "impGanancias") {
+    if (index !== 'stock' && index !== 'impGanancias') {
       const input = tiempos[index].name;
       const state = dataFinanciera.input;
       const newData = { ...dataFinanciera[campo], [input]: value };
       let tot = 0;
       Object.keys(newData).forEach((key, index) => {
-        if(index < 13){
+        if (index < 13) {
           tot += Number(newData[key]);
         }
-
       });
 
       if (tot > 100) {
@@ -119,7 +116,9 @@ function AssumptionsFinancieras() {
       )}
       <div className="border-b-2 mb-8 pb-1">
         <h4 className="cursor-default">Assumption Gastos Financieros</h4>
-        <span className="cursor-default">Gastos Financieros para Operación</span>
+        <span className="cursor-default">
+          Gastos Financieros para Operación
+        </span>
       </div>
       <div className="border-solid border-2 border-#e5e7eb rounded-lg">
         <div className="border-b-2 px-4 py-1">

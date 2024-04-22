@@ -162,7 +162,6 @@ function TablePuestosQ(props) {
     });
 
     if (submit) {
-      console.log('entraaaaa');
       props.postPuestoQData([infoForm]);
     }
   };
@@ -303,8 +302,6 @@ function TablePuestosQ(props) {
                                                   indexYear,
                                                   indexMes,
                                                 );
-                                                // if (/^\d*$/.test(inputValue)) {
-                                                // }
                                               }}
                                               name="month"
                                             />

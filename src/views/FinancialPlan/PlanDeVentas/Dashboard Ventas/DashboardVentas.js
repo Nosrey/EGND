@@ -42,7 +42,7 @@ function DashboardVentas() {
   const [totalsCacr, setTotalsCacr] = useState();
   const [newClients, setNewClients] = useState(0);
   const [showLoader, setShowLoader] = useState(true);
-  const [infoVolToCalculateClient, setInfoVolToCalculateClient] = useState()
+  const [infoVolToCalculateClient, setInfoVolToCalculateClient] = useState();
 
   const selectYear = (event) => {
     setYearSelected(event);
@@ -133,7 +133,6 @@ function DashboardVentas() {
                         }
                       }
                     } else {
-                      console.log("UN ANIO");
                       if (dataAssump.productos[indexO].type === 'producto') {
                         totProd += Number(a.ventasTotal);
                       } else {
@@ -249,14 +248,14 @@ function DashboardVentas() {
     Number(
       formatNumber(
         data.años[indexY].volMeses[MONTHS[indexMes]] /
-        dataAssump.canales[indexChannel].items[indexProd].volumen -
-        (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
           dataAssump.canales[indexChannel].items[indexProd].volumen -
-          ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
-            dataAssump.canales[indexChannel].items[indexProd].volumen) *
-            dataAssump.churns[indexChannel].items[indexProd]
-              .porcentajeChurn) /
-          100),
+          (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
+            dataAssump.canales[indexChannel].items[indexProd].volumen -
+            ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
+              dataAssump.canales[indexChannel].items[indexProd].volumen) *
+              dataAssump.churns[indexChannel].items[indexProd]
+                .porcentajeChurn) /
+              100),
       ),
     );
 
@@ -275,15 +274,15 @@ function DashboardVentas() {
                       if (periodoSelected.month === 0 && indexMes === 0) {
                         tot += Math.floor(
                           a.volMeses[MONTHS[indexMes]] /
-                          dataAssump.canales[indexChannel].items[indexProd]
-                            .volumen,
-                        )
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
+                        );
                       } else if (periodoSelected.month === 4) {
                         if (indexMes === 2) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                            dataAssump.canales[indexChannel].items[indexProd]
-                              .volumen,
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
                           );
                         }
                         if (indexMes < 3) {
@@ -291,19 +290,19 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                p,
-                                indexY,
-                                indexMes,
-                                indexChannel,
-                                indexProd,
-                              );
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
                         }
                       } else if (periodoSelected.month === 6) {
                         if (indexMes === 5) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                            dataAssump.canales[indexChannel].items[indexProd]
-                              .volumen,
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
                           );
                         }
                         if (indexMes < 6) {
@@ -311,20 +310,19 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                p,
-                                indexY,
-                                indexMes,
-                                indexChannel,
-                                indexProd,
-                              );
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
                         }
                       } else if (periodoSelected.month === 12) {
-
                         if (indexMes === 11) {
                           tot += Math.floor(
                             a.volMeses[MONTHS[indexMes]] /
-                            dataAssump.canales[indexChannel].items[indexProd]
-                              .volumen,
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
                           );
                         }
                         if (indexMes > 5) {
@@ -332,12 +330,12 @@ function DashboardVentas() {
                             indexMes === 0
                               ? 0
                               : calcNewClients(
-                                p,
-                                indexY,
-                                indexMes,
-                                indexChannel,
-                                indexProd,
-                              );
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
                         }
                       }
                     } else {
@@ -345,25 +343,24 @@ function DashboardVentas() {
                       if (indexMes === 11) {
                         tot += Math.floor(
                           a.volMeses[MONTHS[indexMes]] /
-                          dataAssump.canales[indexChannel].items[indexProd]
-                            .volumen,
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
                         );
                       }
                       newC +=
                         indexMes === 0
                           ? 0
                           : calcNewClients(
-                            p,
-                            indexY,
-                            indexMes,
-                            indexChannel,
-                            indexProd,
-                          );
+                              p,
+                              indexY,
+                              indexMes,
+                              indexChannel,
+                              indexProd,
+                            );
                     }
                   });
                 }
               } else {
-
                 MONTHS.map((o, indexMes) => {
                   if (indexMes === 11) {
                     tot +=
@@ -374,12 +371,12 @@ function DashboardVentas() {
                     indexMes === 0
                       ? 0
                       : calcNewClients(
-                        p,
-                        indexY,
-                        indexMes,
-                        indexChannel,
-                        indexProd,
-                      );
+                          p,
+                          indexY,
+                          indexMes,
+                          indexChannel,
+                          indexProd,
+                        );
                 });
               }
             });
@@ -420,9 +417,9 @@ function DashboardVentas() {
 
           // seteo la info delvolumen para usar par alos cliente sporque si uso info form estoy usando el valor de ventas
           const datosPrecargadosVol = {};
-          let volDataOrdenada = JSON.parse(localStorage.getItem("volumenData")).sort((a, b) =>
-            a.countryName.localeCompare(b.countryName),
-          );
+          let volDataOrdenada = JSON.parse(
+            localStorage.getItem('volumenData'),
+          ).sort((a, b) => a.countryName.localeCompare(b.countryName));
           for (let i = 0; i < volDataOrdenada.length; i++) {
             datosPrecargadosVol[volDataOrdenada[i].countryName] =
               volDataOrdenada[i].stats;
@@ -445,10 +442,9 @@ function DashboardVentas() {
             datosPrecargados[dataVentas[i].countryName] = dataVentas[i].stats;
           }
           setInfoForm(() => ({ ...datosPrecargados }));
-          console.log("infoForm", infoForm);
-          // **********************************
-          // **********************************
 
+          // **********************************
+          // **********************************
 
           calcTotals();
           calcCacr(data?.volumenData);
@@ -505,7 +501,13 @@ function DashboardVentas() {
                 <div className="mt-[30px] mb-[30px]">
                   <Total title="Total de Ventas" data={totalVentas} />
                 </div>
-                <div className={` ${media === "mobile" ? " flex flex-col gap-y-4" : "grid grid-cols-3 gap-[20px]"} mt-[20px]`}>
+                <div
+                  className={` ${
+                    media === 'mobile'
+                      ? ' flex flex-col gap-y-4'
+                      : 'grid grid-cols-3 gap-[20px]'
+                  } mt-[20px]`}
+                >
                   <CardNumerica
                     type="default"
                     title="Venta de Productos"
@@ -542,8 +544,16 @@ function DashboardVentas() {
                   />
                 </div>
                 {infoForm && (
-                  <div className={`flex justify-center gap-[50px] mt-[50px] mb-[40px] ${media === "mobile" ? "flex-col" : ""} `}>
-                    <div className={` ${media === "mobile" ? "w-[100%]" : "w-[50%]"} `}>
+                  <div
+                    className={`flex justify-center gap-[50px] mt-[50px] mb-[40px] ${
+                      media === 'mobile' ? 'flex-col' : ''
+                    } `}
+                  >
+                    <div
+                      className={` ${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                      } `}
+                    >
                       {yearSelected.value === 'todo' ? (
                         <h5 className="mb-[30px]">
                           Distribución de Ventas por Año
@@ -559,7 +569,11 @@ function DashboardVentas() {
                         periodoSelected={periodoSelected}
                       />
                     </div>
-                    <div className={` ${media === "mobile" ? "w-[100%]" : "w-[50%]"} `}>
+                    <div
+                      className={` ${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                      } `}
+                    >
                       <h5 className="mb-[30px]">
                         Distribución de Ventas por País
                       </h5>
@@ -574,13 +588,14 @@ function DashboardVentas() {
                 )}
                 {infoForm && (
                   <div
-                    className={`flex ${yearSelected.value === 'año 1' ||
-                        yearSelected.value === '' ||
-                        yearSelected.value === 'todo'
+                    className={`flex ${
+                      yearSelected.value === 'año 1' ||
+                      yearSelected.value === '' ||
+                      yearSelected.value === 'todo'
                         ? ''
                         : 'justify-between'
-                      } gap-[50px] mb-[40px]
-                    ${media === "mobile" ? "flex-col" : ""}`}
+                    } gap-[50px] mb-[40px]
+                    ${media === 'mobile' ? 'flex-col' : ''}`}
                   >
                     {dataAssump.length !== 0 && (
                       <ProgresoCircularScroll
@@ -597,13 +612,19 @@ function DashboardVentas() {
                             (totalsCacr[yearSelected.year] / totalsCacr[0]) **
                             (1 / (yearSelected.year + 1) - 1)
                           ).toFixed(2)}
-                          ancho={media === "mobile" && "100%"}
+                          ancho={media === 'mobile' && '100%'}
                         />
                       )}
                   </div>
                 )}
                 <h5 className="mb-[20px]">Clientes</h5>
-                <div className={` ${media === "mobile" ? " flex flex-col gap-y-4" : "grid grid-cols-3 gap-[20px]"} mt-[20px]`}>
+                <div
+                  className={` ${
+                    media === 'mobile'
+                      ? ' flex flex-col gap-y-4'
+                      : 'grid grid-cols-3 gap-[20px]'
+                  } mt-[20px]`}
+                >
                   <CardNumerica
                     title="Clientes Nuevos"
                     type="clear"

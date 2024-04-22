@@ -32,7 +32,6 @@ function GastosPorCC() {
     let estructura = {};
     if (info) {
       Object.keys(puestosQ).map((cc, index) => {
-        console.log('[PQ2]', puestosQ);
         let heads = [];
         for (let i = 0; i < Cuentas.length; i++) {
           let head = {};
@@ -57,7 +56,6 @@ function GastosPorCC() {
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
-        console.log('[ooo]', data);
         if (data?.gastosGeneralData.length !== 0) {
           // carge info en assumption gastos
           if (data.gastosPorCCData.length !== 0) {

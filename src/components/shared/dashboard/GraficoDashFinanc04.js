@@ -11,14 +11,16 @@ import { BASIC_EMPTY, EMPTY_TOTALES, MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
-// import { COLORS } from '../../../configs/chart.config';
+
 let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
 let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
 
 function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
   const [view, setView] = useState(props.variacionDeCajaYBancos);
   const [view2, setView2] = useState(props.cajaYBancosAlCierre);
-  const [typeView, setTypeView] = useState(Array.from({ length: 11 }, (_, i) => i)); // Changed to array of years
+  const [typeView, setTypeView] = useState(
+    Array.from({ length: 11 }, (_, i) => i),
+  );
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
@@ -53,7 +55,6 @@ function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
           curve: 'straight',
           dashArray: [0, 0, 5],
         },
-        // aplico enabled solo para el primer dataLabels y luego un segundo dataLabels con enabled: false
         dataLabels: {
           enabled: true,
           enabledOnSeries: [0],
@@ -86,14 +87,14 @@ function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
       series={[
         {
           data: view,
-          name: "Variación de caja y bancos",
-          type: 'bar' // This will be a bar chart
+          name: 'Variación de caja y bancos',
+          type: 'bar',
         },
         {
           data: view2,
-          name: "Caja y bancos al cierre",
-          type: 'line' // This will be a line chart
-        }
+          name: 'Caja y bancos al cierre',
+          type: 'line',
+        },
       ]}
       type="bar"
       height={300}

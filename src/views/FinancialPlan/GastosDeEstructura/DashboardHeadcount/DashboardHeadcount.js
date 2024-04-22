@@ -204,7 +204,6 @@ function DashboardHeadcount() {
         }
       } else {
         div = Math.floor(cantPers / 12);
-        // setFte(totalVentas / div);
         return totalVentas / div;
       }
     } else {
@@ -256,7 +255,6 @@ function DashboardHeadcount() {
                       }
                     }
                     setTypeView(oneMonth);
-                    console.log('oneMonth: ', oneMonth)
                   }
                   if (periodoSelected.month === 4) {
                     if (indexM < 3) {
@@ -270,7 +268,6 @@ function DashboardHeadcount() {
                       }
                     }
                     setTypeView(trimn);
-                    console.log('trimn: ', trimn)
                   }
                   if (periodoSelected.month === 6) {
                     if (indexM < 6) {
@@ -284,7 +281,6 @@ function DashboardHeadcount() {
                       }
                     }
                     setTypeView(firstSem);
-                    console.log('firstSem: ', firstSem)
                   }
                   if (periodoSelected.month === 12) {
                     if (indexM > 5) {
@@ -298,13 +294,11 @@ function DashboardHeadcount() {
                       }
                     }
                     setTypeView(secondSem);
-                    console.log('secondSem: ', secondSem)
                   }
                 } else {
                   tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
                   cantPers += a.volMeses[MONTHS[indexM]];
                   setTypeView(month);
-                  console.log('month: ', month)
                   if (tots[indexM] || tots[indexM] === 0) {
                     tots[indexM] += a.volMeses[MONTHS[indexM]];
                   } else {
@@ -317,7 +311,6 @@ function DashboardHeadcount() {
               tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
               cantPers += a.volMeses[MONTHS[indexM]];
               setTypeView(year);
-              console.log('year: ', year)
               if (tots[indexY] || tots[indexY] === 0) {
                 tots[indexY] += a.volMeses[MONTHS[indexM]];
               } else {
@@ -348,7 +341,6 @@ function DashboardHeadcount() {
       .then((data) => {
         if (data?.puestosPData.length !== 0) {
           setDataHeadcount(data.puestosPData[0].puestosp);
-          console.log('data.puestosPData[0].puestosp', data.puestosPData[0].puestosp);
           data.puestosPData[0].puestosp.map((p) => {
             calcTotals(p);
           });

@@ -181,7 +181,7 @@ function TableAssumptionVentas({
               ))
             ) : (
               <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]">
-                <span className='cursor-default'>
+                <span className="cursor-default">
                   No hay productos creados. Créalos con el botón de Agregar.
                 </span>
               </div>
@@ -210,9 +210,7 @@ function TableAssumptionVentas({
                           width: '47%',
                         }}
                         className=" flex justify-center items-center"
-                        // variant="solid"
                         variant="twoTone"
-                        // color="blue-600"
                         color="red-600"
                         onClick={() => {
                           setShowRemoveProd(!showRemoveProd);
@@ -234,7 +232,6 @@ function TableAssumptionVentas({
                         width: '47%',
                       }}
                       className=" flex justify-center items-center"
-                      // variant="solid"
                       variant="twoTone"
                       type="button"
                       onClick={() => {
@@ -316,7 +313,7 @@ function TableAssumptionVentas({
             {channels?.length !== 0 && (
               <>
                 <span
-                  className={` cursor-default${ 
+                  className={` cursor-default${
                     media === 'mobile'
                       ? 'col-start-3 col-end-7'
                       : media === 'tablet'
@@ -495,7 +492,7 @@ function TableAssumptionVentas({
               : null}
             {channels?.length === 0 && (
               <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]">
-                <span className='cursor-default'>
+                <span className="cursor-default">
                   No hay canales creados. Créalos con el botón de Agregar.
                 </span>
               </div>

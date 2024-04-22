@@ -13,7 +13,6 @@ import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 import Balance from '../Balance/Balance';
 
 function DashboardFinanciero() {
-
   // grafica 01 ----
   const [cmgBruta, setCmgbruta] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [ebitda, setEbitda] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -21,73 +20,67 @@ function DashboardFinanciero() {
   const [rn, setRn] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
   // grafica 02 ----
-  const [rdoNetoValue, setRdoNetoValue] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [rdoNetoValue, setRdoNetoValue] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
   const [growth, setGrowth] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-
-  // grafica 03 ----
-  // const [ventasGraph03, setVentasGraph03] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // const [totalCostos, setTotalCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // const [cmgBrutaGraph03, setCmgBrutaGraph03] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // const [gastosDeEstructura, setGastosDeEstructura] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // const [ebitdaGraph03, setEbitdaGraph03] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  // const [rdoNeto, setRdoNeto] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
   const [graph03Data, setGraph03Data] = useState([
     {
       name: 'Ventas',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'Total Costos',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'CMG Bruta',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'Gastos de estructura',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'EBITDA',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'Rdo Neto',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
-  ])
+  ]);
 
   const [graph04Data, setGraph04Data] = useState([
     {
       name: 'Variación de caja y bancos',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
     {
       name: 'Caja y bancos al cierre',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     },
-  ])
+  ]);
 
   const [graph05Data, setGraph05Data] = useState([
     {
       name: 'Endeudamiento',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    }
-  ])
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+  ]);
 
   const [graph06Data, setGraph06Data] = useState([
     // solvencia
     {
       name: 'Solvencia',
-      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    }
-  ])
+      data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    },
+  ]);
 
   return (
     <div>
-      <div className='oculto'>
+      <div className="oculto">
         <PyL
           setCmgbruta={setCmgbruta}
           setEbitda={setEbitda}
@@ -101,18 +94,14 @@ function DashboardFinanciero() {
           ebit={ebit}
           rn={rn}
         />
-        <CashflowIndirecto
-          setGraph04Data={setGraph04Data}
-        />
+        <CashflowIndirecto setGraph04Data={setGraph04Data} />
         <Balance
           setGraph05Data={setGraph05Data}
           setGraph06Data={setGraph06Data}
         />
       </div>
       <div className="border-b-2 mb-8 pb-1">
-        <h4 className="cursor-default">
-          Dashboard Financiero
-        </h4>
+        <h4 className="cursor-default">Dashboard Financiero</h4>
         <span className="cursor-default">Estados Financieros</span>
       </div>
       <div className="container-countries">
@@ -136,7 +125,7 @@ function DashboardFinanciero() {
         </FormContainer>
       </div>
     </div>
-  )
-};
+  );
+}
 
 export default DashboardFinanciero;

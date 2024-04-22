@@ -1,16 +1,16 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, { useState, useRef, useEffect } from 'react'
-import classNames from 'classnames'
-import withHeaderItem from 'utils/hoc/withHeaderItem'
-import { Dialog, Button } from 'components/ui'
 // eslint-disable-next-line import/no-unresolved
-import { apiGetSearchResult } from 'services/CommonService'
-import useThemeClass from 'utils/hooks/useThemeClass'
-import navigationIcon from 'configs/navigation-icon.config'
-import debounce from 'lodash/debounce'
-import { HiOutlineSearch, HiChevronRight } from 'react-icons/hi'
-import { Link } from 'react-router-dom'
-import Highlighter from 'react-highlight-words'
+import React, { useState, useRef, useEffect } from 'react';
+import classNames from 'classnames';
+import withHeaderItem from 'utils/hoc/withHeaderItem';
+import { Dialog, Button } from 'components/ui';
+import { apiGetSearchResult } from 'services/CommonService';
+import useThemeClass from 'utils/hooks/useThemeClass';
+import navigationIcon from 'configs/navigation-icon.config';
+import debounce from 'lodash/debounce';
+import { HiOutlineSearch, HiChevronRight } from 'react-icons/hi';
+import { Link } from 'react-router-dom';
+import Highlighter from 'react-highlight-words';
 
 const recommendedSearch = [
   {
@@ -39,12 +39,12 @@ const recommendedSearch = [
       },
     ],
   },
-]
+];
 
 function ListItem(props) {
-  const { icon, label, url = '', isLast, keyWord, onNavigate } = props
+  const { icon, label, url = '', isLast, keyWord, onNavigate } = props;
 
-  const { textTheme } = useThemeClass()
+  const { textTheme } = useThemeClass();
 
   return (
     <Link to={url} onClick={onNavigate}>
@@ -52,7 +52,7 @@ function ListItem(props) {
         className={classNames(
           'flex items-center justify-between rounded-lg p-3.5 cursor-pointer user-select',
           'bg-gray-50 dark:bg-gray-700/60 hover:bg-gray-100 dark:hover:bg-gray-700/90',
-          !isLast && 'mb-3'
+          !isLast && 'mb-3',
         )}
       >
         <div className="flex items-center">
@@ -60,7 +60,7 @@ function ListItem(props) {
             className={classNames(
               'mr-4 rounded-md ring-1 ring-slate-900/5 shadow-sm text-xl group-hover:shadow h-6 w-6 flex items-center justify-center bg-white dark:bg-gray-700',
               textTheme,
-              'dark:text-gray-100'
+              'dark:text-gray-100',
             )}
           >
             {icon && navigationIcon[icon]}
@@ -70,7 +70,7 @@ function ListItem(props) {
               autoEscape
               highlightClassName={classNames(
                 textTheme,
-                'underline bg-transparent font-semibold dark:text-white'
+                'underline bg-transparent font-semibold dark:text-white',
               )}
               searchWords={[keyWord]}
               textToHighlight={label}
@@ -80,70 +80,69 @@ function ListItem(props) {
         <HiChevronRight className="text-lg" />
       </div>
     </Link>
-  )
+  );
 }
 
 export function Search({ className }) {
-  const [searchDialogOpen, setSearchDialogOpen] = useState(false)
-  const [searchResult, setSearchResult] = useState(recommendedSearch)
-  const [noResult, setNoResult] = useState(false)
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+  const [searchResult, setSearchResult] = useState(recommendedSearch);
+  const [noResult, setNoResult] = useState(false);
 
-  const inputRef = useRef()
+  const inputRef = useRef();
 
   const handleReset = () => {
-    setNoResult(false)
-    setSearchResult(recommendedSearch)
-  }
+    setNoResult(false);
+    setSearchResult(recommendedSearch);
+  };
 
   const handleSearchOpen = () => {
-    setSearchDialogOpen(true)
-  }
+    setSearchDialogOpen(true);
+  };
 
   const handleSearchClose = () => {
-    setSearchDialogOpen(false)
+    setSearchDialogOpen(false);
     if (noResult) {
       setTimeout(() => {
-        handleReset()
-      }, 300)
+        handleReset();
+      }, 300);
     }
-  }
-
+  };
 
   async function handleDebounceFn(query) {
     if (!query) {
-      setSearchResult(recommendedSearch)
-      return
+      setSearchResult(recommendedSearch);
+      return;
     }
 
     if (noResult) {
-      setNoResult(false)
+      setNoResult(false);
     }
-    const respond = await apiGetSearchResult({ query })
+    const respond = await apiGetSearchResult({ query });
     if (respond.data) {
       if (respond.data.length === 0) {
-        setNoResult(true)
+        setNoResult(true);
       }
-      setSearchResult(respond.data)
+      setSearchResult(respond.data);
     }
   }
-  const debounceFn = debounce(handleDebounceFn, 200)
+  const debounceFn = debounce(handleDebounceFn, 200);
 
   const handleSearch = (e) => {
-    debounceFn(e.target.value)
-  }
+    debounceFn(e.target.value);
+  };
 
   useEffect(() => {
     if (searchDialogOpen) {
-      const timeout = setTimeout(() => inputRef.current?.focus(), 100)
+      const timeout = setTimeout(() => inputRef.current?.focus(), 100);
       return () => {
-        clearTimeout(timeout)
-      }
+        clearTimeout(timeout);
+      };
     }
-  }, [searchDialogOpen])
+  }, [searchDialogOpen]);
 
   const handleNavigate = () => {
-    handleSearchClose()
-  }
+    handleSearchClose();
+  };
 
   return (
     <>
@@ -202,7 +201,7 @@ export function Search({ className }) {
         </div>
       </Dialog>
     </>
-  )
+  );
 }
 
-export default withHeaderItem(Search)
+export default withHeaderItem(Search);

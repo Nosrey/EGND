@@ -22,7 +22,14 @@ function TableFinancieras({
   const { Tr, Td, TBody } = Table;
 
   const submit = (values) => {
-    const { impGanancias,cobranzas, inversion, pagoProducto, pagoServicio, stock } = values;
+    const {
+      impGanancias,
+      cobranzas,
+      inversion,
+      pagoProducto,
+      pagoServicio,
+      stock,
+    } = values;
 
     createAssumpFinanciera(
       impGanancias,
@@ -93,26 +100,28 @@ function TableFinancieras({
         {({ values, touched, errors, resetForm }) => (
           <Form>
             <FormContainer>
-                  <h5 className="mb-[18px]">Tasa de impuesto a las ganancias</h5>
-                  <FormItem
-                      className={`${
-                        media === 'mobile' ? 'w-[40%]' : 'w-[30%]'
-                      } `}
-                    >
-                      <Field
-                        placeholder="0"
-                        name='impGanancias'
-                        value={dataFinanciera.impGanancias}
-                        type="number"
-                        size="sm"
-                        suffix="%"
-                        component={Input}
-                         onChange={(e) =>
-                          setFormValues('impGanancias', 'pagoProducto', e.target.value)
-                         }
-                        onKeyPress={handleKeyPress}
-                      />
-                   </FormItem>
+              <h5 className="mb-[18px]">Tasa de impuesto a las ganancias</h5>
+              <FormItem
+                className={`${media === 'mobile' ? 'w-[40%]' : 'w-[30%]'} `}
+              >
+                <Field
+                  placeholder="0"
+                  name="impGanancias"
+                  value={dataFinanciera.impGanancias}
+                  type="number"
+                  size="sm"
+                  suffix="%"
+                  component={Input}
+                  onChange={(e) =>
+                    setFormValues(
+                      'impGanancias',
+                      'pagoProducto',
+                      e.target.value,
+                    )
+                  }
+                  onKeyPress={handleKeyPress}
+                />
+              </FormItem>
               <div className="w-[1900px]">
                 <div className="w-[1900px] grid grid-cols-10  gap-x-3 ">
                   <Card className="col-start-1 col-end-3 row-start-1">
@@ -289,11 +298,6 @@ function TableFinancieras({
                           name="incremento"
                           placeholder="Seleccione"
                           options={optionsDiasStock}
-                          // value={optionsIncremento.filter(
-                          //   (option) =>
-                          //     option.value ===
-                          //     infoForm[cc].cuentas[head].incremento,
-                          // )}
                           onChange={(e) =>
                             setFormValues('stock', 'pagoProducto', e.value)
                           }

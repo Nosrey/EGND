@@ -1,14 +1,14 @@
-import { AuthorityCheck } from 'components/shared'
-import { Dropdown, Menu } from 'components/ui'
-import { Trans } from 'react-i18next'
-import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
-import VerticalMenuIcon from './VerticalMenuIcon'
+import { AuthorityCheck } from 'components/shared';
+import { Dropdown, Menu } from 'components/ui';
+import { Trans } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import VerticalMenuIcon from './VerticalMenuIcon';
 
-const { MenuItem, MenuCollapse } = Menu
+const { MenuItem, MenuCollapse } = Menu;
 
 function DefaultItem({ nav, onLinkClick, userAuthority }) {
-  const routeActive = useSelector((state) => state.base.common.currentRouteKey)
+  const routeActive = useSelector((state) => state.base.common.currentRouteKey);
   return (
     <AuthorityCheck userAuthority={userAuthority} authority={nav.authority}>
       <MenuCollapse
@@ -67,7 +67,7 @@ function DefaultItem({ nav, onLinkClick, userAuthority }) {
         ))}
       </MenuCollapse>
     </AuthorityCheck>
-  )
+  );
 }
 
 function CollapsedItem({ nav, onLinkClick, userAuthority, direction }) {
@@ -75,7 +75,7 @@ function CollapsedItem({ nav, onLinkClick, userAuthority, direction }) {
     <MenuItem key={nav.key} eventKey={nav.key} className="mb-2">
       <VerticalMenuIcon icon={nav.icon} />
     </MenuItem>
-  )
+  );
 
   return (
     <AuthorityCheck userAuthority={userAuthority} authority={nav.authority}>
@@ -83,15 +83,17 @@ function CollapsedItem({ nav, onLinkClick, userAuthority, direction }) {
         trigger="hover"
         renderTitle={menuItem}
         placement={direction === 'rtl' ? 'middle-end-top' : 'middle-start-top'}
-      >
-        {nav.subMenu.map((subNav) => console.log(subNav))}
-      </Dropdown>
+      />
     </AuthorityCheck>
-  )
+  );
 }
 
 function VerticalCollapsedMenuItem({ sideCollapsed, ...rest }) {
-  return sideCollapsed ? <CollapsedItem {...rest} /> : <DefaultItem {...rest} />
+  return sideCollapsed ? (
+    <CollapsedItem {...rest} />
+  ) : (
+    <DefaultItem {...rest} />
+  );
 }
 
-export default VerticalCollapsedMenuItem
+export default VerticalCollapsedMenuItem;

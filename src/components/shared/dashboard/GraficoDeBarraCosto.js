@@ -42,7 +42,6 @@ function GraficoDeBarraCosto({
               enabled: true,
             },
           },
-          // colors: COLORS,
           responsive: [
             {
               breakpoint: 480,

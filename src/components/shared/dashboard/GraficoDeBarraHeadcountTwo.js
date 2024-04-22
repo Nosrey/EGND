@@ -144,7 +144,6 @@ function GraficoDeBarraHeadcountTwo({
               enabled: true,
             },
           },
-          // colors: COLORS,
           responsive: [
             {
               breakpoint: 480,

@@ -17,11 +17,10 @@ function ProgresoCircularScroll({ title, churnProducto }) {
         );
       });
     });
-    console.log(churnProducto);
   }, []);
 
   return (
-    <Card className={`${media === "mobile" ? "w-[100%]" : "w-[50%]"}`}>
+    <Card className={`${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'}`}>
       <div>
         <span className="text-lg">{title}</span>
         <div className="flex justify-center gap-[25px] mt-[10px]">

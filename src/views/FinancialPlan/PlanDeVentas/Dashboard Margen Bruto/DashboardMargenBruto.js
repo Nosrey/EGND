@@ -237,7 +237,6 @@ function DashboardMargenBruto() {
                         }
                       } else if (periodoSelected.month === 4) {
                         if (indexM < 3) {
-                          console.log('ACA');
                           tot += Math.round(
                             getMargenBrutoResult(
                               indexCountry,
@@ -442,7 +441,6 @@ function DashboardMargenBruto() {
       ) *
         100) /
       getVentasResult(indexCountry, indexCanal, indexP, indexYear, indexMes);
-    // console.log("PORECNTAJE",percent)
     if (percent === -Infinity) {
       percent = -100;
     }
@@ -586,8 +584,9 @@ function DashboardMargenBruto() {
                   <Total title="Margen Bruto Nominal" data={totalMargen} />
                 </div>
                 <div
-                  className={`${media === 'mobile' ? '' : 'grid grid-cols-3 '
-                    }  gap-[20px] mt-[20px]`}
+                  className={`${
+                    media === 'mobile' ? '' : 'grid grid-cols-3 '
+                  }  gap-[20px] mt-[20px]`}
                 >
                   <CardNumerica
                     type="default"
@@ -602,12 +601,14 @@ function DashboardMargenBruto() {
                     Proyección Margen Bruto Nominal
                   </h5>
                   <div
-                    className={`flex ${media === 'mobile' ? 'flex-col' : ''
-                      } w-[100%] gap-[30px]  justify-between`}
+                    className={`flex ${
+                      media === 'mobile' ? 'flex-col' : ''
+                    } w-[100%] gap-[30px]  justify-between`}
                   >
                     <div
-                      className={`${media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
-                        } `}
+                      className={`${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
+                      } `}
                     >
                       <GraficoDeBarraMargenBruto
                         data={infoForm}
@@ -617,8 +618,9 @@ function DashboardMargenBruto() {
                       />
                     </div>
                     <ProgresoCircular
-                      className={`${media === 'mobile' ? 'h-[70%]' : 'h-[60%]'
-                        } `}
+                      className={`${
+                        media === 'mobile' ? 'h-[70%]' : 'h-[60%]'
+                      } `}
                       ancho={`${media === 'mobile' ? 'w-[100%]' : ''} `}
                       title="Margen Bruto Porcentual"
                       data={percentMArgen}
@@ -632,12 +634,14 @@ function DashboardMargenBruto() {
                       Proyección Margen Bruto Nominal
                     </h5>
                     <div
-                      className={`flex ${media === 'mobile' ? 'flex-col' : ''
-                        } w-[100%] gap-[30px]  justify-between`}
+                      className={`flex ${
+                        media === 'mobile' ? 'flex-col' : ''
+                      } w-[100%] gap-[30px]  justify-between`}
                     >
                       <div
-                        className={`${media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
-                          } `}
+                        className={`${
+                          media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
+                        } `}
                       >
                         <GraficoDeBarraMargenBrutoTwo
                           costoData={costoData}
@@ -654,12 +658,14 @@ function DashboardMargenBruto() {
                 )}
 
                 <div
-                  className={`flex gap-[30px] mt-[50px] ${media === 'mobile' ? 'flex-col' : ''
-                    } `}
+                  className={`flex gap-[30px] mt-[50px] ${
+                    media === 'mobile' ? 'flex-col' : ''
+                  } `}
                 >
                   <div
-                    className={` ${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                      } flex flex-col gap-[30px]`}
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
                   >
                     <h5 className="cursor-default">Margen Bruto por País</h5>
                     <BarraDeProgresoMargenBruto
@@ -672,8 +678,9 @@ function DashboardMargenBruto() {
                     />
                   </div>
                   <div
-                    className={` ${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                      } flex flex-col gap-[30px]`}
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
                   >
                     <h5 className="cursor-default">Margen Bruto por Canal</h5>
                     <BarraDeProgresoMargenBruto
@@ -688,12 +695,14 @@ function DashboardMargenBruto() {
                 </div>
 
                 <div
-                  className={`flex gap-[30px] mt-[40px] ${media === 'mobile' ? 'flex-col' : ''
-                    } `}
+                  className={`flex gap-[30px] mt-[40px] ${
+                    media === 'mobile' ? 'flex-col' : ''
+                  } `}
                 >
                   <div
-                    className={` ${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                      } flex flex-col gap-[30px]`}
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
                   >
                     <h5 className="cursor-default">
                       Margen Bruto por Producto
@@ -708,8 +717,9 @@ function DashboardMargenBruto() {
                     />
                   </div>
                   <div
-                    className={` ${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                      } flex flex-col gap-[30px]`}
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
                   >
                     <h5 className="cursor-default">
                       Margen Bruto por Servicio

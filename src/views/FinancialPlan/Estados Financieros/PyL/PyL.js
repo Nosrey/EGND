@@ -30,17 +30,18 @@ import {
 } from 'utils/calcs';
 import TablePyL from './TablePyL';
 
-function PyL({ setCmgbruta = () => { },
+function PyL({
+  setCmgbruta = () => {},
   cmgBruta = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ebitda = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ebit = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   rn = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  setEbitda = () => { },
-  setEbit = () => { },
-  setRn = () => { },
-  setRdoNetoValue = () => { },
-  setGrowth = () => { },
-  setGraph03Data = () => { },
+  setEbitda = () => {},
+  setEbit = () => {},
+  setRn = () => {},
+  setRdoNetoValue = () => {},
+  setGrowth = () => {},
+  setGraph03Data = () => {},
 }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
@@ -144,7 +145,6 @@ function PyL({ setCmgbruta = () => { },
     getUser(currentState.id)
       .then((data) => {
         if (data?.gastosGeneralData.length !== 0) {
-          // Seteo la info de ventas PxQ
           const datosPrecargados = {};
           const copyVolData = JSON.parse(JSON.stringify(data?.volumenData));
           const copyPcioData = JSON.parse(JSON.stringify(data?.precioData));
@@ -217,88 +217,80 @@ function PyL({ setCmgbruta = () => { },
       )}
       {showLoader ? (
         <MySpinner />
-      ) : (!infoCuentas || !prestamosData || !costoData) ? (
+      ) : !infoCuentas || !prestamosData || !costoData ? (
         <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]  mt-[30px] ml-[30px] mr-[30px]">
           <span className="cursor-default">
             Para acceder a este formulario primero debe completar el formulario
             de{' '}
-            {
-              !infoCuentas &&
+            {!infoCuentas && (
               <Link className="text-indigo-700 underline" to="/gastos-por-cc">
                 Supuesto de Gasto de Estructura{', '}
               </Link>
-            }
-
-            {
-              !prestamosData &&
+            )}
+            {!prestamosData && (
               <Link className="text-indigo-700 underline" to="/prestamos">
                 Prestamos {', '}
               </Link>
-            }
-
-            {
-              !costoData &&
-              <Link className="text-indigo-700 underline" to="/costos-unitarios">
+            )}
+            {!costoData && (
+              <Link
+                className="text-indigo-700 underline"
+                to="/costos-unitarios"
+              >
                 Costos unitarios{' '}
               </Link>
-            }
+            )}
             .
-
           </span>
         </div>
       ) : (
         <>
-          {
-            // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
-            <div>
-              <div className="border-b-2 mb-8 pb-1">
-                <h4 className="cursor-default">P & L</h4>
-                <span className="cursor-default">Estados Financieros</span>
-              </div>
-              <div className="container-countries">
-                <FormContainer className="cont-countries">
-                  <ContainerScrollable
-                    contenido={
-                      <TablePyL
-                        vtasTot={ventasTot || []}
-                        vtasProd={ventasProd || []}
-                        vtasServ={ventasServ || []}
-                        costoProd={costosProd || []}
-                        costoServ={costosServ || []}
-                        costoProduccionTotal={costosProduccionTotal || []}
-                        costoComision={costosComision || []}
-                        costoImpuesto={costosImpuestos || []}
-                        costoCargos={costosCargoPasarela || []}
-                        costoComerciales={costosComerciales || []}
-                        costoTotales={costosTotales || []}
-                        mbPesos={mbPesos || []}
-                        mbPorcentaje={mbPorcentaje || []}
-                        ctasListado={ctasListado || []}
-                        gastoEnCtas={gastoEnCtas || []}
-                        amortizaciones={amortizaciones || []}
-                        intereses={intereses || []}
-                        showAlertSuces={(boolean) =>
-                          setShowSuccessAlert(boolean)
-                        }
-                        showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                        setCmgbruta={setCmgbruta}
-                        setEbitda={setEbitda}
-                        setEbit={setEbit}
-                        setRn={setRn}
-                        setRdoNetoValue={setRdoNetoValue}
-                        setGrowth={setGrowth}
-                        setGraph03Data={setGraph03Data}
-                        cmgBruta={cmgBruta}
-                        ebitda={ebitda}
-                        ebit={ebit}
-                        rn={rn}
-                      />
-                    }
-                  />
-                </FormContainer>
-              </div>
+          <div>
+            <div className="border-b-2 mb-8 pb-1">
+              <h4 className="cursor-default">P & L</h4>
+              <span className="cursor-default">Estados Financieros</span>
             </div>
-          }
+            <div className="container-countries">
+              <FormContainer className="cont-countries">
+                <ContainerScrollable
+                  contenido={
+                    <TablePyL
+                      vtasTot={ventasTot || []}
+                      vtasProd={ventasProd || []}
+                      vtasServ={ventasServ || []}
+                      costoProd={costosProd || []}
+                      costoServ={costosServ || []}
+                      costoProduccionTotal={costosProduccionTotal || []}
+                      costoComision={costosComision || []}
+                      costoImpuesto={costosImpuestos || []}
+                      costoCargos={costosCargoPasarela || []}
+                      costoComerciales={costosComerciales || []}
+                      costoTotales={costosTotales || []}
+                      mbPesos={mbPesos || []}
+                      mbPorcentaje={mbPorcentaje || []}
+                      ctasListado={ctasListado || []}
+                      gastoEnCtas={gastoEnCtas || []}
+                      amortizaciones={amortizaciones || []}
+                      intereses={intereses || []}
+                      showAlertSuces={(boolean) => setShowSuccessAlert(boolean)}
+                      showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                      setCmgbruta={setCmgbruta}
+                      setEbitda={setEbitda}
+                      setEbit={setEbit}
+                      setRn={setRn}
+                      setRdoNetoValue={setRdoNetoValue}
+                      setGrowth={setGrowth}
+                      setGraph03Data={setGraph03Data}
+                      cmgBruta={cmgBruta}
+                      ebitda={ebitda}
+                      ebit={ebit}
+                      rn={rn}
+                    />
+                  }
+                />
+              </FormContainer>
+            </div>
+          </div>
         </>
       )}
     </>

@@ -7,29 +7,30 @@
 import ContainerScrollable from 'components/shared/ContainerScrollable';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
-import { useEffect, useState, } from 'react';
-import { calcAmortizaciones, calcFinanciacionDeTerceros, calcInteresesPagadosPorAnio, calcInversiones, multiplicacionPxQCapex } from 'utils/calcs';
+import { useEffect, useState } from 'react';
+import {
+  calcAmortizaciones,
+  calcFinanciacionDeTerceros,
+  calcInteresesPagadosPorAnio,
+  calcInversiones,
+  multiplicacionPxQCapex,
+} from 'utils/calcs';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableBalance from './TableBalance';
 import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 import Prestamos from '../../Prestamos/Prestamos';
 
-// este es el componente para el dashboard financiero
-import TableDashboardFinanciero from '../DashboardFinanciero/TableDashboardFinanciero';
-
-function Balance({
-  setGraph05Data = () => { },
-  setGraph06Data = () => { },
-}) {
-  // const rn = useContext(MiContexto);
+function Balance({ setGraph05Data = () => {}, setGraph06Data = () => {} }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const myResult = useSelector(state => state.cajaYBcoCierre)
-  const [creditosVentas, setCreditosVentas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-  const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+  const myResult = useSelector((state) => state.cajaYBcoCierre);
+  const [creditosVentas, setCreditosVentas] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
+  const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
   return (
     <>
@@ -43,7 +44,7 @@ function Balance({
           No se pudieron guardar los datos.
         </Alert>
       )}
-      <div className='oculto'>
+      <div className="oculto">
         <Prestamos />
         <CashflowIndirecto />
       </div>
@@ -52,48 +53,28 @@ function Balance({
         <MySpinner />
       ) : (
         <>
-          {
-            // valoresCAC.length !== 0 && valoresLTV.length !== 0 &&  valoresLTVCAC.length !== 0 &&
-            <div>
-              <div className="border-b-2 mb-8 pb-1">
-                <h4 className="cursor-default">
-                  Balance
-                </h4>
-                <span className="cursor-default">Estados Financieros</span>
-              </div>
-              <div className="container-countries">
-                <FormContainer className="cont-countries">
-                  <ContainerScrollable
-                      contenido={
-                        <TableBalance
-                          cajaYBancos={myResult[0]} // ver
-                          creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
-                          setGraph05Data={setGraph05Data}
-                          setGraph06Data={setGraph06Data}
-
-                          showAlertSuces={(boolean) =>
-                            setShowSuccessAlert(boolean)
-                          }
-                          showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                        />
-                      // <TableBalance
-                      //   cajaYBancos={myResult[0]} // ver
-                      //   creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
-
-
-                      //   showAlertSuces={(boolean) =>
-                      //     setShowSuccessAlert(boolean)
-                      //   }
-                      //   showAlertError={(boolean) => setShowErrorAlert(boolean)}
-                      // />
-                    }
-                  />
-                </FormContainer>
-              </div>
-
+          <div>
+            <div className="border-b-2 mb-8 pb-1">
+              <h4 className="cursor-default">Balance</h4>
+              <span className="cursor-default">Estados Financieros</span>
             </div>
-          }
-
+            <div className="container-countries">
+              <FormContainer className="cont-countries">
+                <ContainerScrollable
+                  contenido={
+                    <TableBalance
+                      cajaYBancos={myResult[0]}
+                      creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
+                      setGraph05Data={setGraph05Data}
+                      setGraph06Data={setGraph06Data}
+                      showAlertSuces={(boolean) => setShowSuccessAlert(boolean)}
+                      showAlertError={(boolean) => setShowErrorAlert(boolean)}
+                    />
+                  }
+                />
+              </FormContainer>
+            </div>
+          </div>
         </>
       )}
     </>

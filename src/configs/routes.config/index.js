@@ -280,18 +280,12 @@ export const protectedRoutes = [
     key: 'CashflowIndirecto',
     path: '/cashflow-indirecto',
     component: React.lazy(() =>
-      import('views/FinancialPlan/Estados Financieros/CashflowIndirecto/CashflowIndirecto'),
+      import(
+        'views/FinancialPlan/Estados Financieros/CashflowIndirecto/CashflowIndirecto'
+      ),
     ),
     authority: [],
   },
-  // {
-  //   key: 'CashflowDirecto',
-  //   path: '/cashflow-directo',
-  //   component: React.lazy(() =>
-  //     import('views/FinancialPlan/Estados Financieros/CashflowDirecto/CashflowDirecto'),
-  //   ),
-  //   authority: [],
-  // },
   {
     key: 'Balance',
     path: '/balance',
@@ -304,7 +298,9 @@ export const protectedRoutes = [
     key: 'WorkingCapital',
     path: '/working-capital',
     component: React.lazy(() =>
-      import('views/FinancialPlan/Estados Financieros/WorkingCapital/WorkingCapital'),
+      import(
+        'views/FinancialPlan/Estados Financieros/WorkingCapital/WorkingCapital'
+      ),
     ),
     authority: [],
   },
@@ -312,7 +308,9 @@ export const protectedRoutes = [
     key: 'DashboardFinanciero',
     path: '/dashboard-financiero',
     component: React.lazy(() =>
-      import('views/FinancialPlan/Estados Financieros/DashboardFinanciero/DashboardFinanciero'),
+      import(
+        'views/FinancialPlan/Estados Financieros/DashboardFinanciero/DashboardFinanciero'
+      ),
     ),
     authority: [],
   },
