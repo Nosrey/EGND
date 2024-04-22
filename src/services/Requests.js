@@ -942,23 +942,28 @@ export const getBalance = async (id = idUser, setinputsValues) => {
   try {
     const resp = await fetch(`${URL_API}/api/balance/${id}`);
     const data = await resp.json();
+    console.log('value de entrada: ', data)
     let objeto = {
       cajaYBancos: data.response[0]?.cajaYBancos ? data.response[0]?.cajaYBancos : 0,
       creditosPorVentas: data.response[0]?.creditosPorVentas ? data.response[0]?.creditosPorVentas : 0,
       creditosFiscales: data.response[0]?.creditosFiscales ? data.response[0]?.creditosFiscales : 0,
-      BienesDeCambio: data.response[0]?.BienesDeCambio ? data.response[0]?.BienesDeCambio : 0,
-      BienesDeUso: data.response[0]?.BienesDeUso ? data.response[0]?.BienesDeUso : 0,
-      totActivo: data.response[0]?.totActivo ? data.response[0]?.totActivo : 0,
+      BienesDeCambio: data.response[0]?.bienesDeCambio ? data.response[0]?.bienesDeCambio : 0,
+      BienesDeUso: data.response[0]?.bienesDeUso ? data.response[0]?.bienesDeUso : 0,
       deudasComerciales: data.response[0]?.deudasComerciales ? data.response[0]?.deudasComerciales : 0,
       deudasFiscales: data.response[0]?.deudasFiscales ? data.response[0]?.deudasFiscales : 0,
       deudasFinancieras: data.response[0]?.deudasFinancieras ? data.response[0]?.deudasFinancieras : 0,
       otrasDeudas: data.response[0]?.otrasDeudas ? data.response[0]?.otrasDeudas : 0,
-      totPasivo: data.response[0]?.totPasivo ? data.response[0]?.totPasivo : 0,
       equity: data.response[0]?.equity ? data.response[0]?.equity : 0,
-      ResultadosNoAsignados: data.response[0]?.ResultadosNoAsignados ? data.response[0]?.ResultadosNoAsignados : 0,
+      ResultadosNoAsignados: data.response[0]?.resultadosNoAsignados ? data.response[0]?.resultadosNoAsignados : 0,
       resultadosDelEjercicio: data.response[0]?.resultadosDelEjercicio ? data.response[0]?.resultadosDelEjercicio : 0,
-      totPatNeto: data.response[0]?.totPatNeto ? data.response[0]?.totPatNeto : 0,
-      totPnYPasivo: data.response[0]?.totPnYPasivo ? data.response[0]?.totPnYPasivo : 0,
+
+      totActivo: (Number(data.response[0]?.bienesDeCambio) || 0) + (Number(data.response[0]?.bienesDeUso) || 0) + (Number(data.response[0]?.creditosFiscales) || 0) + (Number(data.response[0]?.creditosPorVentas) || 0) - (Number(data.response[0]?.cajaYBancos) || 0),
+
+      totPasivo: (Number(data.response[0]?.deudasComerciales) || 0) + (Number(data.response[0]?.deudasFiscales) || 0) + (Number(data.response[0]?.deudasFinancieras) || 0) + (Number(data.response[0]?.otrasDeudas) || 0),
+
+      totPatNeto: (Number(data.response[0]?.equity) || 0) + (Number(data.response[0]?.resultadosNoAsignados) || 0) + (Number(data.response[0]?.resultadosDelEjercicio) || 0),
+
+      totPnYPasivo: ((Number(data.response[0]?.equity) || 0) + (Number(data.response[0]?.resultadosNoAsignados) || 0) + (Number(data.response[0]?.resultadosDelEjercicio) || 0)) + ((Number(data.response[0]?.deudasComerciales) || 0) + (Number(data.response[0]?.deudasFiscales) || 0) + (Number(data.response[0]?.deudasFinancieras) || 0) + (Number(data.response[0]?.otrasDeudas) || 0)),
     }
 
     
