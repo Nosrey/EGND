@@ -7,7 +7,7 @@
 import ContainerScrollable from 'components/shared/ContainerScrollable';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { Alert, FormContainer } from 'components/ui';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import TableBalance from './TableBalance';
 import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
