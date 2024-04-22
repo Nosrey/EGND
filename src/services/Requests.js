@@ -5,7 +5,9 @@ import store from '../store/index';
 
 const app = store.getState();
 
-const URL_API = 'http://localhost:8080';
+// const URL_API = 'http://localhost:8080';
+
+const URL_API = 'https://api.egndfinance.com';
 const idUser = localStorage.getItem('userId');
 
 export const activateAccount = async (token) => {
