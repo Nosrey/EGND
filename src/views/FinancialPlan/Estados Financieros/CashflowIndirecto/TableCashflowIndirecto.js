@@ -270,47 +270,56 @@ function TableCashflowIndirecto(props) {
   }, []);
 
   useEffect(() => {
-    let variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    let cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // console.log('props?.variacionCajaYBco', variacionCajaYBco)
+    // console.log('props?.cajaYBancosAlCierre', cajaYBancosAlCierre)
+    // let variacionCajaYBcoFinal = variacionCajaYBco
+    // let cajaYBancosAlCierreFinal = cajaYBancosAlCierre
 
-    if (props?.variacionCajaYBco !== undefined && props?.variacionCajaYBco.length) {
-      if (variacionCajaYBcoFinal.length < 10) {
-        variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      } else {
-        for (let i = 0; i < 10; i++) {
-          if (Number.isNaN(variacionCajaYBcoFinal[i]) || variacionCajaYBcoFinal[i] === Infinity || variacionCajaYBcoFinal[i] === -Infinity) {
-            variacionCajaYBcoFinal[i] = 0;
-          } else {
-            variacionCajaYBcoFinal[i] = props?.variacionCajaYBco?.[i].toFixed(2)
-          }
-        }
-      }
-    }
+    // if (variacionCajaYBcoFinal !== undefined && variacionCajaYBcoFinal.length) {
+    //   if (variacionCajaYBcoFinal.length < 10) {
+    //     variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //   } else {
+    //     for (let i = 0; i < 10; i++) {
+    //       if (Number.isNaN(variacionCajaYBcoFinal[i]) || variacionCajaYBcoFinal[i] === Infinity || variacionCajaYBcoFinal[i] === -Infinity) {
+    //         variacionCajaYBcoFinal[i] = 0;
+    //       } else {
+    //         variacionCajaYBcoFinal[i] = variacionCajaYBco?.[i].toFixed(2)
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // }
 
-    if (props?.cajaYBancosAlCierre !== undefined && props?.cajaYBancosAlCierre.length) {
-      if (cajaYBancosAlCierreFinal.length < 10) {
-        cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      } else {
-        for (let i = 0; i < 10; i++) {
-          if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
-            cajaYBancosAlCierreFinal[i] = 0;
-          } else {
-            cajaYBancosAlCierreFinal[i] = props?.cajaYBancosAlCierre?.[i].toFixed(2)          
-          }
-        }
-      }
-    }
+    // if (cajaYBancosAlCierreFinal !== undefined && cajaYBancosAlCierreFinal.length) {
+    //   if (cajaYBancosAlCierreFinal.length < 10) {
+    //     cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //   } else {
+    //     for (let i = 0; i < 10; i++) {
+    //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
+    //         cajaYBancosAlCierreFinal[i] = 0;
+    //       } else {
+    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)          
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // }
+
+    // console.log('variacionCajaYBcoFinal', variacionCajaYBcoFinal)
+    // console.log('cajaYBancosAlCierreFinal', cajaYBancosAlCierreFinal)
 
     props?.setGraph04Data([
       {
         name: 'Variación de caja y bancos',
-        // data: variacionCajaYBcoFinal.map((año) => parseFloat(año.toFixed(2))),
-        data: variacionCajaYBcoFinal,
+        data: variacionCajaYBco.map((año) => parseFloat(año.toFixed(2))),
+        // data: variacionCajaYBcoFinal,
       },
       {
         name: 'Caja y bancos al cierre',
-        // data: cajaYBancosAlCierreFinal.map((año) => parseFloat(año.toFixed(2))),
-        data: cajaYBancosAlCierreFinal,
+        data: cajaYBancosAlCierre.map((año) => parseFloat(año.toFixed(2))),
+        // data: cajaYBancosAlCierreFinal,
       },
     ]);
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
