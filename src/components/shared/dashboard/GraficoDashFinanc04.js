@@ -23,18 +23,18 @@ function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
   );
   const currency = useSelector((state) => state.auth.user.currency);
 
-  useEffect(() => {
-    let pSelMonth = [0];
-    let pFirstSem = [0, 0, 0, 0, 0, 0];
-    let pSecondSem = [0, 0, 0, 0, 0, 0];
-    let pFirstTrim = [0, 0, 0];
+  // useEffect(() => {
+  //   let pSelMonth = [0];
+  //   let pFirstSem = [0, 0, 0, 0, 0, 0];
+  //   let pSecondSem = [0, 0, 0, 0, 0, 0];
+  //   let pFirstTrim = [0, 0, 0];
 
-    for (let i = 0; i <= 9; i++) {
-      for (let j = 0; j <= 11; j++) {
-        superTotals[i] += totals[i][j];
-      }
-    }
-  }, [yearSelected, periodoSelected]);
+  //   for (let i = 0; i <= 9; i++) {
+  //     for (let j = 0; j <= 11; j++) {
+  //       superTotals[i] += totals[i][j];
+  //     }
+  //   }
+  // }, [yearSelected, periodoSelected]);
 
   useEffect(() => {
     setView(props[0].data);
@@ -44,6 +44,9 @@ function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
   return (
     <Chart
       options={{
+        chart: {
+          id: "04",
+        },
         plotOptions: {
           bar: {
             horizontal: false,
@@ -79,7 +82,7 @@ function GraficoDashFinanc04({ props, yearSelected, periodoSelected }) {
         yaxis: {
           labels: {
             formatter: function (value) {
-              return `${currency}${value}`;
+              return `${value}`;
             },
           },
         },
