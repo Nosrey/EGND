@@ -135,10 +135,11 @@ function TableWorkingCapital(props) {
   }, [inputsValues]);
 
   useEffect(() => {
-    if (Array.isArray(IIGG) && IIGG.length > 1) {
+    if (Array.isArray(IIGG)) {
       setTimeout(() => {
         const fetchData = async () => {
           try {
+            let IIGGFinal = (IIGG?.length === 0) ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
             const data = await getUser(currentState.id);
             let dataCopy = JSON.parse(JSON.stringify(data));
             let dataCopy2 = JSON.parse(JSON.stringify(data));
@@ -147,7 +148,6 @@ function TableWorkingCapital(props) {
               null,
               setCebo,
             );
-
             await calcularBienesDeCambio(data, setCebo, 0);
             let ivasCF = await calcularDeudasComerciales(
               data,
@@ -157,7 +157,7 @@ function TableWorkingCapital(props) {
               ivasDF,
               ivasCF,
               dataCopy2,
-              IIGG,
+              IIGGFinal,
               setDeudasFiscales2,
               setShowLoader,
             );

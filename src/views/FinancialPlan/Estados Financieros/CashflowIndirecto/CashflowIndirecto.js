@@ -115,9 +115,7 @@ function CashflowIndirecto({ setGraph04Data = () => {} }) {
                   contenido={
                     <TableCashflowIndirecto
                       resultadoNeto={myResult[0]}
-                      variacion={[
-                        100, 340, 444, 230, 140, 30, 499, 670, 190, 300,
-                      ]}
+                      variacion={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
                       amortizaciones={amortizaciones || []}
                       interesesPagados={intereses || []}
                       inversiones={inversiones || []}

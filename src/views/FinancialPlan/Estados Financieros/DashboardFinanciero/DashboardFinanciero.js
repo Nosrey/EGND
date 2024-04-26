@@ -102,7 +102,9 @@ function DashboardFinanciero() {
           ebit={ebit}
           rn={rn}
         />
-        <CashflowIndirecto setGraph04Data={setGraph04Data} />
+        <CashflowIndirecto
+          setGraph04Data={setGraph04Data} 
+        />
         <Balance
           setGraph05Data={setGraph05Data}
           setGraph06Data={setGraph06Data}

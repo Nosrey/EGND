@@ -26,7 +26,7 @@ function TableCashflowIndirecto(props) {
   const [pagoPrestamos, setPagoPrestamos] = useState([]);
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
-  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([]);
+  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
   const currentState = useSelector((state) => state.auth.user);
@@ -131,12 +131,18 @@ function TableCashflowIndirecto(props) {
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
-    setResultadoNeto(props.resultadoNeto);
-    setAmortizaciones(props.amortizaciones);
-    setInteresesPagados(props.interesesPagados);
-    setVariacion(props.variacion);
-    setInversiones(props.inversiones);
-    setFinanciacion(props.financiacion);
+    let resultadoNetoFinal = props?.resultadoNeto?.length ? props?.resultadoNeto : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setResultadoNeto(resultadoNetoFinal);
+    let amortizacionesFinal = props?.amortizaciones?.length ? props?.amortizaciones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setAmortizaciones(amortizacionesFinal);
+    let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setInteresesPagados(interesesPagadosFinal);
+    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setVariacion(variacionFinal);
+    let inversionesFinal = props?.inversiones?.length ? props?.inversiones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setInversiones(inversionesFinal);
+    let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    setFinanciacion(financiacionFinal);
   }, [props]);
 
   useEffect(() => {
@@ -145,9 +151,9 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           resultadoNeto[i] +
-            amortizaciones[i] +
-            interesesPagados[i] -
-            variacion[i],
+          amortizaciones[i] +
+          interesesPagados[i] -
+          variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -183,6 +189,8 @@ function TableCashflowIndirecto(props) {
       setVariacionCajaYBco(resultado);
     }
   }, [FEOperativas, FEfinanciacion, inversiones]);
+  // ---------------------------------
+
 
   useEffect(() => {
     if (variacionCajaYBco) {
@@ -197,6 +205,19 @@ function TableCashflowIndirecto(props) {
             parseInt(variacionCajaYBco[i]) + parseInt(resultado[i - 1]),
           );
         }
+      }
+      if (resultado !== undefined) {
+        if (resultado.length < 10) {
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        } else {
+          for (let i = 0; i < 10; i++) {
+            if (Number.isNaN(resultado[i])) {
+              resultado[i] = 0;
+            }
+          }
+        }
+      } else {
+        resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       }
       setCajaYBancosAlCierre(resultado);
       if (!Number.isNaN(resultado[0]))
@@ -219,20 +240,23 @@ function TableCashflowIndirecto(props) {
     createCashflowIndirecto(value)
       .then((resp) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        props.showAlertSuces(true);
+        props?.showAlertSuces(true);
         setTimeout(() => {
-          props.showAlertSuces(false);
+          props?.showAlertSuces(false);
         }, 5000);
       })
       .catch((error) => {
         console.error(error);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        props.showAlertError(true);
+        props?.showAlertError(true);
         setTimeout(() => {
-          props.showAlertError(false);
+          props?.showAlertError(false);
         }, 5000);
       });
   };
+
+
+  // --------------
 
   useEffect(() => {
     getCashflowIndirectoInfo(currentState.id)
@@ -246,14 +270,56 @@ function TableCashflowIndirecto(props) {
   }, []);
 
   useEffect(() => {
-    props.setGraph04Data([
+    // console.log('props?.variacionCajaYBco', variacionCajaYBco)
+    // console.log('props?.cajaYBancosAlCierre', cajaYBancosAlCierre)
+    // let variacionCajaYBcoFinal = variacionCajaYBco
+    // let cajaYBancosAlCierreFinal = cajaYBancosAlCierre
+
+    // if (variacionCajaYBcoFinal !== undefined && variacionCajaYBcoFinal.length) {
+    //   if (variacionCajaYBcoFinal.length < 10) {
+    //     variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //   } else {
+    //     for (let i = 0; i < 10; i++) {
+    //       if (Number.isNaN(variacionCajaYBcoFinal[i]) || variacionCajaYBcoFinal[i] === Infinity || variacionCajaYBcoFinal[i] === -Infinity) {
+    //         variacionCajaYBcoFinal[i] = 0;
+    //       } else {
+    //         variacionCajaYBcoFinal[i] = variacionCajaYBco?.[i].toFixed(2)
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // }
+
+    // if (cajaYBancosAlCierreFinal !== undefined && cajaYBancosAlCierreFinal.length) {
+    //   if (cajaYBancosAlCierreFinal.length < 10) {
+    //     cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    //   } else {
+    //     for (let i = 0; i < 10; i++) {
+    //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
+    //         cajaYBancosAlCierreFinal[i] = 0;
+    //       } else {
+    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)          
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // }
+
+    // console.log('variacionCajaYBcoFinal', variacionCajaYBcoFinal)
+    // console.log('cajaYBancosAlCierreFinal', cajaYBancosAlCierreFinal)
+
+    props?.setGraph04Data([
       {
         name: 'Variación de caja y bancos',
         data: variacionCajaYBco.map((año) => parseFloat(año.toFixed(2))),
+        // data: variacionCajaYBcoFinal,
       },
       {
         name: 'Caja y bancos al cierre',
         data: cajaYBancosAlCierre.map((año) => parseFloat(año.toFixed(2))),
+        // data: cajaYBancosAlCierreFinal,
       },
     ]);
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
@@ -1116,7 +1182,7 @@ function TableCashflowIndirecto(props) {
                 type="submit"
                 onClick={submitInfoFormCashflow}
               >
-                Guardaraa
+                Guardar
               </Button>
             </>
           }

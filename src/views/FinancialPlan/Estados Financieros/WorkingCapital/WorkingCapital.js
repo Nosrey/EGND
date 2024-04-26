@@ -56,15 +56,9 @@ function WorkingCapital() {
                 <ContainerScrollable
                   contenido={
                     <TableWorkingCapital
-                      creditosVentas={[
-                        100, 340, 444, 230, 140, 30, 499, 670, 190, 300,
-                      ]}
-                      bienesDeCambio={[
-                        100, 340, 444, 230, 140, 30, 499, 670, 190, 300,
-                      ]}
-                      deudasComerciales={[
-                        10, 34, 44, 23, 14, 3, 49, 67, 19, 30,
-                      ]}
+                      creditosVentas={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+                      bienesDeCambio={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+                      deudasComerciales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
                       showAlertSuces={(boolean) => setShowSuccessAlert(boolean)}
                       showAlertError={(boolean) => setShowErrorAlert(boolean)}
                     />

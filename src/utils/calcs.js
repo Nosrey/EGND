@@ -6,7 +6,17 @@
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable prefer-destructuring */
 
-import { MONTHS, optionsBienes } from 'constants/forms.constants';
+import {
+  MONTHS,
+  optionsBienes,
+  defaultVolumenData,
+  defaultPrecioData,
+  defaultAssumpFinancierasData,
+  defaultCostoData,
+  defaultGastosPorCCData,
+  defaultCapexPData,
+  defaultCapexQData,
+} from 'constants/forms.constants';
 
 export const redondearHaciaArribaConDosDecimales = (numero) => {
   let multiplicado = numero * 100;
@@ -107,7 +117,7 @@ export const calculateCostosAnuales = (costoData, volumenData) => {
             )
               ? 0
               : volumenData[indexPais].stats[indexCanal].productos[indexProd]
-                  .años[i].volMeses[s];
+                .años[i].volMeses[s];
 
             acum += costoU * vol;
           });
@@ -139,7 +149,7 @@ export const calculateCostosAnualesTipo = (costoData, volumenData, tipo) => {
               )
                 ? 0
                 : volumenData[indexPais].stats[indexCanal].productos[indexProd]
-                    .años[i].volMeses[s];
+                  .años[i].volMeses[s];
 
               acum += costoU * vol;
             });
@@ -444,7 +454,6 @@ export const calcularCreditosPorVentas = (
   // las ventas se obtendran asi: ventas = ventasMes1 + ventasMes2 + ventasMes3 + ventasMes4 + ventasMes5 + ventasMes6 + ventasMes7 + ventasMes8 + ventasMes9 + ventasMes10 + ventasMes11 + ventasMes12
   // las ventasMesX se obtendran asi: ventasMesX = (volMesX * precioMesX)
   // primero usare getUser
-
   // creo un array de 10 años y cada año con los 12 meses
   let ivasGrupo = Array.from({ length: 10 }, () =>
     Object.fromEntries(MONTHS.map((month) => [month, 0])),
@@ -1037,7 +1046,7 @@ export const calcularCreditosPorVentas = (
               Number(ivasGrupo[t][month]) +
               Number(
                 ventas[i].stats[x].productos[j].años[t].volMeses[month] *
-                  (obtenerIva(assumpFinancierasData) / 100),
+                (obtenerIva(assumpFinancierasData) / 100),
               );
           }
           // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
@@ -1058,22 +1067,29 @@ export const calcularCreditosPorVentas = (
           // creditos.push(ventas[i].stats[x].productos[j].años[t].pendientePorCobrar);
           creditos[t] = creditos[t]
             ? creditos[t] +
-              ventas[i].stats[x].productos[j].años[t].pendientePorCobrar
+            ventas[i].stats[x].productos[j].años[t].pendientePorCobrar
             : ventas[i].stats[x].productos[j].años[t].pendientePorCobrar;
         }
       }
     }
   }
 
-  setCreditosVentas(creditos);
+  // reviso creditos y si hay un valor que no sea un numero lo cambio a 0 o si su longitd es menor a 10, le agrego 0 hasta que sea 10
+  if (creditos.length < 10) {
+    for (let i = creditos.length; i < 10; i++) {
+      creditos.push(0);
+    }
+  } else {
+    creditos = creditos.map((item) => (isNaN(item) ? 0 : item));
+  }
 
+  setCreditosVentas(creditos);
   return ivasGrupo;
 };
 
 export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
   // lo vuelvo numero de serlo, si no lo cambio a 0
   stockInicialUser = Number(stockInicialUser) || 0;
-
   let costosFinal = [];
   const { volumenData, costoData, assumpFinancierasData } = data;
   let stockFijo = assumpFinancierasData[0]?.stock / 30;
@@ -1239,7 +1255,7 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
                     t === 0
                       ? stockInicialUser
                       : costos[i].stats[x].productos[j].años[t - 1]
-                          .stockCalculos.diciembre.stockFinal,
+                        .stockCalculos.diciembre.stockFinal,
                   compras: calcularCompras(
                     costos[i].stats[x].productos[j],
                     'enero',
@@ -1451,9 +1467,9 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
                 t === 0 && month === 'enero'
                   ? stockInicialUser
                   : month === 'enero'
-                  ? costos[i].stats[x].productos[j].años[t - 1].stockCalculos
+                    ? costos[i].stats[x].productos[j].años[t - 1].stockCalculos
                       .diciembre.stockFinal
-                  : costos[i].stats[x].productos[j].años[t].stockCalculos[
+                    : costos[i].stats[x].productos[j].años[t].stockCalculos[
                       MONTHS[MONTHS.indexOf(month) - 1]
                     ].stockFinal;
 
@@ -1467,15 +1483,15 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
                     .compras -
                   costos[i].stats[x].productos[j].años[t].stockCalculos[month]
                     .consumo ===
-                0
+                  0
                   ? costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                      .stockInicial
+                    .stockInicial
                   : costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                      .stockInicial +
-                    costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                      .compras -
-                    costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                      .consumo;
+                    .stockInicial +
+                  costos[i].stats[x].productos[j].años[t].stockCalculos[month]
+                    .compras -
+                  costos[i].stats[x].productos[j].años[t].stockCalculos[month]
+                    .consumo;
             }
           }
         }
@@ -1503,21 +1519,32 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
             if (t <= 8)
               costosFinal[t] = costosFinal[t]
                 ? costosFinal[t] +
-                  costos[i].stats[x].productos[j].años[t].stockCalculos
-                    .diciembre.stockFinal
+                costos[i].stats[x].productos[j].años[t].stockCalculos
+                  .diciembre.stockFinal
                 : costos[i].stats[x].productos[j].años[t].stockCalculos
-                    .diciembre.stockFinal;
+                  .diciembre.stockFinal;
             else if (t === 9)
               costosFinal[t] = costosFinal[t]
                 ? costosFinal[t] +
-                  costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                    .stockFinal
+                costos[i].stats[x].productos[j].años[t].stockCalculos[month]
+                  .stockFinal
                 : costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                    .stockFinal;
+                  .stockFinal;
           }
         }
       }
     }
+  }
+
+
+
+  // reviso costosFinal y si hay un valor que no sea un numero lo cambio a 0 o si su longitd es menor a 10, le agrego 0 hasta que sea 10
+  if (costosFinal.length < 10) {
+    for (let i = costosFinal.length; i < 10; i++) {
+      costosFinal.push(0);
+    }
+  } else {
+    costosFinal = costosFinal.map((item) => (isNaN(item) ? 0 : item));
   }
 
   setCostos(costosFinal);
@@ -1532,8 +1559,9 @@ export const calcularbienesDeUso = (data, setBienesDeUso) => {
   let saldoBienesDeUso = [];
   const { capexPData, capexQData } = data;
 
+
   // recorro capexQData
-  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
+  for (let i = 0; i < capexQData[0]?.capexQ?.length; i++) {
     // recorro el .años de cada elemento
     for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
       // recorro volMeses usando MONTHS
@@ -1585,7 +1613,6 @@ export const calcularbienesDeUso = (data, setBienesDeUso) => {
       }
     }
   }
-
   // recorro el array de 10 de amortizaciones y sumo todos los valores de cada mes para obtener el total de cada año en un array llamado amortizacionesAños
   let amortizacionesAños = [];
   for (let i = 0; i < amortizaciones.length; i++) {
@@ -1603,8 +1630,17 @@ export const calcularbienesDeUso = (data, setBienesDeUso) => {
     );
   }
 
-  setBienesDeUso(saldoBienesDeUso);
 
+  // reviso saldoBienesDeUso y si hay un valor que no sea un numero lo cambio a 0 o si su longitd es menor a 10, le agrego 0 hasta que sea 10
+  if (saldoBienesDeUso.length < 10) {
+    for (let i = saldoBienesDeUso.length; i < 10; i++) {
+      saldoBienesDeUso.push(0);
+    }
+  } else {
+    saldoBienesDeUso = saldoBienesDeUso.map((item) => (isNaN(item) ? 0 : item));
+  }
+
+  setBienesDeUso(saldoBienesDeUso);
   // creo 10 elementos en mi array de saldoBienesDeUso donde el primer valor es 0 y el resultado de cada uno sera capexPxQ[i] + valorInicial (en todos sera el resultado del anterior menos en el primer elemento, en ese caso sera 0) - amortizacionesAños[i]
 };
 
@@ -1874,7 +1910,7 @@ export const comprasProductos = (data, obtenerIva) => {
             }
             comprasTotales[t] = comprasTotales[t]
               ? comprasTotales[t] +
-                total * (1 + obtenerIva(assumpFinancierasData) / 100)
+              total * (1 + obtenerIva(assumpFinancierasData) / 100)
               : total * (1 + obtenerIva(assumpFinancierasData) / 100);
           }
         }
@@ -1886,7 +1922,7 @@ export const comprasProductos = (data, obtenerIva) => {
 };
 
 export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
-  const {
+  let {
     volumenData,
     precioData,
     assumpFinancierasData,
@@ -1895,6 +1931,14 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
     capexPData,
     capexQData,
   } = data;
+
+  if (volumenData.length === 0) volumenData = defaultVolumenData;
+  if (precioData.length === 0) precioData = defaultPrecioData;
+  if (assumpFinancierasData.length === 0) assumpFinancierasData = defaultAssumpFinancierasData;
+  if (costoData.length === 0) costoData = defaultCostoData;
+  if (gastosPorCCData.length === 0) gastosPorCCData = defaultGastosPorCCData;
+  if (capexPData.length === 0) capexPData = defaultCapexPData;
+  if (capexQData.length === 0) capexQData = defaultCapexQData;
 
   let ivasCostosGrupoProductos = Array.from({ length: 10 }, () =>
     Object.fromEntries(MONTHS.map((month) => [month, 0])),
@@ -2521,7 +2565,7 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
                 Number(
                   costos[i].stats[x].productos[j].años[t].stockCalculos[month]
                     .consumo *
-                    (obtenerIva(assumpFinancierasData) / 100),
+                  (obtenerIva(assumpFinancierasData) / 100),
                 );
             }
             // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
@@ -2542,7 +2586,7 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
             // creditos.push(costos[i].stats[x].productos[j].años[t].pendientePorCobrar);
             creditos[t] = creditos[t]
               ? creditos[t] +
-                costos[i].stats[x].productos[j].años[t].pendientePorCobrar
+              costos[i].stats[x].productos[j].años[t].pendientePorCobrar
               : costos[i].stats[x].productos[j].años[t].pendientePorCobrar;
           }
         }
@@ -2707,23 +2751,23 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
                 ...deudasComercialesData[t][month],
                 costoServicios: deudasComercialesData[t][month].costoServicios
                   ? Number(deudasComercialesData[t][month].costoServicios) +
-                    Number(
-                      costos[i].stats[x].productos[j].años[t].stockCalculos[
-                        month
-                      ],
-                    )
+                  Number(
+                    costos[i].stats[x].productos[j].años[t].stockCalculos[
+                    month
+                    ],
+                  )
                   : Number(
-                      costos[i].stats[x].productos[j].años[t].stockCalculos[
-                        month
-                      ],
-                    ),
+                    costos[i].stats[x].productos[j].años[t].stockCalculos[
+                    month
+                    ],
+                  ),
               };
 
               ivasCostosGruposServicios[t][month] =
                 Number(ivasCostosGruposServicios[t][month]) +
                 Number(
                   costos[i].stats[x].productos[j].años[t].stockCalculos[month] *
-                    (obtenerIvaServicios(assumpFinancierasData) / 100),
+                  (obtenerIvaServicios(assumpFinancierasData) / 100),
                 );
             }
             for (let month in costos[i].stats[x].productos[j].años[t]
@@ -2733,16 +2777,16 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
                 comprasComerciales: deudasComercialesData[t][month]
                   .comprasComerciales
                   ? Number(deudasComercialesData[t][month].comprasComerciales) +
-                    Number(
-                      costos[i].stats[x].productos[j].años[t].comisionCalculos[
-                        month
-                      ],
-                    )
+                  Number(
+                    costos[i].stats[x].productos[j].años[t].comisionCalculos[
+                    month
+                    ],
+                  )
                   : Number(
-                      costos[i].stats[x].productos[j].años[t].comisionCalculos[
-                        month
-                      ],
-                    ),
+                    costos[i].stats[x].productos[j].años[t].comisionCalculos[
+                    month
+                    ],
+                  ),
               };
             }
           }
@@ -2782,14 +2826,14 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
                 ...deudasComercialesData[t][month],
                 comprasGastos: deudasComercialesData[t][month].comprasGastos
                   ? Number(deudasComercialesData[t][month].comprasGastos) +
-                    Number(
-                      gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
-                        .años[t].volMeses[month],
-                    )
+                  Number(
+                    gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
+                      .años[t].volMeses[month],
+                  )
                   : Number(
-                      gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
-                        .años[t].volMeses[month],
-                    ),
+                    gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
+                      .años[t].volMeses[month],
+                  ),
               };
             }
           }
@@ -3446,10 +3490,10 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
         if (MONTHS.includes(month)) {
           gastosAnualesInversiones[j] = gastosAnualesInversiones[j]
             ? gastosAnualesInversiones[j] +
-              capexQData[0].capexQ[i].años[j][month].volMeses *
-                (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1)
+            capexQData[0].capexQ[i].años[j][month].volMeses *
+            (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1)
             : capexQData[0].capexQ[i].años[j][month].volMeses *
-              (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1);
+            (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1);
         }
       }
     }
@@ -3462,7 +3506,7 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
       for (let month in capexQData[0].capexQ[i].años[j].cobrado) {
         gastosAnualesPagadosInversiones[j] = gastosAnualesPagadosInversiones[j]
           ? gastosAnualesPagadosInversiones[j] +
-            capexQData[0].capexQ[i].años[j].cobrado[month]
+          capexQData[0].capexQ[i].años[j].cobrado[month]
           : capexQData[0].capexQ[i].años[j].cobrado[month];
       }
     }
@@ -3482,9 +3526,16 @@ export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
   for (let i = 0; i < gastosPorPagarAnualesProducto.length; i++) {
     resultadoGastosAnualesPorPagar.push(
       gastosPorPagarAnualesProducto[i] +
-        gastosPorPagarAnualesServicios[i] +
-        gastosAnualesPorPagarInversiones[i],
+      gastosPorPagarAnualesServicios[i] +
+      gastosAnualesPorPagarInversiones[i],
     );
+  }
+
+  // reviso si alguna propiedad de resultadoGastosAnualesPorPagar es NaN y si lo es la cambio a 0
+  for (let i = 0; i < resultadoGastosAnualesPorPagar.length; i++) {
+    if (isNaN(resultadoGastosAnualesPorPagar[i])) {
+      resultadoGastosAnualesPorPagar[i] = 0;
+    }
   }
 
   setDeudasComerciales(resultadoGastosAnualesPorPagar);
@@ -3513,7 +3564,13 @@ export const calcularDeudasFiscales = (
   setDeudasFiscales,
   setShowLoader,
 ) => {
-  const { volumenData, precioData, costoData } = data;
+
+  let { volumenData, precioData, costoData } = data;
+
+  if (volumenData.length === 0) volumenData = defaultVolumenData;
+  if (precioData.length === 0) precioData = defaultPrecioData;
+  if (costoData.length === 0) costoData = defaultCostoData;
+
   // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
   let resultado = Array.from({ length: 10 }, () =>
     Object.fromEntries(MONTHS.map((month) => [month, { SAF: 0, SAP: 0 }])),
@@ -3694,6 +3751,17 @@ export const calcularResultadosNoAsignados = (
         Number(resultadosNoAsignados[i - 1]);
     }
   }
+
+
+  // reviso resultadosNoAsignados y si hay un valor que no sea un numero lo cambio a 0 o si su longitd es menor a 10, le agrego 0 hasta que sea 10
+  if (resultadosNoAsignados.length < 10) {
+    for (let i = resultadosNoAsignados.length; i < 10; i++) {
+      resultadosNoAsignados.push(0);
+    }
+  } else {
+    resultadosNoAsignados = resultadosNoAsignados.map((item) => (isNaN(item) ? 0 : item));
+  }
+
   setFinal(resultadosNoAsignados);
 };
 
@@ -3705,24 +3773,32 @@ export const calcularEquity = (
   setSuma,
   setShowLoader,
 ) => {
-  let arrayFinal = [];
+  let arrayInterno = array
+  let resultadosNoAsignadosInterno = ResultadosNoAsignados
+  let resultadosDelEjercicioInterno = ResultadosDelEjercicio
 
+  if (arrayInterno === undefined || arrayInterno?.length === 0) arrayInterno = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  if (resultadosNoAsignadosInterno === undefined || resultadosNoAsignadosInterno?.length === 0) resultadosNoAsignadosInterno = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  if (resultadosDelEjercicioInterno === undefined || resultadosDelEjercicioInterno?.length === 0) resultadosDelEjercicioInterno = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+  let arrayFinal = [0];
   for (let i = 0; i < 10; i++) {
     if (i === 0) {
-      arrayFinal[i] = array[0] * -1 + array[1] * -1;
+      arrayFinal[i + 1] = arrayInterno[0] * -1 + arrayInterno[1] * -1;
     } else {
-      arrayFinal[i] = arrayFinal[i - 1] + array[i + 1] * -1;
+      arrayFinal[i + 1] = arrayFinal[i - 1] + arrayInterno[i + 1] * -1;
     }
   }
+  // elimino el ultimo elemento del array de arrayFinal
+  arrayFinal.pop();
   setFinal(arrayFinal);
-
-  // sumo los 3 array de final, resultadosNoAsignados y resultadosDelEjercicio
+  // sumo los 3 arrayInterno de final, resultadosNoAsignados y resultadosDelEjercicio
   let suma = [];
   for (let i = 0; i < 10; i++) {
     suma[i] =
       Number(arrayFinal[i]) +
-      Number(ResultadosNoAsignados[i]) +
-      Number(ResultadosDelEjercicio[i]);
+      Number(resultadosNoAsignadosInterno[i]) +
+      Number(resultadosDelEjercicioInterno[i]);
   }
 
   setSuma(suma);
@@ -3731,9 +3807,11 @@ export const calcularEquity = (
 
 const calcCapitalMensual = (monto, tasaAnual, plazo) =>
   calcPagoMensual(monto, tasaAnual, plazo) -
-    calcInteresMensual(monto, tasaAnual, plazo) || 0;
+  calcInteresMensual(monto, tasaAnual, plazo) || 0;
 
 export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
+
+  console.log('prestamos: ', prestamos)
   let prestamoscalculados = [];
   for (let i = 0; i < prestamos.length; i++) {
     prestamoscalculados[i] = {
@@ -3751,44 +3829,44 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
       pagoMensual:
         prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo
           ? calcPagoMensual(
-              prestamos[i]?.monto,
-              prestamos[i]?.tasaAnual,
-              prestamos[i]?.plazo,
-            )
+            prestamos[i]?.monto,
+            prestamos[i]?.tasaAnual,
+            prestamos[i]?.plazo,
+          )
           : 0,
       // calcCapitalMensual(cta.monto, cta.tasaAnual, cta.plazo,),
       capitalMensual:
         prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo
           ? calcCapitalMensual(
-              prestamos[i]?.monto,
-              prestamos[i]?.tasaAnual,
-              prestamos[i]?.plazo,
-            )
+            prestamos[i]?.monto,
+            prestamos[i]?.tasaAnual,
+            prestamos[i]?.plazo,
+          )
           : 0,
       interesMensual:
         prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo
           ? calcInteresMensual(
-              prestamos[i]?.monto,
-              prestamos[i]?.tasaAnual,
-              prestamos[i]?.plazo,
-            )
+            prestamos[i]?.monto,
+            prestamos[i]?.tasaAnual,
+            prestamos[i]?.plazo,
+          )
           : 0,
       // calcInteresTotal(cta.monto, cta.tasaAnual, cta.plazo),
       interesTotal:
         prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo
           ? calcInteresTotal(
-              prestamos[i]?.monto,
-              prestamos[i]?.tasaAnual,
-              prestamos[i]?.plazo,
-            )
+            prestamos[i]?.monto,
+            prestamos[i]?.tasaAnual,
+            prestamos[i]?.plazo,
+          )
           : 0,
       capInt:
         prestamos[i]?.monto && prestamos[i]?.tasaAnual && prestamos[i]?.plazo
           ? calcCapInt(
-              prestamos[i]?.monto,
-              prestamos[i]?.tasaAnual,
-              prestamos[i]?.plazo,
-            )
+            prestamos[i]?.monto,
+            prestamos[i]?.tasaAnual,
+            prestamos[i]?.plazo,
+          )
           : 0,
     };
   }
@@ -3799,26 +3877,36 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
   );
 
   // recorro prestamoscalculados que es donde estan los prestamos y reviso su propiedad .mesInicio, .yearInicio y .monto para saber en que mes y año comienzan y los agrego a prestamosArray en la propiedad .ingreso tomando el .monto
+  console.log('prestamoscalculados: ', prestamoscalculados)
   for (let i = 0; i < prestamoscalculados.length; i++) {
     // en minuscula
-    let mesInicio = prestamoscalculados[i].mesInicio.toLowerCase();
-    let yearInicio = Number(prestamoscalculados[i].yearInicio);
-    let monto = Number(prestamoscalculados[i].monto);
-    let plazo = Number(prestamoscalculados[i].plazo);
-    let capitalMensual = Number(prestamoscalculados[i].capitalMensual);
-    let interesMensual = Number(prestamoscalculados[i].interesMensual);
-    let pagoMensual = Number(prestamoscalculados[i].pagoMensual);
+
+    let mesInicio = (typeof(prestamoscalculados[i]?.mesInicio) === 'string' ? prestamoscalculados[i]?.mesInicio.toLowerCase() : prestamoscalculados[i]?.mesInicio);
+    let yearInicio = Number(prestamoscalculados[i]?.yearInicio);
+    let monto = Number(prestamoscalculados[i]?.monto);
+    let plazo = Number(prestamoscalculados[i]?.plazo);
+    let capitalMensual = Number(prestamoscalculados[i]?.capitalMensual);
+    let interesMensual = Number(prestamoscalculados[i]?.interesMensual);
+    let pagoMensual = Number(prestamoscalculados[i]?.pagoMensual);
 
     // recorro los 10 años
     for (let j = 0; j < 10; j++) {
       // si el año es igual al año de inicio entonces agrego el monto a prestamosArray
       if (j === yearInicio) {
-        prestamosArray[j][mesInicio] = {
-          ...prestamosArray[j][mesInicio],
-          ingreso: prestamosArray[j][mesInicio].ingreso
-            ? prestamosArray[j][mesInicio].ingreso + monto
-            : monto,
-        };
+        // prestamosArray[j][mesInicio] = {
+        //   ...prestamosArray[j][mesInicio],
+        //   ingreso: prestamosArray[j][mesInicio].ingreso
+        //     ? prestamosArray[j][mesInicio].ingreso + monto
+        //     : monto,
+        // };
+        prestamosArray[j] = {
+          ...prestamosArray[j],
+          [mesInicio]: {
+            ...prestamosArray[j][mesInicio],
+            ingreso: prestamosArray[j][mesInicio].ingreso ? prestamosArray[j][mesInicio].ingreso + monto : monto,
+          },
+          
+        }
       }
     }
 
@@ -3887,6 +3975,9 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
     }
   }
 
+  if (final === undefined || final?.length === 0) final = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+  console.log('final: ', final)
   setFinal(final);
   setShowLoader(false);
 };

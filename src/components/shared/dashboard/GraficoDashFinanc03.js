@@ -4,6 +4,9 @@ function GraficoDashFinanc03({ graph03Data }) {
   return (
     <Chart
       options={{
+        chart: {
+          id: "03",
+        },
         dataLabels: {
           enabled: false,
         },
