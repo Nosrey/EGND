@@ -41,6 +41,9 @@ function GraficoDashFinanc02({
   return (
     <Chart
       options={{
+        chart: {
+          id: "02",
+        },
         plotOptions: {
           bar: {
             horizontal: false,
@@ -88,7 +91,7 @@ function GraficoDashFinanc02({
         yaxis: {
           labels: {
             formatter: function (value) {
-              return `${currency}${value}`;
+              return `${value}`;
             },
           },
         },

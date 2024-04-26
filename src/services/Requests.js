@@ -5,9 +5,9 @@ import store from '../store/index';
 
 const app = store.getState();
 
-// const URL_API = 'http://localhost:8080';
+const URL_API = 'http://localhost:8080';
 
-const URL_API = 'https://api.egndfinance.com';
+// const URL_API = 'https://api.egndfinance.com';
 const idUser = localStorage.getItem('userId');
 
 export const activateAccount = async (token) => {
@@ -934,7 +934,6 @@ export const getBalance = async (id = idUser, setinputsValues) => {
   try {
     const resp = await fetch(`${URL_API}/api/balance/${id}`);
     const data = await resp.json();
-    console.log('value de entrada: ', data);
     let objeto = {
       cajaYBancos: data.response[0]?.cajaYBancos
         ? data.response[0]?.cajaYBancos
@@ -1002,7 +1001,7 @@ export const getBalance = async (id = idUser, setinputsValues) => {
     setinputsValues(objeto);
     return objeto;
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error de request:', error);
     throw new Error('No se pudo obtener los datos del usuario.');
   }
 };

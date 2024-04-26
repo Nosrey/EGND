@@ -11,6 +11,7 @@ import GraficoDeBarra from 'components/shared/dashboard/GraficoDeBarra';
 import GraficoDeBarraHeadcountThree from 'components/shared/dashboard/GraficoDeBarraHeadcountThree';
 
 function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, growth, graph03Data, graph04Data, graph05Data, graph06Data, graph07Data }) {
+
     const infoForm = {
         "argentina": [
             {
@@ -6692,14 +6693,10 @@ function TableDashboardFinanciero({ cmgBruta, ebitda, ebit, rn, rdoNetoValue, gr
                 </h2>
 
                 {/* Grafico 9 */}
-                <h5 className="cursor-default">Endeudamiento</h5>
+                {/* <h5 className="cursor-default">Endeudamiento</h5>
                 <GraficoDashFinanc05
                     data={graph05Data}
-                    typeView={typeView}
-                    dataHeadcount={dataHeadcount}
-                    periodoSelected={periodoSelected}
-                    yearSelected={yearSelected}
-                />
+                /> */}
 
                 {/* Grafico 10 */}
                 <h5 className="cursor-default">Solvencia</h5>

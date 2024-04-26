@@ -84,7 +84,8 @@ function Balance({
                 </FormContainer>
               </div>
             </div>
-            <div className="container-countries">
+
+            {/* <div className="container-countries">
               <FormContainer className="cont-countries">
                 <ContainerScrollable
                   contenido={
@@ -93,13 +94,15 @@ function Balance({
                       creditosFiscales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0] || []}
                       setGraph05Data={setGraph05Data}
                       setGraph06Data={setGraph06Data}
+                      setGraph07Data={setGraph07Data}
                       showAlertSuces={(boolean) => setShowSuccessAlert(boolean)}
                       showAlertError={(boolean) => setShowErrorAlert(boolean)}
                     />
                   }
                 />
               </FormContainer>
-            </div>
+            </div> */}
+            
           </div>
         </>
       )}

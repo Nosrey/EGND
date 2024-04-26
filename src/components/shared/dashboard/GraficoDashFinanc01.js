@@ -11,6 +11,7 @@ function GraficoDashed({ data }) {
           zoom: {
             enabled: false,
           },
+          id: "01",
         },
         dataLabels: {
           enabled: false,

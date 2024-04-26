@@ -428,3 +428,2502 @@ export const anosPrestamos = [
   { value: '9', label: 'Año 9' },
   { value: '10', label: 'Año 10' },
 ];
+
+export const defaultVolumenData = [
+  {
+    "_id": "",
+    "countryName": "",
+    "idUser": [],
+    "__v": 0,
+    "stats": [
+      {
+        "canalName": "",
+        "productos": [
+          {
+            "id": "",
+            "volInicial": 0,
+            "comision": 0,
+            "impuesto": 0,
+            "cargos": 0,
+            "precioInicial": 0,
+            "tasa": 0,
+            "name": "",
+            "type": "",
+            "inicioMes": 1,
+            "fecha": "",
+            "años": [
+              {
+                "año": 1,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 2,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 3,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 4,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 5,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 6,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 7,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 8,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 9,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 10,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              }
+            ]
+          },
+        ],
+        "id": ""
+      }
+    ]
+  },
+]
+
+export const defaultPrecioData = [
+  {
+    "_id": "",
+    "countryName": "",
+    "idUser": [
+    ],
+    "__v": 0,
+    "stats": [
+      {
+        "canalName": "",
+        "productos": [
+          {
+            "id": "",
+            "volInicial": 0,
+            "comision": 0,
+            "impuesto": 0,
+            "cargos": 0,
+            "precioInicial": 0,
+            "tasa": 0,
+            "name": "Celular",
+            "type": "producto",
+            "inicioMes": 1,
+            "fecha": "",
+            "años": [
+              {
+                "año": 1,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 2,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 3,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 4,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 5,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 6,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 7,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 8,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 9,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 10,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              }
+            ]
+          },
+        ],
+        "id": ""
+      }
+    ]
+  }
+]
+
+export const defaultAssumpFinancierasData = [
+  {
+    "_id": "",
+    "cobranzas": {
+      "contado": "0",
+      "treintaDias": "0",
+      "cuarentaycincoDias": "0",
+      "sesentaDias": "0",
+      "noventaDias": "0",
+      "cveinteDias": "0",
+      "ccincuentaDias": "0",
+      "cochenteDias": "0",
+      "ddiezDiaz": "0",
+      "dcuarentaDias": "0",
+      "dsetentaDias": "0",
+      "trescientosDias": "0",
+      "ttreintaDias": "0",
+      "IVA": "0",
+      "imponible": "0"
+    },
+    "pagoProducto": {
+      "contado": "0",
+      "treintaDias": "0",
+      "cuarentaycincoDias": "0",
+      "sesentaDias": "0",
+      "noventaDias": "0",
+      "cveinteDias": "0",
+      "ccincuentaDias": "0",
+      "cochenteDias": "0",
+      "ddiezDiaz": "0",
+      "dcuarentaDias": "0",
+      "dsetentaDias": "0",
+      "trescientosDias": "0",
+      "ttreintaDias": "0",
+      "IVA": "0",
+      "imponible": "0"
+    },
+    "pagoServicio": {
+      "contado": "0",
+      "treintaDias": "0",
+      "cuarentaycincoDias": "0",
+      "sesentaDias": "0",
+      "noventaDias": "0",
+      "cveinteDias": "0",
+      "ccincuentaDias": "0",
+      "cochenteDias": "0",
+      "ddiezDiaz": "0",
+      "dcuarentaDias": "0",
+      "dsetentaDias": "0",
+      "trescientosDias": "0",
+      "ttreintaDias": "0",
+      "IVA": "0",
+      "imponible": "0"
+    },
+    "stock": "0",
+    "inversion": {
+      "contado": "0",
+      "treintaDias": "0",
+      "cuarentaycincoDias": "0",
+      "sesentaDias": "0",
+      "noventaDias": "0",
+      "cveinteDias": "0",
+      "ccincuentaDias": "0",
+      "cochenteDias": "0",
+      "ddiezDiaz": "0",
+      "dcuarentaDias": "0",
+      "dsetentaDias": "0",
+      "trescientosDias": "0",
+      "ttreintaDias": "0",
+      "IVA": "0",
+      "imponible": "0"
+    },
+    "idUser": [
+    ],
+    "__v": 0,
+    "impGanancias": "0"
+  }
+]
+
+export const defaultCostoData = [
+  {
+    "_id": "",
+    "countryName": "",
+    "idUser": [
+    ],
+    "__v": 0,
+    "stats": [
+      {
+        "canalName": "",
+        "productos": [
+          {
+            "id": "",
+            "volInicial": 0,
+            "comision": 0,
+            "impuesto": 0,
+            "cargos": 0,
+            "precioInicial": 0,
+            "tasa": 0,
+            "name": "",
+            "type": "",
+            "inicioMes": 1,
+            "fecha": "",
+            "años": [
+              {
+                "año": 1,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 2,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 3,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 4,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 5,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 6,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 7,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 8,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 9,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              },
+              {
+                "año": 10,
+                "volMeses": {
+                  "enero": 0,
+                  "febrero": 0,
+                  "marzo": 0,
+                  "abril": 0,
+                  "mayo": 0,
+                  "junio": 0,
+                  "julio": 0,
+                  "agosto": 0,
+                  "septiembre": 0,
+                  "octubre": 0,
+                  "noviembre": 0,
+                  "diciembre": 0
+                },
+                "volTotal": 0
+              }
+            ]
+          },
+        ],
+        "id": ""
+      }
+    ]
+  },
+]
+
+export const defaultGastosPorCCData = [
+  {
+    "_id": "",
+    "idUser": [
+    ],
+    "__v": 0,
+    "centroDeCostos": [
+      {
+        "Administración": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "Operaciones": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "Comercial": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "Marketing": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "PandD": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "nuevo ": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+        "nuevo 2": {
+          "visible": false,
+          "cuentas": [
+            {
+              "id": 0,
+              "años": [
+                {
+                  "año": 1,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 2,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 3,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 4,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 5,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 6,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 7,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 8,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 9,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                },
+                {
+                  "año": 10,
+                  "volMeses": {
+                    "enero": 0,
+                    "febrero": 0,
+                    "marzo": 0,
+                    "abril": 0,
+                    "mayo": 0,
+                    "junio": 0,
+                    "julio": 0,
+                    "agosto": 0,
+                    "septiembre": 0,
+                    "octubre": 0,
+                    "noviembre": 0,
+                    "diciembre": 0
+                  },
+                  "volTotal": 0
+                }
+              ],
+              "name": "",
+              "precioInicial": 0,
+              "tasa": 0,
+              "incremento": "mensual"
+            },
+          ],
+          "sum": []
+        },
+      }
+    ]
+  }
+]
+
+export const defaultCapexPData = [
+  {
+    "_id": "",
+    "idUser": [
+    ],
+    "__v": 0,
+    "capexP": [
+      {
+        "id": "",
+        "bien": "",
+        "descripcion": "",
+        "unidad": "UNIDAD",
+        "tasa": 0,
+        "precioInicial": 0,
+        "incremento": "mensual",
+        "años": [
+          {
+            "año": 1,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 2,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 3,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 4,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 5,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 6,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 7,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 8,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 9,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 10,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          }
+        ]
+      }
+    ]
+  }
+]
+
+export const defaultCapexQData = [
+  {
+    "_id": "",
+    "idUser": [
+    ],
+    "__v": 0,
+    "capexQ": [
+      {
+        "id": "",
+        "bien": "",
+        "descripcion": "",
+        "unidad": "UNIDAD",
+        "tasa": 0,
+        "precioInicial": 0,
+        "incremento": "mensual",
+        "años": [
+          {
+            "año": 1,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 2,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 3,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 4,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 5,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 6,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 7,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 8,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 9,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          },
+          {
+            "año": 10,
+            "volMeses": {
+              "enero": 0,
+              "febrero": 0,
+              "marzo": 0,
+              "abril": 0,
+              "mayo": 0,
+              "junio": 0,
+              "julio": 0,
+              "agosto": 0,
+              "septiembre": 0,
+              "octubre": 0,
+              "noviembre": 0,
+              "diciembre": 0
+            },
+            "volTotal": 0
+          }
+        ]
+      }
+    ]
+  }
+]
