@@ -57,32 +57,32 @@ function CashflowIndirecto({ setGraph04Data = () => {} }) {
     }
   }, [prestamosData]);
 
-  useEffect(() => {
-    getUser(currentState.id)
-      .then((data) => {
-        if (data?.capexPData[0]?.length !== 0) {
-          setCapexPData(data?.capexPData[0]?.capexP);
-        } else {
-          alert('Falta completar info en Costo Inversiones');
-        }
+  // useEffect(() => {
+  //   getUser(currentState.id)
+  //     .then((data) => {
+  //       if (data?.capexPData[0]?.length !== 0) {
+  //         setCapexPData(data?.capexPData[0]?.capexP);
+  //       } else {
+  //         // alert('Falta completar info en Costo Inversiones');
+  //       }
 
-        if (data?.capexQData[0]?.length !== 0) {
-          setCapexQData(data?.capexQData[0]?.capexQ);
-        } else {
-          alert('Falta completar info en Volumen de Inversiones');
-        }
+  //       if (data?.capexQData[0]?.length !== 0) {
+  //         setCapexQData(data?.capexQData[0]?.capexQ);
+  //       } else {
+  //         // alert('Falta completar info en Volumen de Inversiones');
+  //       }
 
-        if (data?.prestamos?.length !== 0) {
-          setPrestamosData(data?.prestamos);
-        } else {
-          alert('Falta completar info en la sección de Préstamos');
-        }
-        setTimeout(() => {
-          setShowLoader(false);
-        }, 4000);
-      })
-      .catch((error) => console.error(error));
-  }, []);
+  //       if (data?.prestamos?.length !== 0) {
+  //         setPrestamosData(data?.prestamos);
+  //       } else {
+  //         // alert('Falta completar info en la sección de Préstamos');
+  //       }
+  //       setTimeout(() => {
+  //         setShowLoader(false);
+  //       }, 4000);
+  //     })
+  //     .catch((error) => console.error(error));
+  // }, []);
 
   return (
     <>
