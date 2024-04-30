@@ -1520,16 +1520,16 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
               costosFinal[t] = costosFinal[t]
                 ? costosFinal[t] +
                 costos[i].stats[x].productos[j].años[t].stockCalculos
-                  .diciembre.stockFinal
+                  .diciembre?.stockFinal
                 : costos[i].stats[x].productos[j].años[t].stockCalculos
-                  .diciembre.stockFinal;
+                  .diciembre?.stockFinal;
             else if (t === 9)
               costosFinal[t] = costosFinal[t]
                 ? costosFinal[t] +
                 costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                  .stockFinal
+                  ?.stockFinal
                 : costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                  .stockFinal;
+                  ?.stockFinal;
           }
         }
       }
