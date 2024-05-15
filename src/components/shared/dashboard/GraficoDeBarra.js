@@ -12,9 +12,6 @@ import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
 
-let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
-let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
-
 function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
   const [view, setView] = useState();
   const [typeView, setTypeView] = useState(year);
@@ -25,6 +22,10 @@ function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
     let pFirstSem = [0, 0, 0, 0, 0, 0];
     let pSecondSem = [0, 0, 0, 0, 0, 0];
     let pFirstTrim = [0, 0, 0];
+    let pYear = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
+    let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
+
     Object.values(data).map((d) => {
       d.map((m) => {
         m.productos.map((p) => {
@@ -63,6 +64,12 @@ function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
                       setTypeView(secondSem);
                       setView(pSecondSem);
                     }
+                  } else if (periodoSelected.month === 24) {
+                    if (yearSelected.year === indexY) {
+                      pYear[indexM] += Number(a.volMeses[MONTHS[indexM]]);
+                      setTypeView(month);
+                      setView(pYear);
+                    }
                   }
                 }
                 if (!periodoSelected.month && yearSelected.year) {
@@ -71,6 +78,7 @@ function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
                   setTypeView(month);
                 }
               } else {
+                superTotals[indexY] += Number(a.volMeses[MONTHS[indexM]]);
                 setView(superTotals);
                 setTypeView(year);
               }
@@ -79,12 +87,6 @@ function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
         });
       });
     });
-
-    for (let i = 0; i <= 9; i++) {
-      for (let j = 0; j <= 11; j++) {
-        superTotals[i] += totals[i][j];
-      }
-    }
   }, [yearSelected, periodoSelected]);
 
   return (

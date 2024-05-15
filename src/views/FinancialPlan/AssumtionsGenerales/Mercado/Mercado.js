@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Input, Button, FormItem, FormContainer, Alert } from 'components/ui';
-import { Field, Form, Formik } from 'formik';
-import * as Yup from 'yup';
-import { createMercado, getUser } from 'services/Requests';
-import { useMedia } from 'utils/hooks/useMedia';
 import ShortNumberNotation from 'components/shared/shortNumberNotation/ShortNumberNotation';
+import { Alert, Button, FormContainer, FormItem, Input } from 'components/ui';
+import { Field, Form, Formik } from 'formik';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { createMercado, getUser } from 'services/Requests';
 import { formatearNumero } from 'utils/formatTotalsValues';
+import { useMedia } from 'utils/hooks/useMedia';
+import * as Yup from 'yup';
 import ImageMercado from '../../../../assets/image/Mercado.png';
 
 const validationSchema = Yup.object().shape({
@@ -165,7 +165,6 @@ function Mercado() {
                   setTimeout(() => {
                     setShowSuccessAlert(false);
                   }, 5000);
-                  window.location.reload();
                 })
                 .catch((error) => {
                   console.error('Error de API:', error.response.data.message);

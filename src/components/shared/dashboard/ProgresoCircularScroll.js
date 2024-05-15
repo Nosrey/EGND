@@ -1,7 +1,7 @@
 import { Card, Progress } from 'components/ui';
 import { useEffect, useState } from 'react';
-import './scrollBar.css';
 import { useMedia } from 'utils/hooks/useMedia';
+import './scrollBar.css';
 
 function ProgresoCircularScroll({ title, churnProducto }) {
   const media = useMedia();
@@ -13,7 +13,10 @@ function ProgresoCircularScroll({ title, churnProducto }) {
       c.items.map((i) => {
         sum += Number(i.porcentajeChurn);
         setPercent(
-          sum / (churnProducto.churns.length * churnProducto.productos.length),
+          (
+            sum /
+            (churnProducto.churns.length * churnProducto.productos.length)
+          ).toFixed(1),
         );
       });
     });
@@ -39,7 +42,9 @@ function ProgresoCircularScroll({ title, churnProducto }) {
                     <span className="cursor-default">
                       {`${churnProducto.productos[
                         indxChurn
-                      ].name.toUpperCase()} ${item.porcentajeChurn}%`}
+                      ].name.toUpperCase()} ${Number(
+                        item.porcentajeChurn,
+                      ).toFixed(1)}%`}
                     </span>
                   </div>
                 ))}
