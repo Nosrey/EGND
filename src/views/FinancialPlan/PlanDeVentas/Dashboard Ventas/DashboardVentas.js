@@ -131,12 +131,19 @@ function DashboardVentas() {
                           }
                           tot += Number(a.volMeses[MONTHS[indexM]]);
                         }
+                      } else if (periodoSelected.month === 24) {
+                        if (dataAssump.productos[indexO].type === 'producto') {
+                          totProd += Number(a.volMeses[MONTHS[indexM]]);
+                        } else {
+                          totServ += Number(a.volMeses[MONTHS[indexM]]);
+                        }
+                        tot += Number(a.volMeses[MONTHS[indexM]]);
                       }
                     } else {
                       if (dataAssump.productos[indexO].type === 'producto') {
-                        totProd += Number(a.ventasTotal);
+                        totProd += Number(a.volMeses[MONTHS[indexM]]);
                       } else {
-                        totServ += Number(a.ventasTotal);
+                        totServ += Number(a.volMeses[MONTHS[indexM]]);
                       }
                       tot += Number(a.ventasTotal);
                     }
@@ -218,6 +225,12 @@ function DashboardVentas() {
                           } else {
                             totS += Number(a.volMeses[MONTHS[indexM]]);
                           }
+                        }
+                      } else if (periodoSelected.month === 24) {
+                        if (dataAssump.productos[indexP].type === 'producto') {
+                          totV += Number(a.volMeses[MONTHS[indexM]]);
+                        } else {
+                          totS += Number(a.volMeses[MONTHS[indexM]]);
                         }
                       }
                     } else if (
@@ -508,40 +521,49 @@ function DashboardVentas() {
                       : 'grid grid-cols-3 gap-[20px]'
                   } mt-[20px]`}
                 >
-                  <CardNumerica
-                    type="default"
-                    title="Venta de Productos"
-                    hasCurrency
-                    cantidad={totalProd}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Cantidad de productos"
-                    cantidad={volProd}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Ticket medio por Producto"
-                    hasCurrency
-                    cantidad={volProd ? totalProd / volProd : 0}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Venta de Servicios"
-                    hasCurrency
-                    cantidad={totalServ}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Volumen de Servicios"
-                    cantidad={volServ}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Ticket medio por Servicio"
-                    hasCurrency
-                    cantidad={volServ ? totalServ / volServ : 0}
-                  />
+                  {totalProd > 0 && volProd > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        title="Venta de Productos"
+                        hasCurrency
+                        cantidad={totalProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Cantidad de productos"
+                        cantidad={volProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Ticket medio por Producto"
+                        hasCurrency
+                        cantidad={volProd ? totalProd / volProd : 0}
+                      />
+                    </>
+                  )}
+
+                  {totalServ > 0 && volServ > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        title="Venta de Servicios"
+                        hasCurrency
+                        cantidad={totalServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Volumen de Servicios"
+                        cantidad={volServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Ticket medio por Servicio"
+                        hasCurrency
+                        cantidad={volServ ? totalServ / volServ : 0}
+                      />
+                    </>
+                  )}
                 </div>
                 {infoForm && (
                   <div

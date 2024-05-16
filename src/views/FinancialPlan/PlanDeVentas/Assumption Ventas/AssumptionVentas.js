@@ -200,11 +200,13 @@ function AssumptionVentas() {
   const validateEmptyInputs = () => {
     let isEmpty = false;
 
-    productos.forEach((p) => {
-      if (p.name === '' || p.model === '' || p.type === '') {
-        isEmpty = true;
-      }
-    });
+    if (productos.length) {
+      productos.forEach((p) => {
+        if (p.name === '' || p.model === '' || p.type === '') {
+          isEmpty = true;
+        }
+      });
+    }
 
     channels.forEach((c) => {
       if (c.name === '' || c.sameClient === '') {
@@ -220,18 +222,20 @@ function AssumptionVentas() {
       });
     });
 
-    churn.forEach((c) => {
-      if (c.items?.length === 0) {
-        isEmpty = true;
-      }
-      c.items.forEach((i) => {
-        if (i.porcentajeChurn === '') {
+    if (channels.length > 0) {
+      churn.forEach((c) => {
+        if (c.items?.length === 0) {
           isEmpty = true;
         }
+        c.items.forEach((i) => {
+          if (i.porcentajeChurn === '') {
+            isEmpty = true;
+          }
+        });
       });
-    });
+    }
 
-    if (countries.length === 0) isEmpty = true;
+    if (countries.length === 0 && productos.length !== 0) isEmpty = true;
 
     return isEmpty;
   };
@@ -298,12 +302,12 @@ function AssumptionVentas() {
       ) : (
         <>
           <div className="border-b-2 mb-8 pb-1">
-            <h4 className='cursor-default'>Supuestos de Ventas</h4>
-            <span className='cursor-default'>Plan de ventas</span>
+            <h4 className="cursor-default">Supuestos de Ventas</h4>
+            <span className="cursor-default">Plan de ventas</span>
           </div>
           <div className="border-solid border-2 border-#e5e7eb rounded-lg">
             <div className="border-b-2 px-4 py-1">
-              <h6 className='cursor-default'>Carga de productos / servicios</h6>
+              <h6 className="cursor-default">Carga de productos / servicios</h6>
             </div>
             {media === 'mobile' ? (
               <ContainerScrollable
