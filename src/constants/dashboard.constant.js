@@ -17,7 +17,7 @@ export const periodo = [
   { value: '1er trimestre', label: '1er trimestre', month: 4 },
   { value: '1er semestre', label: '1er semestre', month: 6 },
   { value: '2do semestre', label: '2do semestre', month: 12 },
-  { value: 'todo el año', label: 'Todo el año' },
+  { value: 'todo el año', label: 'Todo el año', month: 24 },
 ];
 
 export const month = [

@@ -63,14 +63,14 @@ function AssumptionGeneral() {
   };
 
   const getInfo = () => {
-    getUser(localStorage.getItem("userId"))
-    .then((data) => {
-      setInfo(data);
-    })
-    .catch((error) => console.error(error));
-  }
+    getUser(localStorage.getItem('userId'))
+      .then((data) => {
+        setInfo(data);
+      })
+      .catch((error) => console.error(error));
+  };
   useEffect(() => {
-   getInfo();
+    getInfo();
   }, []);
 
   const onSetFormFile = (form, field, files) => {
@@ -149,7 +149,6 @@ function AssumptionGeneral() {
                       setShowSuccessAlert(false);
                     }, 5000);
                     onChangeCurrency(values?.moneda);
-                    window.location.reload();
                   })
                   .catch((error) => {
                     console.error('Error de API:', error.response.data.message);
