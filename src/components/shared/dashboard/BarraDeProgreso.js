@@ -46,6 +46,9 @@ function BarraDeProgreso({ data, totalVentas, selectYear, periodoSelected }) {
                     );
                   }
                 }
+                if (periodoSelected.month === 24) {
+                  paises[indexD].total += Number(a.volMeses[MONTHS[indexMes]]);
+                }
               } else {
                 paises[indexD].total += Number(a.ventasTotal);
               }
@@ -77,7 +80,6 @@ function BarraDeProgreso({ data, totalVentas, selectYear, periodoSelected }) {
           <Progress
             percent={((country.total * 100) / totalVentas).toFixed(0)}
             color="amber-400"
-
           />
         </div>
       ))}
