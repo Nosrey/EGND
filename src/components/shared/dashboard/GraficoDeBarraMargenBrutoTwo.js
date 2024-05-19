@@ -133,6 +133,10 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
                     }
+                  } else if (periodoSelected.month === 24) {
+                    if (yearSelected.year === indexY) {
+                      setTypeView(month);
+                    }
                   }
                 }
 
@@ -245,6 +249,26 @@ function GraficoDeBarraMargenBrutoTwo({
                             indexM,
                           );
                         }
+                      }
+                    }
+                    if (periodoSelected.month === 24) {
+                      if (head[indexM] || head[indexM] === 0) {
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                      } else {
+                        head.push(0);
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
                       }
                     }
                   } else if (head[indexM] || head[indexM] === 0) {
