@@ -306,41 +306,6 @@ function DashboardMargenBruto() {
                           11,
                           yearSelected.year,
                         );
-                      } else if (periodoSelected.month === 24) {
-                        tot += Math.round(
-                          getMargenBrutoResult(
-                            indexCountry,
-                            indexChannel,
-                            indexO,
-                            indexY,
-                            indexM,
-                          ),
-                        );
-
-                        percent += calculatePercent(
-                          indexCountry,
-                          indexChannel,
-                          indexO,
-                          indexY,
-                          indexM,
-                        );
-                        if (!totPerMonth[indexM]) {
-                          totPerMonth.push(0);
-                        }
-                        totPerMonth[indexM] += Math.round(
-                          getMargenBrutoResult(
-                            indexCountry,
-                            indexChannel,
-                            indexO,
-                            indexY,
-                            indexM,
-                          ),
-                        );
-
-                        margenByClient = getAcumulateClients(
-                          11,
-                          yearSelected.year,
-                        );
                       }
                     } else {
                       tot += Math.round(
@@ -432,9 +397,6 @@ function DashboardMargenBruto() {
           break;
         case 12:
           cantidadMeses = 6;
-          break;
-        case 24:
-          cantidadMeses = 12;
           break;
         case undefined:
           cantidadMeses = 12;
@@ -643,21 +605,18 @@ function DashboardMargenBruto() {
                       media === 'mobile' ? 'flex-col' : ''
                     } w-[100%] gap-[30px]  justify-between`}
                   >
-                    {Object.values(infoForm).length && (
-                      <div
-                        className={`${
-                          media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
-                        } `}
-                      >
-                        <GraficoDeBarraMargenBruto
-                          data={infoForm}
-                          yearSelected={yearSelected}
-                          periodoSelected={periodoSelected}
-                          totPerMonth={totPerMonth}
-                        />
-                      </div>
-                    )}
-
+                    <div
+                      className={`${
+                        media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
+                      } `}
+                    >
+                      <GraficoDeBarraMargenBruto
+                        data={infoForm}
+                        yearSelected={yearSelected}
+                        periodoSelected={periodoSelected}
+                        totPerMonth={totPerMonth}
+                      />
+                    </div>
                     <ProgresoCircular
                       className={`${
                         media === 'mobile' ? 'h-[70%]' : 'h-[60%]'
@@ -669,125 +628,112 @@ function DashboardMargenBruto() {
                   </div>
                 </div>
 
-                {infoForm &&
-                  costoData.length &&
-                  volumenData.length &&
-                  precioData.length && (
-                    <div className=" mt-[40px]">
-                      <h5 className="cursor-default">
-                        Proyección Margen Bruto Nominal
-                      </h5>
-                      <div
-                        className={`flex ${
-                          media === 'mobile' ? 'flex-col' : ''
-                        } w-[100%] gap-[30px]  justify-between`}
-                      >
-                        {Object.values(infoForm).length && (
-                          <div
-                            className={`${
-                              media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
-                            } `}
-                          >
-                            <GraficoDeBarraMargenBrutoTwo
-                              costoData={costoData}
-                              volumenData={volumenData}
-                              precioData={precioData}
-                              infoForm={infoForm}
-                              yearSelected={yearSelected}
-                              periodoSelected={periodoSelected}
-                              totPerMonth={totPerMonth}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                {Object.values(infoForm).length && (
-                  <>
+                {infoForm && costoData && volumenData && precioData && (
+                  <div className=" mt-[40px]">
+                    <h5 className="cursor-default">
+                      Proyección Margen Bruto Nominal
+                    </h5>
                     <div
-                      className={`flex gap-[30px] mt-[50px] ${
+                      className={`flex ${
                         media === 'mobile' ? 'flex-col' : ''
-                      } `}
+                      } w-[100%] gap-[30px]  justify-between`}
                     >
                       <div
-                        className={` ${
-                          media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                        } flex flex-col gap-[30px]`}
+                        className={`${
+                          media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
+                        } `}
                       >
-                        <h5 className="cursor-default">
-                          Margen Bruto por País
-                        </h5>
-                        <BarraDeProgresoMargenBruto
-                          dataAssump={dataAssump}
-                          type="pais"
-                          getMargenResult={getMargenBrutoResult}
-                          selectYear={yearSelected}
-                          periodoSelected={periodoSelected}
+                        <GraficoDeBarraMargenBrutoTwo
+                          costoData={costoData}
+                          volumenData={volumenData}
+                          precioData={precioData}
                           infoForm={infoForm}
-                        />
-                      </div>
-                      <div
-                        className={` ${
-                          media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                        } flex flex-col gap-[30px]`}
-                      >
-                        <h5 className="cursor-default">
-                          Margen Bruto por Canal
-                        </h5>
-                        <BarraDeProgresoMargenBruto
-                          dataAssump={dataAssump}
-                          type="canal"
-                          getMargenResult={getMargenBrutoResult}
-                          selectYear={yearSelected}
+                          yearSelected={yearSelected}
                           periodoSelected={periodoSelected}
-                          infoForm={infoForm}
+                          totPerMonth={totPerMonth}
                         />
                       </div>
                     </div>
-
-                    <div
-                      className={`flex gap-[30px] mt-[40px] ${
-                        media === 'mobile' ? 'flex-col' : ''
-                      } `}
-                    >
-                      <div
-                        className={` ${
-                          media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                        } flex flex-col gap-[30px]`}
-                      >
-                        <h5 className="cursor-default">
-                          Margen Bruto por Producto
-                        </h5>
-                        <BarraDeProgresoMargenBruto
-                          dataAssump={dataAssump}
-                          type="producto"
-                          getMargenResult={getMargenBrutoResult}
-                          selectYear={yearSelected}
-                          periodoSelected={periodoSelected}
-                          infoForm={infoForm}
-                        />
-                      </div>
-                      <div
-                        className={` ${
-                          media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                        } flex flex-col gap-[30px]`}
-                      >
-                        <h5 className="cursor-default">
-                          Margen Bruto por Servicio
-                        </h5>
-                        <BarraDeProgresoMargenBruto
-                          dataAssump={dataAssump}
-                          type="servicio"
-                          getMargenResult={getMargenBrutoResult}
-                          selectYear={yearSelected}
-                          periodoSelected={periodoSelected}
-                          infoForm={infoForm}
-                        />
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 )}
+
+                <div
+                  className={`flex gap-[30px] mt-[50px] ${
+                    media === 'mobile' ? 'flex-col' : ''
+                  } `}
+                >
+                  <div
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
+                  >
+                    <h5 className="cursor-default">Margen Bruto por País</h5>
+                    <BarraDeProgresoMargenBruto
+                      dataAssump={dataAssump}
+                      type="pais"
+                      getMargenResult={getMargenBrutoResult}
+                      selectYear={yearSelected}
+                      periodoSelected={periodoSelected}
+                      infoForm={infoForm}
+                    />
+                  </div>
+                  <div
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
+                  >
+                    <h5 className="cursor-default">Margen Bruto por Canal</h5>
+                    <BarraDeProgresoMargenBruto
+                      dataAssump={dataAssump}
+                      type="canal"
+                      getMargenResult={getMargenBrutoResult}
+                      selectYear={yearSelected}
+                      periodoSelected={periodoSelected}
+                      infoForm={infoForm}
+                    />
+                  </div>
+                </div>
+
+                <div
+                  className={`flex gap-[30px] mt-[40px] ${
+                    media === 'mobile' ? 'flex-col' : ''
+                  } `}
+                >
+                  <div
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
+                  >
+                    <h5 className="cursor-default">
+                      Margen Bruto por Producto
+                    </h5>
+                    <BarraDeProgresoMargenBruto
+                      dataAssump={dataAssump}
+                      type="producto"
+                      getMargenResult={getMargenBrutoResult}
+                      selectYear={yearSelected}
+                      periodoSelected={periodoSelected}
+                      infoForm={infoForm}
+                    />
+                  </div>
+                  <div
+                    className={` ${
+                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
+                    } flex flex-col gap-[30px]`}
+                  >
+                    <h5 className="cursor-default">
+                      Margen Bruto por Servicio
+                    </h5>
+                    <BarraDeProgresoMargenBruto
+                      dataAssump={dataAssump}
+                      type="servicio"
+                      getMargenResult={getMargenBrutoResult}
+                      selectYear={yearSelected}
+                      periodoSelected={periodoSelected}
+                      infoForm={infoForm}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

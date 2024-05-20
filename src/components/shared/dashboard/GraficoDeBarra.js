@@ -11,7 +11,6 @@ import { BASIC_EMPTY, EMPTY_TOTALES, MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
-import { formatShortNumberNotation } from 'utils/formatNumbers';
 
 function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
   const [view, setView] = useState();
@@ -101,7 +100,7 @@ function GraficoDeBarra({ data, yearSelected, periodoSelected }) {
         dataLabels: {
           enabled: true,
           formatter: function (value) {
-            return `${currency}${formatShortNumberNotation(value)}`;
+            return `${currency}${value}`;
           },
         },
         xaxis: {
