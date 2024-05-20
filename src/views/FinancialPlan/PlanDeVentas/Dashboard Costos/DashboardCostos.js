@@ -1,10 +1,12 @@
 import CardNumerica from 'components/shared/dashboard/CardNumerica';
 import GraficoDeBarraCosto from 'components/shared/dashboard/GraficoDeBarraCosto';
 import Total from 'components/shared/dashboard/Total';
+import MySpinner from 'components/shared/loaders/MySpinner';
 import { MenuItem, Select } from 'components/ui';
 import {
   año,
   firstSem,
+  month,
   oneMonth,
   periodo,
   secondSem,
@@ -13,11 +15,10 @@ import {
 } from 'constants/dashboard.constant';
 import { MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
-import { useMedia } from 'utils/hooks/useMedia';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import { resolveResul } from 'services/TotalProductsService';
-import MySpinner from 'components/shared/loaders/MySpinner';
+import { useMedia } from 'utils/hooks/useMedia';
 
 function DashboardCostos() {
   const media = useMedia();
@@ -132,6 +133,12 @@ function DashboardCostos() {
                           totS += Number(a.volMeses[MONTHS[indexM]]);
                         }
                       }
+                    } else if (periodoSelected.month === 24) {
+                      if (dataAssump.productos[indexP].type === 'producto') {
+                        totV += Number(a.volMeses[MONTHS[indexM]]);
+                      } else {
+                        totS += Number(a.volMeses[MONTHS[indexM]]);
+                      }
                     }
                   } else if (dataAssump.productos[indexP].type === 'producto') {
                     totV += Number(a.volTotal);
@@ -162,7 +169,7 @@ function DashboardCostos() {
     let comisionGraf = [0];
     let impuestoGraf = [0];
     let cargoGraf = [0];
-    let volGrafTrim = [0, 0, 0, 0];
+    let volGrafTrim = [0, 0, 0];
     let comisionGrafTrim = [0, 0, 0, 0];
     let impuestoGrafTrim = [0, 0, 0, 0];
     let cargoGrafTrim = [0, 0, 0, 0];
@@ -491,13 +498,13 @@ function DashboardCostos() {
                             s.canalName === canalSelected.value &&
                             p.name === productoSelected.value
                           ) {
-                            volGrafSem[indexM] +=
+                            volGrafSem[indexM - 6] +=
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m] *
                               costoData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m];
 
-                            comisionGrafSem[indexM] += resolveResul(
+                            comisionGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
@@ -505,7 +512,7 @@ function DashboardCostos() {
                                 .productos[indexP].comision,
                             );
 
-                            impuestoGrafSem[indexM] += resolveResul(
+                            impuestoGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
@@ -513,7 +520,7 @@ function DashboardCostos() {
                                 .productos[indexP].impuesto,
                             );
 
-                            cargoGrafSem[indexM] += resolveResul(
+                            cargoGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
@@ -583,6 +590,110 @@ function DashboardCostos() {
                           ].años[indexYear].volMeses[m],
                         );
                       }
+                    } else if (periodoSelected.month === 24) {
+                      if (canalSelected && productoSelected && paisSelected) {
+                        if (
+                          d.countryName === paisSelected.value &&
+                          s.canalName === canalSelected.value &&
+                          p.name === productoSelected.value
+                        ) {
+                          volGrafYear[indexM] +=
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m] *
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].años[indexYear].volMeses[m];
+
+                          comisionGrafYear[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].comision,
+                          );
+
+                          impuestoGrafYear[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].impuesto,
+                          );
+
+                          cargoGrafYear[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].cargos,
+                          );
+                          setVolGrafico(volGrafYear);
+                          setComisionGrafico(comisionGrafYear);
+                          setImpuestoGrafico(impuestoGrafYear);
+                          setCargasGrafico(cargoGrafYear);
+                          setTypeViewGraf(month);
+                        }
+                      }
+                      if (dataAssump.productos[indexP].type === 'producto') {
+                        totProd += calcCostos(
+                          a.volMeses[m],
+                          volumenData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].comision,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].impuesto,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].cargos,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                        );
+                      } else {
+                        totServ += calcCostos(
+                          a.volMeses[m],
+                          volumenData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].comision,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].impuesto,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].cargos,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                        );
+                      }
+                      tot += calcCostos(
+                        a.volMeses[m],
+                        volumenData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].años[indexYear].volMeses[m],
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].comision,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].impuesto,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].cargos,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].años[indexYear].volMeses[m],
+                      );
                     }
                   }
                 }
@@ -774,133 +885,158 @@ function DashboardCostos() {
 
   return (
     <>
-    {showLoader ? (
+      {showLoader ? (
         <MySpinner />
       ) : (
         <>
-        <div>
-          <div className="border-b-2 mb-8 pb-1">
-            <h4 className="cursor-default">Dashboard de Costos</h4>
-            <span className="cursor-default">Costos directos</span>
-          </div>
-          <div className="border-solid border-2 border-#e5e7eb rounded-lg">
-            <div className="px-4 py-5">
-              <div className="flex justify-end gap-[20px]">
-                <Select
-                  className="w-[12%] min-w-[115px]"
-                  placeholder="Año"
-                  onChange={selectYear}
-                  options={año}
-                  value={yearSelected}
-                />
-
-                {yearSelected.value !== 'todo' && (
+          <div>
+            <div className="border-b-2 mb-8 pb-1">
+              <h4 className="cursor-default">Dashboard de Costos</h4>
+              <span className="cursor-default">Costos directos</span>
+            </div>
+            <div className="border-solid border-2 border-#e5e7eb rounded-lg">
+              <div className="px-4 py-5">
+                <div className="flex justify-end gap-[20px]">
                   <Select
                     className="w-[12%] min-w-[115px]"
-                    placeholder="Periodo"
-                    options={periodo}
-                    onChange={selectPeriodo}
-                    value={periodoSelected}
-                  >
-                    {periodo.map((a) => (
-                      <MenuItem key={a.value} value={a.value}>
-                        {a.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-              </div>
-              <div className="mt-[30px] mb-[30px] cursor-default">
-                <Total title="Costos Totales" data={totalCostos} />
-              </div>
-              <div className={` ${media === "mobile" ? " flex flex-col gap-y-4" : "grid grid-cols-3 gap-[20px]"} mt-[20px]`}>
-                <CardNumerica
-                  type="default"
-                  hasCurrency
-                  title="Costo total productos"
-                  cantidad={totalProd}
-                />
-                <CardNumerica
-                  type="default"
-                  title="Volumen de productos"
-                  cantidad={volProd}
-                />
-                <CardNumerica
-                  type="default"
-                  hasCurrency
-                  title="Costo medio por producto"
-                  cantidad={volProd ? totalProd / volProd : 0}
-                />
-                <CardNumerica
-                  type="default"
-                  hasCurrency
-                  title="Costo de servicios"
-                  cantidad={totalServ}
-                />
-                <CardNumerica
-                  type="default"
-                  title="Volumen de servicios"
-                  cantidad={volServ}
-                />
-                <CardNumerica
-                  type="default"
-                  title="Costo medio por servicio"
-                  hasCurrency
-                  cantidad={volServ ? totalServ / volServ : 0}
-                />
-              </div>
-              <div className={`flex ${media === "mobile" ? " flex-col mt-[30px]  pl-[10px] gap-y-3.5" : "justify-between items-center mt-[100px]  pl-[20px]"} ` }  >
-                <h5 className="cursor-default">
-                  Representación de Costos sobre Ventas
-                </h5>
-                <div className="flex gap-[20px]">
-                  <Select
-                    className="w-[100%]"
-                    placeholder="Producto"
-                    options={productosOptions}
-                    onChange={(e) => selecOptions('producto', e)}
+                    placeholder="Año"
+                    onChange={selectYear}
+                    options={año}
+                    value={yearSelected}
                   />
 
-                  <Select
-                    className="w-[100%]"
-                    placeholder="Canal"
-                    options={canalesOptions}
-                    onChange={(e) => selecOptions('canal', e)}
-                  />
-                  <Select
-                    className="w-[100%]"
-                    placeholder="País"
-                    options={paisesOptions}
-                    onChange={(e) => selecOptions('pais', e)}
-                  />
+                  {yearSelected.value !== 'todo' && (
+                    <Select
+                      className="w-[12%] min-w-[115px]"
+                      placeholder="Periodo"
+                      options={periodo}
+                      onChange={selectPeriodo}
+                      value={periodoSelected}
+                    >
+                      {periodo.map((a) => (
+                        <MenuItem key={a.value} value={a.value}>
+                          {a.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
                 </div>
+                <div className="mt-[30px] mb-[30px] cursor-default">
+                  <Total title="Costos Totales" data={totalCostos} />
+                </div>
+                <div
+                  className={` ${
+                    media === 'mobile'
+                      ? ' flex flex-col gap-y-4'
+                      : 'grid grid-cols-3 gap-[20px]'
+                  } mt-[20px]`}
+                >
+                  {totalProd > 0 && volProd > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo total productos"
+                        cantidad={totalProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Volumen de productos"
+                        cantidad={volProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo medio por producto"
+                        cantidad={volProd ? totalProd / volProd : 0}
+                      />
+                    </>
+                  )}
+
+                  {totalServ > 0 && volServ > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo de servicios"
+                        cantidad={totalServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Volumen de servicios"
+                        cantidad={volServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Costo medio por servicio"
+                        hasCurrency
+                        cantidad={volServ ? totalServ / volServ : 0}
+                      />
+                    </>
+                  )}
+                </div>
+                <div
+                  className={`flex ${
+                    media === 'mobile'
+                      ? ' flex-col mt-[30px]  pl-[10px] gap-y-3.5'
+                      : 'justify-between items-center mt-[100px]  pl-[20px]'
+                  } `}
+                >
+                  <h5 className="cursor-default">
+                    Representación de Costos sobre Ventas
+                  </h5>
+                  <div className="flex gap-[20px]">
+                    <Select
+                      className="w-[100%]"
+                      placeholder="Producto"
+                      options={productosOptions}
+                      onChange={(e) => selecOptions('producto', e)}
+                    />
+
+                    <Select
+                      className="w-[100%]"
+                      placeholder="Canal"
+                      options={canalesOptions}
+                      onChange={(e) => selecOptions('canal', e)}
+                    />
+                    <Select
+                      className="w-[100%]"
+                      placeholder="País"
+                      options={paisesOptions}
+                      onChange={(e) => selecOptions('pais', e)}
+                    />
+                  </div>
+                </div>
+                {canalSelected &&
+                productoSelected &&
+                paisSelected &&
+                volGrafico.length &&
+                comisionGrafico.length &&
+                cargasGrafico.length &&
+                impuestoGrafico.length ? (
+                  <div className="mt-[50px] mb-[50px]">
+                    <GraficoDeBarraCosto
+                      typeView={typeViewGraf}
+                      volumen={volGrafico}
+                      comision={comisionGrafico}
+                      cargos={cargasGrafico}
+                      impuesto={impuestoGrafico}
+                    />
+                  </div>
+                ) : (
+                  <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]  mt-[30px] ml-[30px] mr-[30px]">
+                    <span className="text-center cursor-default">
+                      Para visualizar este gráfico es necesario seleccionar
+                      Producto, Canal y País.
+                    </span>
+                  </div>
+                )}
               </div>
-              {canalSelected && productoSelected && paisSelected ? (
-                <div className="mt-[50px] mb-[50px]">
-                  <GraficoDeBarraCosto
-                    typeView={typeViewGraf}
-                    volumen={volGrafico}
-                    comision={comisionGrafico}
-                    cargos={cargasGrafico}
-                    impuesto={impuestoGrafico}
-                  />
-                </div>
-              ) : (
-                <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]  mt-[30px] ml-[30px] mr-[30px]">
-                  <span className="text-center cursor-default">
-                    Para visualizar este gráfico es necesario seleccionar Producto,
-                    Canal y País.
-                  </span>
-                </div>
-              )}
             </div>
           </div>
-        </div>
         </>
-      )
-    }
+      )}
     </>
-    
   );
 }
 
