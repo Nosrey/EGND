@@ -215,6 +215,22 @@ function BarraDeProgresoMargenBruto({
                       );
                     }
                   }
+                  if (periodoSelected.month === 24) {
+                    getTotalsByParam(
+                      indexD,
+                      indexChannel,
+                      indexP,
+                      indexY,
+                      indexMes,
+                    );
+                    total += getMargenResult(
+                      indexD,
+                      indexChannel,
+                      indexP,
+                      indexY,
+                      indexMes,
+                    );
+                  }
                 } else {
                   getTotalsByParam(
                     indexD,
@@ -328,6 +344,7 @@ function BarraDeProgresoMargenBruto({
         ))}
 
       {type === 'producto' &&
+        productos.length &&
         productos.map((country) => (
           <div key={country.name}>
             <span>{country.name.toUpperCase()}</span>

@@ -30,7 +30,6 @@ function GraficoDeBarraCosto({
 
   return (
     <div>
-      {' '}
       <Chart
         options={{
           chart: {

@@ -11,9 +11,7 @@ import { BASIC_EMPTY, EMPTY_TOTALES, MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
-
-let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
-let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
+import { formatShortNumberNotation } from 'utils/formatNumbers';
 
 function GraficoDeBarraMargenBruto({
   data,
@@ -23,6 +21,9 @@ function GraficoDeBarraMargenBruto({
 }) {
   const [typeView, setTypeView] = useState(year);
   const currency = useSelector((state) => state.auth.user.currency);
+
+  let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
+  let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
 
   useEffect(() => {
     Object.values(data).map((d) => {
@@ -47,6 +48,10 @@ function GraficoDeBarraMargenBruto({
                   } else if (periodoSelected.month === 12) {
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
+                    }
+                  } else if (periodoSelected.month === 24) {
+                    if (yearSelected.year === indexY) {
+                      setTypeView(month);
                     }
                   }
                 }
@@ -81,7 +86,7 @@ function GraficoDeBarraMargenBruto({
         dataLabels: {
           enabled: true,
           formatter: function (value) {
-            return `${currency}${value}`;
+            return `${currency}${formatShortNumberNotation(value)}`;
           },
         },
         xaxis: {
