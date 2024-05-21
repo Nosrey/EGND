@@ -347,15 +347,19 @@ function DashboardHeadcount() {
                 }
               }
             } else if (!yearSelected.year) {
-              tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-              cantPers += a.volMeses[MONTHS[indexM]];
-              setTypeView(year);
+              if (indexM === 11 && a.año === 10) {
+                tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
+                cantPers += a.volMeses[MONTHS[indexM]];
+              }
+
               if (tots[indexY] || tots[indexY] === 0) {
                 tots[indexY] += a.volMeses[MONTHS[indexM]];
               } else {
                 tots.push(0);
                 tots[indexY] += a.volMeses[MONTHS[indexM]];
               }
+
+              setTypeView(year);
             }
           });
         });

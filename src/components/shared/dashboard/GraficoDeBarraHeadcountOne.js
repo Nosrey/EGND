@@ -80,10 +80,14 @@ function GraficoDeBarraHeadcountOne({
                     }
                   }
                 } else if (h.data[indexY] || h.data[indexY] === 0) {
-                  h.data[indexY] += a.volMeses[MONTHS[indexM]];
+                  if (indexM === 11) {
+                    h.data[indexY] += a.volMeses[MONTHS[indexM]];
+                  }
                 } else {
                   h.data.push(0);
-                  h.data[indexY] += a.volMeses[MONTHS[indexM]];
+                  if (indexM === 11) {
+                    h.data[indexY] += a.volMeses[MONTHS[indexM]];
+                  }
                 }
               });
             });
