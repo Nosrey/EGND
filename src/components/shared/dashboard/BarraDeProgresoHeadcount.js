@@ -64,6 +64,12 @@ function BarraDeProgresoHeadcount({
                           );
                         }
                       }
+                      if (periodoSelected.month === 24) {
+                        h.total += calcTotal(
+                          a.volMeses[MONTHS[indexM]],
+                          m.total,
+                        );
+                      }
                     } else {
                       h.total += calcTotal(a.volMeses[MONTHS[indexM]], m.total);
                     }
