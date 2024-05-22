@@ -96,6 +96,20 @@ function GraficoDeBarraHeadcountTwo({
                           }
                         }
                       }
+                      if (periodoSelected.month === 24) {
+                        if (h.data[indexM] || h.data[indexM] === 0) {
+                          h.data[indexM] += calcTotal(
+                            a.volMeses[MONTHS[indexM]],
+                            m.total,
+                          );
+                        } else {
+                          h.data.push(0);
+                          h.data[indexM] += calcTotal(
+                            a.volMeses[MONTHS[indexM]],
+                            m.total,
+                          );
+                        }
+                      }
                     } else if (h.data[indexM] || h.data[indexM] === 0) {
                       h.data[indexM] += calcTotal(
                         a.volMeses[MONTHS[indexM]],

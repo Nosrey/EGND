@@ -261,6 +261,15 @@ function BarraDeProgresoMargenBruto({
                 );
               }
             }
+
+            if (!selectYear.year) {
+              for (let j = 0; j <= 9; j++) {
+                for (let i = 0; i <= 11; i++) {
+                  getTotalsByParam(indexD, indexChannel, indexP, indexY, i);
+                  total += getMargenResult(indexD, indexChannel, indexP, j, i);
+                }
+              }
+            }
           });
         });
       });

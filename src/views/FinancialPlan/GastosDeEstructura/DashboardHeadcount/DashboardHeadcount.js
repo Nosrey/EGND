@@ -138,6 +138,20 @@ function DashboardHeadcount() {
                           }
                           tot += Number(a.volMeses[MONTHS[indexM]]);
                         }
+                      } else if (periodoSelected.month === 24) {
+                        if (o.type === 'producto') {
+                          totProd += Number(a.volMeses[MONTHS[indexM]]);
+                        } else {
+                          totServ += Number(a.volMeses[MONTHS[indexM]]);
+                        }
+
+                        if (tots[indexM] || tots[indexM] === 0) {
+                          tots[indexM] += a.volMeses[MONTHS[indexM]];
+                        } else {
+                          tots.push(0);
+                          tots[indexM] += a.volMeses[MONTHS[indexM]];
+                        }
+                        tot += Number(a.volMeses[MONTHS[indexM]]);
                       }
                     } else {
                       if (o.type === 'producto') {
@@ -202,6 +216,10 @@ function DashboardHeadcount() {
           div = Math.floor(cantPers / 6);
           return totalVentas / div;
         }
+        if (periodoSelected.month === 24) {
+          div = Math.floor(cantPers / 12);
+          return totalVentas / div;
+        }
       } else {
         div = Math.floor(cantPers / 12);
         return totalVentas / div;
@@ -254,7 +272,6 @@ function DashboardHeadcount() {
                         tots[indexM] += a.volMeses[MONTHS[indexM]];
                       }
                     }
-                    console.log(cantPers);
                     setTypeView(oneMonth);
                   }
                   if (periodoSelected.month === 4) {
@@ -315,7 +332,7 @@ function DashboardHeadcount() {
                       tots[indexM] += a.volMeses[MONTHS[indexM]];
                     }
 
-                    setTypeView(secondSem);
+                    setTypeView(month);
                   }
                 } else {
                   tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
@@ -330,15 +347,19 @@ function DashboardHeadcount() {
                 }
               }
             } else if (!yearSelected.year) {
-              tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-              cantPers += a.volMeses[MONTHS[indexM]];
-              setTypeView(year);
+              if (indexM === 11 && a.año === 10) {
+                tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
+                cantPers += a.volMeses[MONTHS[indexM]];
+              }
+
               if (tots[indexY] || tots[indexY] === 0) {
                 tots[indexY] += a.volMeses[MONTHS[indexM]];
               } else {
                 tots.push(0);
                 tots[indexY] += a.volMeses[MONTHS[indexM]];
               }
+
+              setTypeView(year);
             }
           });
         });
