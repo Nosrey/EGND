@@ -60,6 +60,14 @@ function GraficoDeBarraHeadcountThree({
                           }
                         }
                       }
+                      if (periodoSelected.month === 24) {
+                        if (head[indexM] || head[indexM] === 0) {
+                          head[indexM] += a.volMeses[MONTHS[indexM]];
+                        } else {
+                          head.push(0);
+                          head[indexM] += a.volMeses[MONTHS[indexM]];
+                        }
+                      }
                     } else if (head[indexM] || head[indexM] === 0) {
                       head[indexM] += a.volMeses[MONTHS[indexM]];
                     } else {
@@ -104,7 +112,7 @@ function GraficoDeBarraHeadcountThree({
           curve: 'smooth',
           width: 3,
         },
-        colors: ["#10B981"],
+        colors: ['#10B981'],
         xaxis: {
           categories: typeView,
         },
