@@ -5,6 +5,8 @@ import { setUser } from 'store/auth/userSlice';
 
 function Home() {
   const [currencyInfo, setCurrencyInfo] = useState();
+  const [logoClientInfo, setlogoClientInfo] = useState();
+
   const dispatch = useDispatch();
   const currentState = useSelector((state) => state.auth.user);
 
@@ -12,6 +14,8 @@ function Home() {
     getUser(currentState.id)
       .then((data) => {
         setCurrencyInfo(data?.businessInfo[0]?.currency);
+        console.log('cargo imagend el cliente', data?.imagePath);
+        setlogoClientInfo(data?.imagePath); // logo cliente
       })
       .catch((error) => console.error(error));
   }, []);
@@ -25,6 +29,16 @@ function Home() {
       dispatch(setUser(newState));
     }
   }, [currencyInfo]);
+
+  useEffect(() => {
+    if (logoClientInfo) {
+      const newState = {
+        ...currentState,
+        logo: logoClientInfo,
+      };
+      dispatch(setUser(newState));
+    }
+  }, [logoClientInfo]);
 
   return <div>Home</div>;
 }
