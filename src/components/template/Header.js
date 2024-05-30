@@ -4,9 +4,12 @@ import PropTypes from 'prop-types';
 import { HEADER_HEIGHT_CLASS } from 'constants/theme.constant';
 import { useDispatch, useSelector } from 'react-redux';
 import { setFalse } from 'store/icon/iconSlice';
+import { useMedia } from 'utils/hooks/useMedia';
+
 import Logo from './Logo';
 
 function Header(props) {
+  const media = useMedia();
   const { headerStart, headerEnd, headerMiddle, className, container } = props;
   const currentCurrency = useSelector((state) => state.auth.user.currency);
 
@@ -81,9 +84,11 @@ function Header(props) {
           {headerStart}
         </div>
         <div>
-          <div className="side-nav-header" style={{ paddingBottom: '6px' }}>
-            <Logo />
-          </div>
+          {media !== 'mobile' && (
+            <div className="side-nav-header" style={{ paddingBottom: '6px' }}>
+              <Logo />
+            </div>
+          )}
         </div>
         <div className="flex items-center">
           <div className="flex items-center gap-x-1.5">{flagComponent}</div>
