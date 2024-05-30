@@ -1,3 +1,4 @@
+import { upload } from '@testing-library/user-event/dist/upload';
 import {
   Alert,
   Button,
@@ -76,7 +77,9 @@ function AssumptionGeneral() {
   const onSetFormFile = (form, field, files) => {
     form.setFieldValue(field.name, files);
   };
-
+  const resetFile = (form, field, files) => {
+    form.setFieldValue(field, files);
+  };
   const beforeUpload = (file, fileList) => {
     let valid = true;
 
@@ -129,7 +132,7 @@ function AssumptionGeneral() {
                 modeloNegorcio:
                   info?.businessInfo[0]?.businessModel.toLowerCase() || '',
                 moneda: info?.businessInfo[0]?.currency || '',
-                upload: [],
+                upload: info?.imagePath || [],
               }}
               validationSchema={validationSchema}
               onSubmit={(values, { resetForm, setSubmitting }) => {
@@ -265,28 +268,80 @@ function AssumptionGeneral() {
                       compañía.
                     </span>
 
-                    <FormItem
-                      className="col-span-1 row-start-4"
-                      label="Sube tu logo"
-                      invalid={Boolean(errors.upload && touched.upload)}
-                      errorMessage={errors.upload}
-                    >
-                      <Field name="upload">
-                        {({ field, form }) => (
-                          <Upload
-                            onChange={(files) =>
-                              onSetFormFile(form, field, files)
-                            }
-                            onFileRemove={(files) =>
-                              onSetFormFile(form, field, files)
-                            }
-                            beforeUpload={beforeUpload}
-                            fileList={values.upload}
-                          />
-                        )}
-                      </Field>
-                    </FormItem>
+                    {typeof values.upload === 'string' &&
+                    values.upload.length > 0 ? (
+                      <div className="col-span-1 row-start-4">
+                        <p>
+                          <b>Logo:</b>
+                        </p>
 
+                        <img
+                          src={values.upload}
+                          alt="Logo"
+                          style={{ maxHeight: '80px' }}
+                        />
+                        <FormItem
+                          className="col-span-1 row-start-4"
+                          label="Sube tu logo"
+                          invalid={Boolean(errors.upload && touched.upload)}
+                          errorMessage={errors.upload}
+                        >
+                          <Field name="upload">
+                            {({ field, form }) => (
+                              <>
+                                <span
+                                  style={{
+                                    color: 'grey',
+                                    fontSize: '12px',
+                                    cursor: 'pointer',
+                                    marginTop: '5px',
+                                  }}
+                                  onClick={(files) =>
+                                    resetFile(form, 'upload', [])
+                                  }
+                                >
+                                  Modificar
+                                </span>
+                              </>
+                            )}
+                          </Field>
+                        </FormItem>
+                      </div>
+                    ) : (
+                      <FormItem
+                        className="col-span-1 row-start-4"
+                        label="Sube tu logo"
+                        invalid={Boolean(errors.upload && touched.upload)}
+                        errorMessage={errors.upload}
+                      >
+                        <Field name="upload">
+                          {({ field, form }) => (
+                            <>
+                              <Upload
+                                onChange={(files) =>
+                                  onSetFormFile(form, field, files)
+                                }
+                                onFileRemove={(files) =>
+                                  onSetFormFile(form, field, files)
+                                }
+                                beforeUpload={beforeUpload}
+                                fileList={values.upload}
+                              />
+                              <p
+                                style={{
+                                  color: 'grey',
+                                  fontSize: '12px',
+                                  marginTop: '5px',
+                                }}
+                              >
+                                Puede tardar unos minutos en impactar en la
+                                interfáz.
+                              </p>
+                            </>
+                          )}
+                        </Field>
+                      </FormItem>
+                    )}
                     <FormItem
                       className={`col-start-3 col-end-4 row-start-5 ${
                         media === 'mobile' ? 'col-start-0 col-end-1' : ''

@@ -13,8 +13,8 @@ function Home() {
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
-        console.log('DATAA', data);
         setCurrencyInfo(data?.businessInfo[0]?.currency);
+        console.log('cargo imagend el cliente', data?.imagePath);
         setlogoClientInfo(data?.imagePath); // logo cliente
       })
       .catch((error) => console.error(error));

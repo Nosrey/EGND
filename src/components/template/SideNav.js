@@ -95,7 +95,18 @@ function SideNav() {
                   sideNavCollapse ? SIDE_NAV_CONTENT_GUTTER : LOGO_X_GUTTER
                 }
               /> */}
-              <img src={logoClient} alt="logo" />
+              <img
+                style={{
+                  width: '40%',
+                  maxWidth: '95px',
+                  display: 'block',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  padding: '20px 5px',
+                }}
+                src={logoClient}
+                alt="logo"
+              />
             </div>
           ) : (
             <div className="side-nav-header" style={{ height: '20px' }}>
