@@ -133,6 +133,10 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
                     }
+                  } else if (periodoSelected.month === 24) {
+                    if (yearSelected.year === indexY) {
+                      setTypeView(month);
+                    }
                   }
                 }
 
@@ -247,6 +251,27 @@ function GraficoDeBarraMargenBrutoTwo({
                         }
                       }
                     }
+
+                    if (periodoSelected.month === 24) {
+                      if (head[indexM] || head[indexM] === 0) {
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                      } else {
+                        head.push(0);
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                      }
+                    }
                   } else if (head[indexM] || head[indexM] === 0) {
                     head[indexM] += calculatePercent(
                       indexCountry,
@@ -267,10 +292,24 @@ function GraficoDeBarraMargenBrutoTwo({
                   }
                 }
               } else if (head[indexY] || head[indexY] === 0) {
-                head[indexY] += a.volMeses[MONTHS[indexM]];
+                head[indexY] +=
+                  calculatePercent(
+                    indexCountry,
+                    indexCanal,
+                    indexP,
+                    indexY,
+                    indexM,
+                  ) / 12;
               } else {
                 head.push(0);
-                head[indexY] += a.volMeses[MONTHS[indexM]];
+                head[indexY] +=
+                  calculatePercent(
+                    indexCountry,
+                    indexCanal,
+                    indexP,
+                    indexY,
+                    indexM,
+                  ) / 12;
               }
             });
           });
@@ -306,7 +345,7 @@ function GraficoDeBarraMargenBrutoTwo({
         yaxis: {
           labels: {
             formatter(value) {
-              return `%${value}`;
+              return `%${value.toFixed(2)}`;
             },
           },
         },

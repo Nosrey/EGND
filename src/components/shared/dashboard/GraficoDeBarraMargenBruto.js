@@ -48,6 +48,10 @@ function GraficoDeBarraMargenBruto({
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
                     }
+                  } else if (periodoSelected.month === 24) {
+                    if (indexM > 5 && yearSelected.year === indexY) {
+                      setTypeView(month);
+                    }
                   }
                 }
 
