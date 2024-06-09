@@ -307,6 +307,41 @@ function DashboardMargenBruto() {
                           11,
                           yearSelected.year,
                         );
+                      } else if (periodoSelected.month === 24) {
+                        tot += Math.round(
+                          getMargenBrutoResult(
+                            indexCountry,
+                            indexChannel,
+                            indexO,
+                            indexY,
+                            indexM,
+                          ),
+                        );
+
+                        percent += calculatePercent(
+                          indexCountry,
+                          indexChannel,
+                          indexO,
+                          indexY,
+                          indexM,
+                        );
+                        if (!totPerMonth[indexM]) {
+                          totPerMonth.push(0);
+                        }
+                        totPerMonth[indexM] += Math.round(
+                          getMargenBrutoResult(
+                            indexCountry,
+                            indexChannel,
+                            indexO,
+                            indexY,
+                            indexM,
+                          ),
+                        );
+
+                        margenByClient = getAcumulateClients(
+                          11,
+                          yearSelected.year,
+                        );
                       }
                     } else {
                       tot += Math.round(
@@ -387,39 +422,6 @@ function DashboardMargenBruto() {
       setTotPerMonth(totPerMonth);
       setTotalMargen(tot);
       setMargenClient(margenByClient);
-
-      switch (periodoSelected.month) {
-        case 0:
-          cantidadMeses = 1;
-          break;
-        case 4:
-          cantidadMeses = 3;
-          break;
-        case 6:
-          cantidadMeses = 6;
-          break;
-        case 12:
-          cantidadMeses = 6;
-          break;
-        case undefined:
-          cantidadMeses = 12;
-          break;
-
-        default:
-          break;
-      }
-
-      if (!yearSelected.year) {
-        cantidadMeses = 12 * 10;
-      }
-      if (infoForm) {
-        const cant =
-          (Object.keys(infoForm).length +
-            infoForm[Object.keys(infoForm)[0]].length +
-            infoForm[Object.keys(infoForm)[0]][0].productos.length) *
-          cantidadMeses;
-        setPercentMArgen(Math.round(percent / cant));
-      }
     } else {
       selectYear({ value: 'año 1', label: 'Año 1', year: 0 });
       selectPeriodo({
@@ -427,6 +429,184 @@ function DashboardMargenBruto() {
         label: '1er semestre',
         month: 6,
       });
+    }
+  };
+
+  const calcPercents = () => {
+    let head = [];
+    let cantidadMeses = 0;
+    Object.keys(infoForm).map((pais, indexCountry) => {
+      infoForm[pais].map((canal, indexCanal) => {
+        canal.productos.map((producto, indexP) => {
+          producto.años.map((a, indexY) => {
+            MONTHS.map((n, indexM) => {
+              if (yearSelected.year || yearSelected.year === 0) {
+                if (yearSelected.year === indexY) {
+                  if (periodoSelected.month || periodoSelected.month === 0) {
+                    if (periodoSelected.month === 0) {
+                      if (indexM === 0) {
+                        if (head[indexM] || head[indexM] === 0) {
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        } else {
+                          head.push(0);
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        }
+                      }
+                    }
+                    if (periodoSelected.month === 4) {
+                      if (indexM < 3) {
+                        if (head[indexM] || head[indexM] === 0) {
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        } else {
+                          head.push(0);
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        }
+                      }
+                    }
+                    if (periodoSelected.month === 6) {
+                      if (indexM < 6) {
+                        if (head[indexM] || head[indexM] === 0) {
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        } else {
+                          head.push(0);
+                          head[indexM] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        }
+                      }
+                    }
+                    if (periodoSelected.month === 12) {
+                      if (indexM > 5) {
+                        if (head[indexM - 6] || head[indexM - 6] === 0) {
+                          head[indexM - 6] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        } else {
+                          head.push(0);
+                          head[indexM - 6] += calculatePercent(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                        }
+                      }
+                    }
+
+                    if (periodoSelected.month === 24) {
+                      if (head[indexM] || head[indexM] === 0) {
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                      } else {
+                        head.push(0);
+                        head[indexM] += calculatePercent(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                      }
+                    }
+                  }
+                }
+              } else if (head[indexY] || head[indexY] === 0) {
+                head[indexY] += calculatePercent(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+              } else {
+                head.push(0);
+                head[indexY] += calculatePercent(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+              }
+            });
+          });
+        });
+      });
+    });
+
+    switch (periodoSelected.month) {
+      case 0:
+        cantidadMeses = 1;
+        break;
+      case 4:
+        cantidadMeses = 3;
+        break;
+      case 6:
+        cantidadMeses = 6;
+        break;
+      case 12:
+        cantidadMeses = 6;
+        break;
+      case 24:
+        cantidadMeses = 12;
+        break;
+
+      default:
+        break;
+    }
+
+    if (infoForm) {
+      if (head.length) {
+        if (head.length === 10) {
+          cantidadMeses = 120;
+        }
+        const cant = head.reduce((a, b) => a + b, 0);
+        setPercentMArgen(cant / cantidadMeses);
+      }
     }
   };
 
@@ -536,6 +716,7 @@ function DashboardMargenBruto() {
           setInfoForm(() => ({ ...datosPrecargados }));
           setProducts(data?.assumptionData[0].productos);
           calcTotals();
+          calcPercents();
         }
         setDefaultCountry(data?.assumptionData[0]?.paises[0]?.value);
         setCountry(data?.assumptionData[0]?.paises[0]?.value);
@@ -630,7 +811,7 @@ function DashboardMargenBruto() {
                       } `}
                       ancho={`${media === 'mobile' ? 'w-[100%]' : ''} `}
                       title="Margen Bruto Porcentual"
-                      data={percentMArgen}
+                      data={percentMArgen.toFixed(2)}
                     />
                   </div>
                 </div>
@@ -640,6 +821,29 @@ function DashboardMargenBruto() {
                     <h5 className="cursor-default">
                       Proyección Margen Bruto Nominal
                     </h5>
+                    <div
+                      className={`flex ${
+                        media === 'mobile' ? 'flex-col' : ''
+                      } w-[100%] gap-[30px]  justify-between`}
+                    >
+                      {Object.values(infoForm).length && (
+                        <div
+                          className={`${
+                            media === 'mobile' ? 'w-[100%]' : 'w-[60%]'
+                          } `}
+                        >
+                          <GraficoDeBarraMargenBrutoTwo
+                            costoData={costoData}
+                            volumenData={volumenData}
+                            precioData={precioData}
+                            infoForm={infoForm}
+                            yearSelected={yearSelected}
+                            periodoSelected={periodoSelected}
+                            totPerMonth={totPerMonth}
+                          />
+                        </div>
+                      )}
+                    </div>
                     <div
                       className={`flex ${
                         media === 'mobile' ? 'flex-col' : ''
@@ -718,47 +922,6 @@ function DashboardMargenBruto() {
                     <BarraDeProgresoMargenBruto
                       dataAssump={dataAssump}
                       type="canal"
-                      getMargenResult={getMargenBrutoResult}
-                      selectYear={yearSelected}
-                      periodoSelected={periodoSelected}
-                      infoForm={infoForm}
-                    />
-                  </div>
-                </div>
-
-                <div
-                  className={`flex gap-[30px] mt-[40px] ${
-                    media === 'mobile' ? 'flex-col' : ''
-                  } `}
-                >
-                  <div
-                    className={` ${
-                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                    } flex flex-col gap-[30px]`}
-                  >
-                    <h5 className="cursor-default">
-                      Margen Bruto por Producto
-                    </h5>
-                    <BarraDeProgresoMargenBruto
-                      dataAssump={dataAssump}
-                      type="producto"
-                      getMargenResult={getMargenBrutoResult}
-                      selectYear={yearSelected}
-                      periodoSelected={periodoSelected}
-                      infoForm={infoForm}
-                    />
-                  </div>
-                  <div
-                    className={` ${
-                      media === 'mobile' ? 'w-[100%]' : 'w-[50%]'
-                    } flex flex-col gap-[30px]`}
-                  >
-                    <h5 className="cursor-default">
-                      Margen Bruto por Servicio
-                    </h5>
-                    <BarraDeProgresoMargenBruto
-                      dataAssump={dataAssump}
-                      type="servicio"
                       getMargenResult={getMargenBrutoResult}
                       selectYear={yearSelected}
                       periodoSelected={periodoSelected}

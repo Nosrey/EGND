@@ -35,7 +35,7 @@ function GraficoDeBarraHeadcountOne({
                         }
                       }
                       if (periodoSelected.month === 4) {
-                        if (indexM < 4) {
+                        if (indexM < 3) {
                           if (h.data[indexM] || h.data[indexM] === 0) {
                             h.data[indexM] += a.volMeses[MONTHS[indexM]];
                           } else {
