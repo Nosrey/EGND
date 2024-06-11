@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-expressions */
 import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
+import { useSelector } from 'react-redux';
 
 function GraficoDashed({ typeView, data }) {
+  const currency = useSelector((state) => state.auth.user.currency);
   return (
     <Chart
       options={{
@@ -36,6 +38,13 @@ function GraficoDashed({ typeView, data }) {
         },
         xaxis: {
           categories: typeView,
+        },
+        yaxis: {
+          labels: {
+            formatter(value) {
+              return `${currency}${value.toFixed(2)}`;
+            },
+          },
         },
         tooltip: {
           y: [

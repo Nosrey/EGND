@@ -200,16 +200,23 @@ function DashboardInversiones(props) {
                       }
 
                       if (
-                        bienesValues[bienes.indexOf(c.bien)][c.bien][indexM] ||
-                        bienesValues[bienes.indexOf(c.bien)][c.bien][indexM] ===
-                          0
+                        bienesValues[bienes.indexOf(c.bien)][c.bien][
+                          indexM - 6
+                        ] ||
+                        bienesValues[bienes.indexOf(c.bien)][c.bien][
+                          indexM - 6
+                        ] === 0
                       ) {
-                        bienesValues[bienes.indexOf(c.bien)][c.bien] +=
+                        bienesValues[bienes.indexOf(c.bien)][c.bien][
+                          indexM - 6
+                        ] +=
                           a.volMeses[MONTHS[indexM]] *
                           capexQ[indexC].años[indexY].volMeses[MONTHS[indexM]];
                       } else {
                         bienesValues[bienes.indexOf(c.bien)][c.bien].push(0);
-                        bienesValues[bienes.indexOf(c.bien)][c.bien][indexM] +=
+                        bienesValues[bienes.indexOf(c.bien)][c.bien][
+                          [indexM - 6]
+                        ] +=
                           a.volMeses[MONTHS[indexM]] *
                           capexQ[indexC].años[indexY].volMeses[MONTHS[indexM]];
                       }

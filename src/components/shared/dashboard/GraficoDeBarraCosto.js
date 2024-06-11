@@ -1,5 +1,6 @@
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics } from 'utils/formatTotalsValues';
 
 function GraficoDeBarraCosto({
   volumen,
@@ -62,7 +63,7 @@ function GraficoDeBarraCosto({
           dataLabels: {
             enabled: true,
             formatter(value) {
-              return `${currency}${value}`;
+              return `${currency}${formatNumberGrafics(value)}`;
             },
           },
           xaxis: {

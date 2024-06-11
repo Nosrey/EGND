@@ -148,9 +148,11 @@ function Cac() {
   const calculateCAC = () => {
     const costos = costosMktyComercial(gastosPorCCData);
     const nuevosClientes = calculateClients();
-    return costos.map((elemento, indice) =>
+    const newData = costos.map((elemento, indice) =>
       Math.round(elemento / nuevosClientes[indice]),
     );
+
+    return newData;
   };
   // ********************** fin calculos de CAC // **********************
 

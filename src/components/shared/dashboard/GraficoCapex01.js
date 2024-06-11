@@ -1,6 +1,7 @@
 /* eslint-disable object-shorthand */
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics } from 'utils/formatTotalsValues';
 
 function GraficoCapex01({ data, typeView }) {
   const currency = useSelector((state) => state.auth.user.currency);
@@ -16,7 +17,7 @@ function GraficoCapex01({ data, typeView }) {
         dataLabels: {
           enabled: true,
           formatter: function (value) {
-            return `${currency}${value}`;
+            return `${currency}${formatNumberGrafics(value)}`;
           },
         },
         xaxis: {
@@ -25,7 +26,7 @@ function GraficoCapex01({ data, typeView }) {
         yaxis: {
           labels: {
             formatter: function (value) {
-              return `${currency}${value}`;
+              return `${currency}${value.toFixed(2)}`;
             },
           },
         },
