@@ -31,6 +31,9 @@ import {
 import TablePyL from './TablePyL';
 
 function PyL({
+  // traigo setIntereses de las propiedades
+  setInteresesExterior,
+  setAmortizacionesExterior,
   setCmgbruta = () => {},
   cmgBruta = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ebitda = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -255,6 +258,8 @@ function PyL({
                 <ContainerScrollable
                   contenido={
                     <TablePyL
+                      setInteresesExterior={setInteresesExterior}
+                      setAmortizacionesExterior={setAmortizacionesExterior}
                       vtasTot={ventasTot || []}
                       vtasProd={ventasProd || []}
                       vtasServ={ventasServ || []}

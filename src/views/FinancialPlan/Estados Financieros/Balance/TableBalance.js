@@ -2,7 +2,7 @@
 /* eslint-disable arrow-body-style */
 import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { getUser, getBalance, createBalance } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
@@ -17,8 +17,11 @@ import {
   calcularEquity,
   calcularPrestamos,
 } from 'utils/calcs';
+import { addVariacion } from 'store/tableVariacionesCapital/tableVariacionesCapitalSlice';
+
 
 function TableBalance(props) {
+  const dispatch = useDispatch();
   const [cebo, setCebo] = useState(0);
   const [showLoader, setShowLoader] = useState(true);
   const [creditosPorVentas, setCreditosPorVentas] = useState([]);
@@ -57,6 +60,8 @@ function TableBalance(props) {
   let ResultadosDelEjercicioData = useSelector(
     (state) => state.netoResult[0],
   );
+
+
 
   if (ResultadosDelEjercicioData === undefined) {
     ResultadosDelEjercicioData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -280,6 +285,9 @@ function TableBalance(props) {
         Number(copy.deudasFinancieras) +
         Number(copy.otrasDeudas);
       setinputsValues(copy);
+    }
+    if (deudasComerciales) {
+      dispatch(addVariacion(deudasComerciales))
     }
   }, [
     deudasComerciales,

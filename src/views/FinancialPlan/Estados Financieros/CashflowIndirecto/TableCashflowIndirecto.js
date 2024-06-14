@@ -19,7 +19,7 @@ function TableCashflowIndirecto(props) {
   const [amortizaciones, setAmortizaciones] = useState([]);
   const [interesesPagados, setInteresesPagados] = useState([]);
   const [resultadoNeto, setResultadoNeto] = useState([]);
-  const [variacion, setVariacion] = useState([]);
+  const [variacion, setVariacion] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [FEOperativas, setFEOperativas] = useState([]);
   const [inversiones, setInversiones] = useState([]);
   const [financiacion, setFinanciacion] = useState([]);
@@ -47,6 +47,9 @@ function TableCashflowIndirecto(props) {
     variacionCajaYBco: '0',
     cajaYBancosAlCierre: '0',
   });
+
+  // traigo del reducer a variacion
+  const variacionRedux = useSelector((state) => state.tableVariacionesCapital)
 
   const handleChangeInputs = (key, value) => {
     const copy = { ...inputsValues };
@@ -128,6 +131,16 @@ function TableCashflowIndirecto(props) {
   // **********************************************
   // **********************************************
 
+  // creo un useEffect para establecer variaciones en base a variacionesRedux
+  useEffect(() => {
+    if (variacionRedux.length) {
+      console.log('variaciones: ', variacionRedux)
+      setVariacion([1,1,1,1,1,1,1,1,1,1])
+    } else {
+      console.log('no hubo variacion')
+    }
+  }, variacionRedux)
+
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
@@ -137,8 +150,6 @@ function TableCashflowIndirecto(props) {
     setAmortizaciones(amortizacionesFinal);
     let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setInteresesPagados(interesesPagadosFinal);
-    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    setVariacion(variacionFinal);
     let inversionesFinal = props?.inversiones?.length ? props?.inversiones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setInversiones(inversionesFinal);
     let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -583,7 +594,7 @@ function TableCashflowIndirecto(props) {
                               prefix="$"
                             />
                           </FormItem>
-                        </div>
+                        </div>                        
                         {interesesPagados?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
