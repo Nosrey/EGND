@@ -203,6 +203,7 @@ function TableBalance(props) {
               setCreditosPorVentas,
             );
 
+            console.log('inputsValues.BienesDeCambio: ', inputsValues.BienesDeCambio)
             await calcularBienesDeCambio(
               data,
               setBienesDeCambio,

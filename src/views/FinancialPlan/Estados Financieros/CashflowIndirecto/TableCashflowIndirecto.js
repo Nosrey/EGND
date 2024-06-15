@@ -6,11 +6,13 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
+  getUser,
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 import { addCajaCierre } from 'store/tableBalanceCajaCierre/tableBalanceCajaCierreSlice';
+import { calcularDeudasComerciales, calcularBienesDeCambio } from 'utils/calcs';
 
 function TableCashflowIndirecto(props) {
   const dispatch = useDispatch();
@@ -47,9 +49,6 @@ function TableCashflowIndirecto(props) {
     variacionCajaYBco: '0',
     cajaYBancosAlCierre: '0',
   });
-
-  // traigo del reducer a variacion
-  const variacionRedux = useSelector((state) => state.tableVariacionesCapital)
 
   const handleChangeInputs = (key, value) => {
     const copy = { ...inputsValues };
@@ -131,16 +130,6 @@ function TableCashflowIndirecto(props) {
   // **********************************************
   // **********************************************
 
-  // creo un useEffect para establecer variaciones en base a variacionesRedux
-  useEffect(() => {
-    if (variacionRedux.length) {
-      console.log('variaciones: ', variacionRedux)
-      setVariacion([1,1,1,1,1,1,1,1,1,1])
-    } else {
-      console.log('no hubo variacion')
-    }
-  }, variacionRedux)
-
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
@@ -155,6 +144,26 @@ function TableCashflowIndirecto(props) {
     let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setFinanciacion(financiacionFinal);
   }, [props]);
+
+  // useEffect para incluir la funcion calcularDeudasComerciales
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUser(currentState.id);
+      await calcularBienesDeCambio(
+        data,
+        () => {},
+        0,
+      );
+
+      await calcularDeudasComerciales(
+        data,
+        setVariacion,
+      );
+    };
+
+    fetchData();
+
+  }, [])
 
   useEffect(() => {
     if (resultadoNeto && amortizaciones && interesesPagados && variacion) {
@@ -594,7 +603,7 @@ function TableCashflowIndirecto(props) {
                               prefix="$"
                             />
                           </FormItem>
-                        </div>                        
+                        </div>
                         {interesesPagados?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
