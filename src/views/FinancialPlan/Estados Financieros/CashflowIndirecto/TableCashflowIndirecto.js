@@ -29,6 +29,7 @@ function TableCashflowIndirecto(props) {
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
   const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
   const currentState = useSelector((state) => state.auth.user);
@@ -419,8 +420,8 @@ function TableCashflowIndirecto(props) {
                                 type="text"
                                 value={
                                   indexYear !== 0
-                                    ? formatNumberPrestamos(año)
-                                    : año
+                                    ? formatNumberPrestamos(cajaYBancosAlCierre[indexYear - 1])
+                                    : inputsValues.cajaYBancosAlCierre
                                 }
                                 name="year"
                                 disabled={indexYear !== 0}
