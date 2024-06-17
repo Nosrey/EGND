@@ -198,6 +198,11 @@ function TablePyL(props) {
       }
       setEBIT(resultado);
     }
+    if (amortizaciones) {
+      if (props?.setAmortizacionesExterior) {
+        props?.setAmortizacionesExterior(amortizaciones)
+      }
+    }
   }, [EBITDA, amortizaciones]);
 
   useEffect(() => {
@@ -219,6 +224,11 @@ function TablePyL(props) {
         );
       }
       setBAT(resultado);
+    }
+    if (intereses) {
+      if (props?.setInteresesExterior) {
+        props?.setInteresesExterior(intereses)
+      }
     }
   }, [EBIT, intereses]);
 

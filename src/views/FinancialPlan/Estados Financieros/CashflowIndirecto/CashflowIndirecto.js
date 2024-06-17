@@ -20,7 +20,7 @@ import { getUser } from 'services/Requests';
 import TableCashflowIndirecto from './TableCashflowIndirecto';
 import PyL from '../PyL/PyL';
 
-function CashflowIndirecto({ setGraph04Data = () => {} }) {
+function CashflowIndirecto({ setGraph04Data = () => { } }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -35,6 +35,7 @@ function CashflowIndirecto({ setGraph04Data = () => {} }) {
   const [intereses, setIntereses] = useState();
   const [inversiones, setInversiones] = useState();
   const [financiacion, setFinanciacion] = useState();
+  const [variacion, setVariacion] = useState();
 
   useEffect(() => {
     if (
@@ -97,7 +98,10 @@ function CashflowIndirecto({ setGraph04Data = () => {} }) {
         </Alert>
       )}
       <div className="oculto">
-        <PyL />
+        <PyL
+          setInteresesExterior={setIntereses}
+          setAmortizacionesExterior={setAmortizaciones}
+        />
       </div>
       <div />
       {showLoader ? (
@@ -115,7 +119,7 @@ function CashflowIndirecto({ setGraph04Data = () => {} }) {
                   contenido={
                     <TableCashflowIndirecto
                       resultadoNeto={myResult[0]}
-                      variacion={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+                      variacion={variacion || []}
                       amortizaciones={amortizaciones || []}
                       interesesPagados={intereses || []}
                       inversiones={inversiones || []}

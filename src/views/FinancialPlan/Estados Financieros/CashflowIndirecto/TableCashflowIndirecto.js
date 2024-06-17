@@ -6,11 +6,13 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
+  getUser,
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 import { addCajaCierre } from 'store/tableBalanceCajaCierre/tableBalanceCajaCierreSlice';
+import { calcularDeudasComerciales, calcularBienesDeCambio } from 'utils/calcs';
 
 function TableCashflowIndirecto(props) {
   const dispatch = useDispatch();
@@ -19,7 +21,7 @@ function TableCashflowIndirecto(props) {
   const [amortizaciones, setAmortizaciones] = useState([]);
   const [interesesPagados, setInteresesPagados] = useState([]);
   const [resultadoNeto, setResultadoNeto] = useState([]);
-  const [variacion, setVariacion] = useState([]);
+  const [variacion, setVariacion] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [FEOperativas, setFEOperativas] = useState([]);
   const [inversiones, setInversiones] = useState([]);
   const [financiacion, setFinanciacion] = useState([]);
@@ -27,6 +29,7 @@ function TableCashflowIndirecto(props) {
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
   const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
   const currentState = useSelector((state) => state.auth.user);
@@ -137,13 +140,31 @@ function TableCashflowIndirecto(props) {
     setAmortizaciones(amortizacionesFinal);
     let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setInteresesPagados(interesesPagadosFinal);
-    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    setVariacion(variacionFinal);
     let inversionesFinal = props?.inversiones?.length ? props?.inversiones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setInversiones(inversionesFinal);
     let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setFinanciacion(financiacionFinal);
   }, [props]);
+
+  // useEffect para incluir la funcion calcularDeudasComerciales
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getUser(currentState.id);
+      await calcularBienesDeCambio(
+        data,
+        () => {},
+        0,
+      );
+
+      await calcularDeudasComerciales(
+        data,
+        setVariacion,
+      );
+    };
+
+    fetchData();
+
+  }, [])
 
   useEffect(() => {
     if (resultadoNeto && amortizaciones && interesesPagados && variacion) {
@@ -399,8 +420,8 @@ function TableCashflowIndirecto(props) {
                                 type="text"
                                 value={
                                   indexYear !== 0
-                                    ? formatNumberPrestamos(año)
-                                    : año
+                                    ? formatNumberPrestamos(cajaYBancosAlCierre[indexYear - 1])
+                                    : inputsValues.cajaYBancosAlCierre
                                 }
                                 name="year"
                                 disabled={indexYear !== 0}

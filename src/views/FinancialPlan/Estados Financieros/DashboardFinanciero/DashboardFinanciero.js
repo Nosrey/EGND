@@ -90,6 +90,8 @@ function DashboardFinanciero() {
     <div>
       <div className="oculto">
         <PyL
+          setInteresesExterior={() => { }}
+          setAmortizacionesExterior={() => { }}
           setCmgbruta={setCmgbruta}
           setEbitda={setEbitda}
           setEbit={setEbit}
@@ -103,7 +105,7 @@ function DashboardFinanciero() {
           rn={rn}
         />
         <CashflowIndirecto
-          setGraph04Data={setGraph04Data} 
+          setGraph04Data={setGraph04Data}
         />
         <Balance
           setGraph05Data={setGraph05Data}

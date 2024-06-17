@@ -9,6 +9,7 @@ import cajaYBcoCierre from './cajaYBcoCierre/cajaYBcoCierreSlice'
 import tableBalanceResult from './tableBalanceResult/tableBalanceResultSlice'
 import tableBalanceCajaCierre from './tableBalanceCajaCierre/tableBalanceCajaCierreSlice'
 import tableBalancePrestamos from './tableBalancePrestamos/tableBalancePrestamosSlice'
+import tableVariacionesCapital from './tableVariacionesCapital/tableVariacionesCapitalSlice'
 
 const rootReducer = (asyncReducers) => (state, action) => {
   const combinedReducer = combineReducers({
@@ -22,6 +23,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
     tableBalancePrestamos,
     tableBalanceResult,
     tableBalanceCajaCierre,
+    tableVariacionesCapital,
     ...asyncReducers,
   })
   return combinedReducer(state, action)
