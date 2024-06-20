@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableCashflowIndirecto from './TableCashflowIndirecto';
 import PyL from '../PyL/PyL';
+import WorkingCapital from '../WorkingCapital/WorkingCapital';
 
 function CashflowIndirecto({ setGraph04Data = () => { } }) {
   const [showLoader, setShowLoader] = useState(false);
@@ -101,6 +102,9 @@ function CashflowIndirecto({ setGraph04Data = () => { } }) {
         <PyL
           setInteresesExterior={setIntereses}
           setAmortizacionesExterior={setAmortizaciones}
+        />
+        <WorkingCapital
+          setVariacionExterior={setVariacion}
         />
       </div>
       <div />

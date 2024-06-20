@@ -11,9 +11,11 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableWorkingCapital from './TableWorkingCapital';
-import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
+// import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 
-function WorkingCapital() {
+function WorkingCapital({
+  setVariacionExterior
+}) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -40,7 +42,7 @@ function WorkingCapital() {
         </Alert>
       )}
       <div className="oculto">
-        <CashflowIndirecto />
+        {/* <CashflowIndirecto /> */}
       </div>
       {showLoader ? (
         <MySpinner />
@@ -56,6 +58,7 @@ function WorkingCapital() {
                 <ContainerScrollable
                   contenido={
                     <TableWorkingCapital
+                      setVariacionExterior={setVariacionExterior}
                       creditosVentas={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
                       bienesDeCambio={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
                       deudasComerciales={[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
