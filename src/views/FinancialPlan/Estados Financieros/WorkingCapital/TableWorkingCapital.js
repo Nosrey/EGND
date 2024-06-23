@@ -81,6 +81,13 @@ function TableWorkingCapital(props) {
             inputsValues.bienesDeCambio,
           );
         })
+
+        // dentro de 1 segundo hacer console.log de bienesDeCambio
+        .then(() => {
+          setTimeout(() => {
+            console.log('bienesDeCambio', bienesDeCambio);
+          }, 1000);
+        })
         .catch((error) => console.error(error));
     }
   }, [updateBienesDeCambio]);
@@ -93,10 +100,10 @@ function TableWorkingCapital(props) {
       .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    setCreditosVentas(props.creditosVentas);
-    setBienesDeCambio(props.bienesDeCambio);
-  }, [props]);
+  // useEffect(() => {
+  //   setCreditosVentas(props.creditosVentas);
+  //   setBienesDeCambio(props.bienesDeCambio);
+  // }, [props]);
 
   useEffect(() => {
     if (creditosVentas && bienesDeCambio && deudasComerciales) {
@@ -181,10 +188,10 @@ function TableWorkingCapital(props) {
   }, [deudasFiscales2, deudasComerciales2]);
 
   useEffect(() => {
-    if (posicionAlCierre) {
-      const arrayResultado = [];
+    if (!isNaN(posicionAlCierre[0])) {
+      let arrayResultado = [];
       for (let i = 1; i < posicionAlCierre.length; i++) {
-        const resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
+        let resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
         arrayResultado.push(resultado);
       }
       if (props?.setVariacionExterior) {

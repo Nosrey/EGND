@@ -49,9 +49,6 @@ function CashflowIndirecto({ setGraph04Data = () => { } }) {
       const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData);
       // setAmortizaciones(calcAmortizaciones(PxQCapex));
       setInversiones(calcInversiones(PxQCapex));
-      console.log('inversiones calculadas', calcInversiones(PxQCapex))
-    } else {
-      console.log('inversiones NO calculadas', capexPData, capexQData)
     }
   }, [capexPData, capexQData]);
 
