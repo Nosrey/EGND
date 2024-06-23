@@ -1,4 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable no-unneeded-ternary */
+
 import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,7 +30,9 @@ function TableCashflowIndirecto(props) {
   const [pagoPrestamos, setPagoPrestamos] = useState([]);
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
-  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
 
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
@@ -62,8 +66,8 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
-    console.log('copy: ', copy)
-    console.log('valor: ', valorFOp.toString())
+    console.log('copy: ', copy);
+    console.log('valor: ', valorFOp.toString());
 
     const valorFFinanciacion =
       parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
@@ -136,18 +140,30 @@ function TableCashflowIndirecto(props) {
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
-    let resultadoNetoFinal = props?.resultadoNeto?.length ? props?.resultadoNeto : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let resultadoNetoFinal = props?.resultadoNeto?.length
+      ? props?.resultadoNeto
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setResultadoNeto(resultadoNetoFinal);
-    let amortizacionesFinal = props?.amortizaciones?.length ? props?.amortizaciones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let amortizacionesFinal = props?.amortizaciones?.length
+      ? props?.amortizaciones
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setAmortizaciones(amortizacionesFinal);
-    let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let interesesPagadosFinal = props?.interesesPagados?.length
+      ? props?.interesesPagados
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setInteresesPagados(interesesPagadosFinal);
-    let inversionesFinal = props?.inversiones?.length ? props?.inversiones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let inversionesFinal = props?.inversiones?.length
+      ? props?.inversiones
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setInversiones(inversionesFinal);
-    let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let financiacionFinal = props?.financiacion?.length
+      ? props?.financiacion
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setFinanciacion(financiacionFinal);
     // para variacion tambien
-    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let variacionFinal = props?.variacion?.length
+      ? props?.variacion
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setVariacion(variacionFinal);
   }, [props]);
 
@@ -215,7 +231,6 @@ function TableCashflowIndirecto(props) {
   }, [FEOperativas, FEfinanciacion, inversiones]);
   // ---------------------------------
 
-
   useEffect(() => {
     if (variacionCajaYBco) {
       let resultado = [];
@@ -232,7 +247,7 @@ function TableCashflowIndirecto(props) {
       }
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -279,7 +294,6 @@ function TableCashflowIndirecto(props) {
       });
   };
 
-
   // --------------
 
   useEffect(() => {
@@ -288,7 +302,10 @@ function TableCashflowIndirecto(props) {
         if (data.length !== 0) {
           // hago una copia de los valores de data[0] para no modificar el original y a la propiedad FEOperativas le sumo los valores de amortizaciones, intereses pagados y variacion
           let copy = { ...data[0] };
-          copy.FEOperativas = parseFloat(data[0].amortizaciones) + parseFloat(data[0].interesesPagados) + parseFloat(data[0].variacion);
+          copy.FEOperativas =
+            parseFloat(data[0].amortizaciones) +
+            parseFloat(data[0].interesesPagados) +
+            parseFloat(data[0].variacion);
           setinputsValues(copy);
           setCajaYBancosInicioManual(data[0].cajaYBancosAnioUno);
         }
@@ -326,7 +343,7 @@ function TableCashflowIndirecto(props) {
     //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
     //         cajaYBancosAlCierreFinal[i] = 0;
     //       } else {
-    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)          
+    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)
     //       }
     //     }
     //   }
@@ -426,7 +443,9 @@ function TableCashflowIndirecto(props) {
                                 type="text"
                                 value={
                                   indexYear !== 0
-                                    ? formatNumberPrestamos(cajaYBancosAlCierre[indexYear - 1])
+                                    ? formatNumberPrestamos(
+                                        cajaYBancosAlCierre[indexYear - 1],
+                                      )
                                     : inputsValues.cajaYBancosAlCierre
                                 }
                                 name="year"
