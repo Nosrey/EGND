@@ -105,14 +105,14 @@ function TableWorkingCapital(props) {
         if (i === 0) {
           resultado.push(
             Number(inputsValues.creditosVentas) +
-              Number(inputsValues.bienesDeCambio) -
-              Number(inputsValues.deudasComerciales),
+            Number(inputsValues.bienesDeCambio) -
+            Number(inputsValues.deudasComerciales),
           );
         } else {
           resultado.push(
             Number(creditosVentas[i - 1]) +
-              Number(bienesDeCambio[i - 1]) -
-              Number(deudasComerciales[i - 1]),
+            Number(bienesDeCambio[i - 1]) -
+            Number(deudasComerciales[i - 1]),
           );
         }
       }
@@ -186,6 +186,11 @@ function TableWorkingCapital(props) {
       for (let i = 1; i < posicionAlCierre.length; i++) {
         const resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
         arrayResultado.push(resultado);
+      }
+      if (props?.setVariacionExterior) {
+        // invierto los valores para que queden en negativo o positivo
+        let arrayInvertido = arrayResultado.map((item) => item * -1);
+        props.setVariacionExterior(arrayInvertido);
       }
       setVariacion(arrayResultado);
     }

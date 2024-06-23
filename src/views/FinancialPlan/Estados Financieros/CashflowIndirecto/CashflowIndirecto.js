@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import TableCashflowIndirecto from './TableCashflowIndirecto';
 import PyL from '../PyL/PyL';
+import WorkingCapital from '../WorkingCapital/WorkingCapital';
 
 function CashflowIndirecto({ setGraph04Data = () => { } }) {
   const [showLoader, setShowLoader] = useState(false);
@@ -42,48 +43,51 @@ function CashflowIndirecto({ setGraph04Data = () => { } }) {
       capexPData &&
       capexPData.length !== 0 &&
       capexQData &&
-      capexQData.length !== 0 &&
-      !amortizaciones
+      capexQData.length !== 0
+      // && !amortizaciones
     ) {
       const PxQCapex = multiplicacionPxQCapex(capexQData, capexPData);
-      setAmortizaciones(calcAmortizaciones(PxQCapex));
+      // setAmortizaciones(calcAmortizaciones(PxQCapex));
       setInversiones(calcInversiones(PxQCapex));
+      console.log('inversiones calculadas', calcInversiones(PxQCapex))
+    } else {
+      console.log('inversiones NO calculadas', capexPData, capexQData)
     }
   }, [capexPData, capexQData]);
 
   useEffect(() => {
     if (prestamosData) {
-      setIntereses(calcInteresesPagadosPorAnio(prestamosData));
+      // setIntereses(calcInteresesPagadosPorAnio(prestamosData));
       setFinanciacion(calcFinanciacionDeTerceros(prestamosData));
     }
   }, [prestamosData]);
 
-  // useEffect(() => {
-  //   getUser(currentState.id)
-  //     .then((data) => {
-  //       if (data?.capexPData[0]?.length !== 0) {
-  //         setCapexPData(data?.capexPData[0]?.capexP);
-  //       } else {
-  //         // alert('Falta completar info en Costo Inversiones');
-  //       }
+  useEffect(() => {
+    getUser(currentState.id)
+      .then((data) => {
+        if (data?.capexPData[0]?.length !== 0) {
+          setCapexPData(data?.capexPData[0]?.capexP);
+        } else {
+          // alert('Falta completar info en Costo Inversiones');
+        }
 
-  //       if (data?.capexQData[0]?.length !== 0) {
-  //         setCapexQData(data?.capexQData[0]?.capexQ);
-  //       } else {
-  //         // alert('Falta completar info en Volumen de Inversiones');
-  //       }
+        if (data?.capexQData[0]?.length !== 0) {
+          setCapexQData(data?.capexQData[0]?.capexQ);
+        } else {
+          // alert('Falta completar info en Volumen de Inversiones');
+        }
 
-  //       if (data?.prestamos?.length !== 0) {
-  //         setPrestamosData(data?.prestamos);
-  //       } else {
-  //         // alert('Falta completar info en la sección de Préstamos');
-  //       }
-  //       setTimeout(() => {
-  //         setShowLoader(false);
-  //       }, 4000);
-  //     })
-  //     .catch((error) => console.error(error));
-  // }, []);
+        if (data?.prestamos?.length !== 0) {
+          setPrestamosData(data?.prestamos);
+        } else {
+          // alert('Falta completar info en la sección de Préstamos');
+        }
+        setTimeout(() => {
+          setShowLoader(false);
+        }, 4000);
+      })
+      .catch((error) => console.error(error));
+  }, []);
 
   return (
     <>
@@ -101,6 +105,9 @@ function CashflowIndirecto({ setGraph04Data = () => { } }) {
         <PyL
           setInteresesExterior={setIntereses}
           setAmortizacionesExterior={setAmortizaciones}
+        />
+        <WorkingCapital
+          setVariacionExterior={setVariacion}
         />
       </div>
       <div />
