@@ -140,7 +140,11 @@ function Cac() {
       // Usa el operador de fusión nula para proporcionar 0 si la posición es undefined porque si no tengo gasto en comercial o mk unod e lso arrays va aser []
       const valorComercial = totGastoComercial[i] ?? 0;
       const valorMkt = totGastoMkt[i] ?? 0;
-      resultadoCAC.push(valorComercial + valorMkt);
+      if (isNaN(valorComercial + valorMkt)) {
+        resultadoCAC.push(0);
+      } else {
+        resultadoCAC.push(valorComercial + valorMkt);
+      }
     }
     return resultadoCAC;
   };
@@ -265,7 +269,11 @@ function Cac() {
 
       if (valoresLTV.length === valoresCAC.length) {
         for (let i = 0; i < valoresLTV.length; i++) {
-          resultado[i] = valoresLTV[i] / valoresCAC[i]; // LTV /CAC
+          if (!isFinite(valoresLTV[i] / valoresCAC[i])) {
+            resultado[i] = 0;
+          } else {
+            resultado[i] = valoresLTV[i] / valoresCAC[i];
+          }
         }
         setValoresLTVCAC(resultado);
       } else {
@@ -375,15 +383,18 @@ function Cac() {
                   </FormContainer>
                 </div>
 
-                <div className=" mt-[40px]">
-                  <h5>CAC y LTV</h5>
-                  <GraficoDashed cac={valoresCAC} ltv={valoresLTV} />
-                </div>
-
-                <div className=" mt-[40px]">
-                  <h5>LTV / CAC</h5>
-                  <GraficoDashedLTVCAC ltvcac={valoresLTVCAC} />
-                </div>
+                {valoresCAC.length > 0 && valoresLTV.length > 0 && (
+                  <div className=" mt-[40px]">
+                    <h5>CAC y LTV</h5>
+                    <GraficoDashed cac={valoresCAC} ltv={valoresLTV} />
+                  </div>
+                )}
+                {valoresLTVCAC.length > 0 && (
+                  <div className=" mt-[40px]">
+                    <h5>LTV / CAC</h5>
+                    <GraficoDashedLTVCAC ltvcac={valoresLTVCAC} />
+                  </div>
+                )}
               </div>
             )}
         </>
