@@ -11,6 +11,8 @@ import { BASIC_EMPTY, EMPTY_TOTALES, MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics, formatearNumero } from 'utils/formatTotalsValues';
+import ShortNumberNotation from '../shortNumberNotation/ShortNumberNotation';
 
 let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
 let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
@@ -48,6 +50,10 @@ function GraficoDeBarraMargenBruto({
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
                     }
+                  } else if (periodoSelected.month === 24) {
+                    if (indexM > 5 && yearSelected.year === indexY) {
+                      setTypeView(month);
+                    }
                   }
                 }
 
@@ -81,7 +87,7 @@ function GraficoDeBarraMargenBruto({
         dataLabels: {
           enabled: true,
           formatter: function (value) {
-            return `${currency}${value}`;
+            return `${currency}${formatNumberGrafics(value)}`;
           },
         },
         xaxis: {

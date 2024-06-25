@@ -1,4 +1,6 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable no-unneeded-ternary */
+
 import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,11 +8,13 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
+  getUser,
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 import { addCajaCierre } from 'store/tableBalanceCajaCierre/tableBalanceCajaCierreSlice';
+import { calcularDeudasComerciales, calcularBienesDeCambio } from 'utils/calcs';
 
 function TableCashflowIndirecto(props) {
   const dispatch = useDispatch();
@@ -19,14 +23,17 @@ function TableCashflowIndirecto(props) {
   const [amortizaciones, setAmortizaciones] = useState([]);
   const [interesesPagados, setInteresesPagados] = useState([]);
   const [resultadoNeto, setResultadoNeto] = useState([]);
-  const [variacion, setVariacion] = useState([]);
+  const [variacion, setVariacion] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [FEOperativas, setFEOperativas] = useState([]);
   const [inversiones, setInversiones] = useState([]);
   const [financiacion, setFinanciacion] = useState([]);
   const [pagoPrestamos, setPagoPrestamos] = useState([]);
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
-  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
+
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
   const currentState = useSelector((state) => state.auth.user);
@@ -49,16 +56,18 @@ function TableCashflowIndirecto(props) {
   });
 
   const handleChangeInputs = (key, value) => {
-    const copy = { ...inputsValues };
+    let copy = { ...inputsValues };
     if (value.startsWith('0') && value.length > 1) {
       value = value.slice(1);
     }
     copy[key] = value;
     const valorFOp =
       parseInt(copy.amortizaciones) +
-      parseInt(copy.interesesPagados) -
+      parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
+    console.log('copy: ', copy);
+    console.log('valor: ', valorFOp.toString());
 
     const valorFFinanciacion =
       parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
@@ -131,29 +140,60 @@ function TableCashflowIndirecto(props) {
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
-    let resultadoNetoFinal = props?.resultadoNeto?.length ? props?.resultadoNeto : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let resultadoNetoFinal = props?.resultadoNeto?.length
+      ? props?.resultadoNeto
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setResultadoNeto(resultadoNetoFinal);
-    let amortizacionesFinal = props?.amortizaciones?.length ? props?.amortizaciones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let amortizacionesFinal = props?.amortizaciones?.length
+      ? props?.amortizaciones
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setAmortizaciones(amortizacionesFinal);
-    let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let interesesPagadosFinal = props?.interesesPagados?.length
+      ? props?.interesesPagados
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setInteresesPagados(interesesPagadosFinal);
-    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    setVariacion(variacionFinal);
-    let inversionesFinal = props?.inversiones?.length ? props?.inversiones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let inversionesFinal = props?.inversiones?.length
+      ? props?.inversiones
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setInversiones(inversionesFinal);
-    let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let financiacionFinal = props?.financiacion?.length
+      ? props?.financiacion
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setFinanciacion(financiacionFinal);
+    // para variacion tambien
+    let variacionFinal = props?.variacion?.length
+      ? props?.variacion
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    setVariacion(variacionFinal);
   }, [props]);
+
+  // // useEffect para incluir la funcion calcularDeudasComerciales
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const data = await getUser(currentState.id);
+  //     await calcularBienesDeCambio(
+  //       data,
+  //       () => {},
+  //       0,
+  //     );
+
+  //     await calcularDeudasComerciales(
+  //       data,
+  //       setVariacion,
+  //     );
+  //   };
+
+  //   fetchData();
+
+  // }, [])
 
   useEffect(() => {
     if (resultadoNeto && amortizaciones && interesesPagados && variacion) {
       let resultado = [];
       for (let i = 0; i < 10; i++) {
         resultado.push(
-          resultadoNeto[i] +
-          amortizaciones[i] +
-          interesesPagados[i] -
-          variacion[i],
+          // resultadoNeto[i] +
+          amortizaciones[i] + interesesPagados[i] + variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -191,7 +231,6 @@ function TableCashflowIndirecto(props) {
   }, [FEOperativas, FEfinanciacion, inversiones]);
   // ---------------------------------
 
-
   useEffect(() => {
     if (variacionCajaYBco) {
       let resultado = [];
@@ -208,7 +247,7 @@ function TableCashflowIndirecto(props) {
       }
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -255,14 +294,19 @@ function TableCashflowIndirecto(props) {
       });
   };
 
-
   // --------------
 
   useEffect(() => {
     getCashflowIndirectoInfo(currentState.id)
       .then((data) => {
         if (data.length !== 0) {
-          setinputsValues(data[0]);
+          // hago una copia de los valores de data[0] para no modificar el original y a la propiedad FEOperativas le sumo los valores de amortizaciones, intereses pagados y variacion
+          let copy = { ...data[0] };
+          copy.FEOperativas =
+            parseFloat(data[0].amortizaciones) +
+            parseFloat(data[0].interesesPagados) +
+            parseFloat(data[0].variacion);
+          setinputsValues(copy);
           setCajaYBancosInicioManual(data[0].cajaYBancosAnioUno);
         }
       })
@@ -299,7 +343,7 @@ function TableCashflowIndirecto(props) {
     //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
     //         cajaYBancosAlCierreFinal[i] = 0;
     //       } else {
-    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)          
+    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)
     //       }
     //     }
     //   }
@@ -379,7 +423,7 @@ function TableCashflowIndirecto(props) {
                             handleChangeInputs('cajaYBancos', e.target.value)
                           }
                           name="initial"
-                          prefix="$"
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -399,12 +443,14 @@ function TableCashflowIndirecto(props) {
                                 type="text"
                                 value={
                                   indexYear !== 0
-                                    ? formatNumberPrestamos(año)
-                                    : año
+                                    ? formatNumberPrestamos(
+                                        cajaYBancosAlCierre[indexYear - 1],
+                                      )
+                                    : inputsValues.cajaYBancosAlCierre
                                 }
                                 name="year"
                                 disabled={indexYear !== 0}
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                                 onChange={(e) =>
                                   handleChangeCyB(e.target.value)
                                 }
@@ -420,7 +466,7 @@ function TableCashflowIndirecto(props) {
                                   : año
                               }
                               name="year"
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                               disabled={indexYear !== 0}
                               onChange={(e) => handleChangeCyB(e.target.value)}
                             />
@@ -452,7 +498,7 @@ function TableCashflowIndirecto(props) {
                             handleChangeInputs('resultadoNeto', e.target.value)
                           }
                           name="initial"
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -470,7 +516,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -480,7 +526,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
@@ -519,7 +565,7 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              prefix="$"
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -537,7 +583,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -546,7 +592,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -580,7 +626,7 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              prefix="$"
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -598,7 +644,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -607,7 +653,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -638,7 +684,7 @@ function TableCashflowIndirecto(props) {
                                 handleChangeInputs('variacion', e.target.value)
                               }
                               name="initial"
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -656,7 +702,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -665,7 +711,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -703,7 +749,7 @@ function TableCashflowIndirecto(props) {
                           }
                           name="initial"
                           disabled
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -721,7 +767,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -731,7 +777,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
@@ -770,7 +816,8 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              prefix={currency}
+                              // prefix={currency ? currency : '$'}
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -788,7 +835,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -797,7 +844,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -835,7 +882,7 @@ function TableCashflowIndirecto(props) {
                           }
                           name="initial"
                           disabled
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -853,7 +900,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -863,7 +910,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
@@ -901,7 +948,7 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -919,7 +966,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -928,7 +975,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -961,7 +1008,7 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           </FormItem>
                         </div>
@@ -979,7 +1026,7 @@ function TableCashflowIndirecto(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency ? currency : '$'}
                                   />
                                 </Tooltip>
                               ) : (
@@ -988,7 +1035,7 @@ function TableCashflowIndirecto(props) {
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency}
+                                  prefix={currency ? currency : '$'}
                                   disabled
                                 />
                               )}
@@ -1023,7 +1070,7 @@ function TableCashflowIndirecto(props) {
                           value={inputsValues.FEfinanciacion}
                           name="initial"
                           disabled
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -1041,7 +1088,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -1051,7 +1098,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
@@ -1080,7 +1127,7 @@ function TableCashflowIndirecto(props) {
                           value={inputsValues.variacionCajaYBco}
                           name="initial"
                           disabled
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -1098,7 +1145,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -1108,7 +1155,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
@@ -1137,7 +1184,7 @@ function TableCashflowIndirecto(props) {
                           value={inputsValues.cajaYBancosAlCierre}
                           name="initial"
                           disabled
-                          prefix={currency}
+                          prefix={currency ? currency : '$'}
                         />
                       </FormItem>
                     </div>
@@ -1155,7 +1202,7 @@ function TableCashflowIndirecto(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency ? currency : '$'}
                               />
                             </Tooltip>
                           ) : (
@@ -1165,7 +1212,7 @@ function TableCashflowIndirecto(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency}
+                              prefix={currency ? currency : '$'}
                             />
                           )}
                         </FormItem>
