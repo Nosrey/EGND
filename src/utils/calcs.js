@@ -1546,7 +1546,6 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
   } else {
     costosFinal = costosFinal.map((item) => (isNaN(item) ? 0 : item));
   }
-
   setCostos(costosFinal);
 };
 
@@ -3811,7 +3810,6 @@ const calcCapitalMensual = (monto, tasaAnual, plazo) =>
 
 export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
 
-  console.log('prestamos: ', prestamos)
   let prestamoscalculados = [];
   for (let i = 0; i < prestamos.length; i++) {
     prestamoscalculados[i] = {
@@ -3877,7 +3875,6 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
   );
 
   // recorro prestamoscalculados que es donde estan los prestamos y reviso su propiedad .mesInicio, .yearInicio y .monto para saber en que mes y año comienzan y los agrego a prestamosArray en la propiedad .ingreso tomando el .monto
-  console.log('prestamoscalculados: ', prestamoscalculados)
   for (let i = 0; i < prestamoscalculados.length; i++) {
     // en minuscula
 
@@ -3977,7 +3974,6 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
 
   if (final === undefined || final?.length === 0) final = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-  console.log('final: ', final)
   setFinal(final);
   setShowLoader(false);
 };
