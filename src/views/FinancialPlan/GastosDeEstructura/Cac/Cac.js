@@ -32,7 +32,7 @@ function Cac() {
   const [infoVolToCalculateClient, setInfoVolToCalculateClient] = useState();
   const [dataAssump, setDataAssump] = useState();
   const [gastosPorCCData, setGastosPorCCData] = useState();
-  const [valoresCAC, setValoresCAC] = useState([]);
+  const [valoresCAC, setValoresCAC] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [valoresLTV, setValoresLTV] = useState([]);
   const [valoresLTVCAC, setValoresLTVCAC] = useState([]);
 
@@ -242,7 +242,10 @@ function Cac() {
 
   useEffect(() => {
     if (infoVolToCalculateClient && dataAssump && gastosPorCCData) {
-      setValoresCAC(calculateCAC());
+      const result = calculateCAC();
+      if (calculateCAC().length !== 0) {
+        setValoresCAC(result);
+      }
     }
   }, [infoVolToCalculateClient, dataAssump, gastosPorCCData]);
 
