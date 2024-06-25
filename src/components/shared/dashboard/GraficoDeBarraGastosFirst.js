@@ -2,6 +2,7 @@
 import { BASIC_EMPTY, EMPTY_TOTALES } from 'constants/forms.constants';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics } from 'utils/formatTotalsValues';
 
 let totals = JSON.parse(JSON.stringify(EMPTY_TOTALES));
 let superTotals = JSON.parse(JSON.stringify(BASIC_EMPTY));
@@ -20,7 +21,7 @@ function GraficoDeBarraGastosFirst({ typeView, dataView }) {
         dataLabels: {
           enabled: true,
           formatter: function (value) {
-            return `${currency}${value}`;
+            return `${currency}${formatNumberGrafics(value)}`;
           },
         },
         xaxis: {

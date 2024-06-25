@@ -426,12 +426,14 @@ function DashboardGastos() {
                 <div className=" mt-[40px]">
                   <h5>Distribución de Gasto por mes</h5>
                   <div className="flex w-[100%] gap-[30px] items-center">
-                    <div className="w-[50%]">
-                      <GraficoDeBarraGastosFirst
-                        typeView={typeView}
-                        dataView={totalsView}
-                      />
-                    </div>
+                    {totalsView && totalsView.length > 0 && (
+                      <div className="w-[50%]">
+                        <GraficoDeBarraGastosFirst
+                          typeView={typeView}
+                          dataView={totalsView}
+                        />
+                      </div>
+                    )}
                     <div className="flex flex-col justify-center items-center gap-[20px] w-[50%]">
                       {infoForm && infoForm.Marketing.visible && (
                         <ProgresoCircular
@@ -453,16 +455,18 @@ function DashboardGastos() {
                   </div>
                 </div>
 
-                <div className=" mb-[50px] flex flex-col gap-[30px] mt-[100px] ">
-                  <h5 className="cursor-default pl-[20px]">
-                    Distribución de gasto por Centro de Costo
-                  </h5>
-                  <GraficoDeBarraGastos
-                    nameData={nameDataView}
-                    cuentasData={dataCuentasView}
-                    typeView={typeView}
-                  />
-                </div>
+                {nameDataView.length && dataCuentasView.length && (
+                  <div className=" mb-[50px] flex flex-col gap-[30px] mt-[100px] ">
+                    <h5 className="cursor-default pl-[20px]">
+                      Distribución de gasto por Centro de Costo
+                    </h5>
+                    <GraficoDeBarraGastos
+                      nameData={nameDataView}
+                      cuentasData={dataCuentasView}
+                      typeView={typeView}
+                    />
+                  </div>
+                )}
 
                 {totalPorCuenta.length !== 0 && nameDataView.length !== 0 && (
                   <div className="flex gap-[30px] mt-[40px] flex-col">
