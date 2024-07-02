@@ -819,7 +819,7 @@ function DashboardMargenBruto() {
                 {infoForm && costoData && volumenData && precioData && (
                   <div className=" mt-[40px]">
                     <h5 className="cursor-default">
-                      Proyección Margen Bruto Nominal
+                      Proyección Margen Bruto Porcentual
                     </h5>
                     <div
                       className={`flex ${

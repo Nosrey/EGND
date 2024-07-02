@@ -14,9 +14,9 @@ import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 import Prestamos from '../../Prestamos/Prestamos';
 
 function Balance({
-  setGraph05Data = () => {},
-  setGraph06Data = () => {},
-  setGraph07Data = () => {},
+  setGraph05Data = () => { },
+  setGraph06Data = () => { },
+  setGraph07Data = () => { },
 }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
@@ -27,6 +27,7 @@ function Balance({
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
   const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  
 
   return (
     <>
@@ -102,7 +103,7 @@ function Balance({
                 />
               </FormContainer>
             </div> */}
-            
+
           </div>
         </>
       )}

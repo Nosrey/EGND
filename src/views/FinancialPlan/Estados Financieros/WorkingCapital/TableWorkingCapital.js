@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
@@ -81,6 +82,13 @@ function TableWorkingCapital(props) {
             inputsValues.bienesDeCambio,
           );
         })
+
+        // dentro de 1 segundo hacer console.log de bienesDeCambio
+        .then(() => {
+          setTimeout(() => {
+            console.log('bienesDeCambio', bienesDeCambio);
+          }, 1000);
+        })
         .catch((error) => console.error(error));
     }
   }, [updateBienesDeCambio]);
@@ -93,10 +101,10 @@ function TableWorkingCapital(props) {
       .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    setCreditosVentas(props.creditosVentas);
-    setBienesDeCambio(props.bienesDeCambio);
-  }, [props]);
+  // useEffect(() => {
+  //   setCreditosVentas(props.creditosVentas);
+  //   setBienesDeCambio(props.bienesDeCambio);
+  // }, [props]);
 
   useEffect(() => {
     if (creditosVentas && bienesDeCambio && deudasComerciales) {
@@ -139,7 +147,8 @@ function TableWorkingCapital(props) {
       setTimeout(() => {
         const fetchData = async () => {
           try {
-            let IIGGFinal = (IIGG?.length === 0) ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
+            let IIGGFinal =
+              IIGG?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
             const data = await getUser(currentState.id);
             let dataCopy = JSON.parse(JSON.stringify(data));
             let dataCopy2 = JSON.parse(JSON.stringify(data));
@@ -181,11 +190,16 @@ function TableWorkingCapital(props) {
   }, [deudasFiscales2, deudasComerciales2]);
 
   useEffect(() => {
-    if (posicionAlCierre) {
-      const arrayResultado = [];
+    if (!isNaN(posicionAlCierre[0])) {
+      let arrayResultado = [];
       for (let i = 1; i < posicionAlCierre.length; i++) {
-        const resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
+        let resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
         arrayResultado.push(resultado);
+      }
+      if (props?.setVariacionExterior) {
+        // invierto los valores para que queden en negativo o positivo
+        let arrayInvertido = arrayResultado.map((item) => item * -1);
+        props.setVariacionExterior(arrayInvertido);
       }
       setVariacion(arrayResultado);
     }
