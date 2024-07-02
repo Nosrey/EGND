@@ -34,7 +34,7 @@ function GraficoCapex01({ data, typeView }) {
       series={[
         {
           data,
-          name: 'Total de ventas',
+          name: 'Inversión total',
         },
       ]}
       type="bar"
