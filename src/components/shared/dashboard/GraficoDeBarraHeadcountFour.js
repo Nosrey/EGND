@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics } from 'utils/formatTotalsValues';
 
 function GraficoDeBarraHeadcountFour({ typeView, ftes }) {
   const currency = useSelector((state) => state.auth.user.currency);
@@ -22,7 +23,7 @@ function GraficoDeBarraHeadcountFour({ typeView, ftes }) {
             enabled: true,
           },
         },
-        colors: ["#4F46E5"],
+        colors: ['#4F46E5'],
         responsive: [
           {
             breakpoint: 480,
@@ -43,7 +44,7 @@ function GraficoDeBarraHeadcountFour({ typeView, ftes }) {
         dataLabels: {
           enabled: true,
           formatter(value) {
-            return `${currency}${value}`;
+            return `${currency}${formatNumberGrafics(value)}`;
           },
         },
         xaxis: {
