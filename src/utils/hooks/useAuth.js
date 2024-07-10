@@ -31,18 +31,28 @@ function useAuth() {
         localStorage.setItem('userId', id);
         dispatch(onSignInSuccess(token));
 
-        let currencyInfo;
-        try {
-          const userData = await getUser(id);
-          currencyInfo = userData?.businessInfo[0]?.currency;
-          if (currencyInfo) {
-            console.log('cargo moneda', currencyInfo);
-          } else {
-            console.log('no cargo moneda');
-          }
-        } catch (error) {
-          console.error(error);
-        }
+        // getUser(userInfo).then((data) => {
+        //   setInfo({ nombre: data.businessName, email: data.mail });
+        // });
+
+        // let currencyInfo = "$";
+        // let nombre = "Anonymous";
+        // let email = "Anonymous";
+
+        // try {
+        //   const userData = await getUser(id);
+        //   currencyInfo = userData?.businessInfo[0]?.currency;
+        //   nombre = userData?.businessName;
+        //   email = userData?.mail;
+
+        //   if (currencyInfo) {
+        //     console.log('cargo moneda', currencyInfo);
+        //   } else {
+        //     console.log('no cargo moneda');
+        //   }
+        // } catch (error) {
+        //   console.error(error);
+        // }
 
         dispatch(
           setUser({
@@ -51,9 +61,11 @@ function useAuth() {
             userName: 'Anonymous',
             authority: ['USER'],
             email: mail,
-            currency: currencyInfo,
+            // currency: currencyInfo,
           }),
         );
+
+
 
         const redirectUrl = query.get(REDIRECT_URL_KEY);
         navigate(redirectUrl || appConfig.authenticatedEntryPath);

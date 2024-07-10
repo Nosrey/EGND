@@ -2,21 +2,36 @@ import React, { useEffect, useState } from 'react';
 import { Avatar, Dropdown } from 'components/ui';
 import withHeaderItem from 'utils/hoc/withHeaderItem';
 import useAuth from 'utils/hooks/useAuth';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import classNames from 'classnames';
 import { HiOutlineUser, HiOutlineLogout } from 'react-icons/hi';
 import { getUser } from 'services/Requests';
+import { setUser } from 'store/auth/userSlice';
 
 const dropdownItemList = [];
 
 export function UserDropdown({ className }) {
+  const dispatch = useDispatch();
+
   const userInfo = useSelector((state) => state.auth.user.id);
+  const currentState = useSelector((state) => state.auth.user);
+
   const [info, setInfo] = useState();
 
   useEffect(() => {
     getUser(userInfo).then((data) => {
+
+      let currencyInfo = data?.businessInfo[0]?.currency || "$";
+
+      const newState = {
+        ...currentState,
+        currency: currencyInfo,
+      };
+      
       setInfo({ nombre: data.businessName, email: data.mail });
+      
+      dispatch(setUser(newState));
     });
   }, []);
 
