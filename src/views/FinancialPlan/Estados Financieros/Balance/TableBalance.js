@@ -203,7 +203,6 @@ function TableBalance(props) {
               setCreditosPorVentas,
             );
 
-            console.log('inputsValues.BienesDeCambio: ', inputsValues.BienesDeCambio)
             await calcularBienesDeCambio(
               data,
               setBienesDeCambio,
@@ -229,7 +228,7 @@ function TableBalance(props) {
               setTotalPatrimonioNeto,
               setCebo,
             );
-            console.log('prestamos finales: ', prestamos)
+   
             let prestamosFinal = prestamos
             if (prestamosFinal.length === 1 && prestamosFinal[0].monto === 0 && prestamosFinal[0].plazo === 0 && prestamosFinal[0].tasaAnual === 0 && prestamosFinal[0].mesInicio === '') prestamosFinal = []
             await calcularPrestamos(
@@ -557,7 +556,6 @@ function TableBalance(props) {
       totPnYPasivo: inputsValues.totPnYPasivo,
       idUser: localStorage.getItem('userId'),
     };
-    console.log('value: ', value);
     createBalance(value)
       .then((resp) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
