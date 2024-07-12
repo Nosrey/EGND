@@ -11,6 +11,7 @@ import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
 
 const impGanancias = 20;
 function TablePyL(props) {
+  const dispatch = useDispatch();
   const [showLoader, setShowLoader] = useState(true);
   const MiContexto = createContext();
 
@@ -73,7 +74,7 @@ function TablePyL(props) {
   });
 
   const handleChangeInputs = (key, value, indexCta) => {
-    const copy = { ...inputsValues };
+    let copy = { ...inputsValues };
     if (value.startsWith('0')) {
       value = value.slice(1);
     }
@@ -246,7 +247,7 @@ function TablePyL(props) {
     }
   }, [BAT]);
 
-  const dispatch = useDispatch();
+
   useEffect(() => {
     if (BAT && IIGG) {
       let resultado = [];
@@ -356,6 +357,7 @@ function TablePyL(props) {
         data: rdoNeto.map((año) => parseFloat(año.toFixed(2))),
       },
     ]);
+    // eslint-disable-next-line
   }, [vtasTot, costoTotales, MBPesos, gastoEnCtasTotal, EBITDA, rdoNeto]);
 
   const submitInfoForm = () => {
@@ -386,6 +388,7 @@ function TablePyL(props) {
         }
       })
       .catch((error) => console.error(error));
+    // eslint-disable-next-line
   }, []);
 
   return (
@@ -448,7 +451,7 @@ function TablePyL(props) {
                                   handleChangeInputs('vtasProd', e.target.value)
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -474,7 +477,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -483,7 +486,7 @@ function TablePyL(props) {
                                     type="text"
                                     value={formatNumberPrestamos(año)}
                                     name="year"
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                     disabled
                                   />
                                 )}
@@ -515,7 +518,7 @@ function TablePyL(props) {
                                 onChange={(e) =>
                                   handleChangeInputs('vtasServ', e.target.value)
                                 }
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -535,7 +538,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -545,7 +548,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -591,12 +594,15 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            name="initial"
                             value={inputsValues.vtasTot}
                             onChange={(e) =>
-                              handleChangeInputs('vtasTot', e.target.value)
+                              handleChangeInputs(
+                                'vtasTot',
+                                e.target.value
+                              )
                             }
-                            prefix="$"
+                            name="initial"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -614,7 +620,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -624,7 +630,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
@@ -659,7 +665,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -679,7 +685,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -688,7 +694,7 @@ function TablePyL(props) {
                                     type="text"
                                     value={formatNumberPrestamos(año)}
                                     name="year"
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                     disabled
                                   />
                                 )}
@@ -723,7 +729,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -743,7 +749,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -753,7 +759,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -787,7 +793,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -807,7 +813,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -817,7 +823,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -850,7 +856,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -870,7 +876,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -880,7 +886,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -914,7 +920,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -934,7 +940,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -944,7 +950,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -978,7 +984,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -998,7 +1004,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1008,7 +1014,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1041,7 +1047,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1061,7 +1067,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1071,7 +1077,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1107,7 +1113,7 @@ function TablePyL(props) {
                               handleChangeInputs('costoTotales', e.target.value)
                             }
                             name="initial"
-                            prefix="$"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -1125,7 +1131,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -1135,7 +1141,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
@@ -1165,7 +1171,7 @@ function TablePyL(props) {
                               handleChangeInputs('MBPesos', e.target.value)
                             }
                             name="initial"
-                            prefix="$"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -1183,7 +1189,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -1193,7 +1199,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
@@ -1289,7 +1295,7 @@ function TablePyL(props) {
                                     )
                                   }
                                   name="initial"
-                                  prefix="$"
+                                  prefix={currency || '$'}
                                 />
                               </FormItem>
                             </div>
@@ -1309,7 +1315,7 @@ function TablePyL(props) {
                                         value={formatNumberPrestamos(anio)}
                                         name="year"
                                         disabled
-                                        prefix={currency}
+                                        prefix={currency || '$'}
                                       />
                                     </Tooltip>
                                   ) : (
@@ -1319,7 +1325,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(anio)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   )}
                                 </FormItem>
@@ -1359,7 +1365,7 @@ function TablePyL(props) {
                               )
                             }
                             name="initial"
-                            prefix="$"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -1377,7 +1383,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -1387,7 +1393,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
@@ -1418,7 +1424,7 @@ function TablePyL(props) {
                               handleChangeInputs('EBITDA', e.target.value)
                             }
                             name="initial"
-                            prefix="$"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -1436,7 +1442,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -1446,7 +1452,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
@@ -1544,7 +1550,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1564,7 +1570,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1574,7 +1580,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1605,7 +1611,7 @@ function TablePyL(props) {
                                   handleChangeInputs('EBIT', e.target.value)
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1625,7 +1631,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1635,7 +1641,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1731,7 +1737,7 @@ function TablePyL(props) {
                                   )
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1751,7 +1757,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1761,7 +1767,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1792,7 +1798,7 @@ function TablePyL(props) {
                                   handleChangeInputs('BAT', e.target.value)
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1812,7 +1818,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1822,7 +1828,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1853,7 +1859,7 @@ function TablePyL(props) {
                                   handleChangeInputs('IIGG', e.target.value)
                                 }
                                 name="initial"
-                                prefix="$"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
                           </div>
@@ -1873,7 +1879,7 @@ function TablePyL(props) {
                                       value={formatNumberPrestamos(año)}
                                       name="year"
                                       disabled
-                                      prefix={currency}
+                                      prefix={currency || '$'}
                                     />
                                   </Tooltip>
                                 ) : (
@@ -1883,7 +1889,7 @@ function TablePyL(props) {
                                     value={formatNumberPrestamos(año)}
                                     name="year"
                                     disabled
-                                    prefix={currency}
+                                    prefix={currency || '$'}
                                   />
                                 )}
                               </FormItem>
@@ -1921,7 +1927,7 @@ function TablePyL(props) {
                               handleChangeInputs('rdoNeto', e.target.value)
                             }
                             name="initial"
-                            prefix="$"
+                            prefix={currency || '$'}
                           />
                         </FormItem>
                       </div>
@@ -1939,7 +1945,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency}
+                                  prefix={currency || '$'}
                                 />
                               </Tooltip>
                             ) : (
@@ -1949,7 +1955,7 @@ function TablePyL(props) {
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
-                                prefix={currency}
+                                prefix={currency || '$'}
                               />
                             )}
                           </FormItem>
