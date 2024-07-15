@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
@@ -112,14 +113,14 @@ function TableWorkingCapital(props) {
         if (i === 0) {
           resultado.push(
             Number(inputsValues.creditosVentas) +
-            Number(inputsValues.bienesDeCambio) -
-            Number(inputsValues.deudasComerciales),
+              Number(inputsValues.bienesDeCambio) -
+              Number(inputsValues.deudasComerciales),
           );
         } else {
           resultado.push(
             Number(creditosVentas[i - 1]) +
-            Number(bienesDeCambio[i - 1]) -
-            Number(deudasComerciales[i - 1]),
+              Number(bienesDeCambio[i - 1]) -
+              Number(deudasComerciales[i - 1]),
           );
         }
       }
@@ -146,7 +147,8 @@ function TableWorkingCapital(props) {
       setTimeout(() => {
         const fetchData = async () => {
           try {
-            let IIGGFinal = (IIGG?.length === 0) ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
+            let IIGGFinal =
+              IIGG?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
             const data = await getUser(currentState.id);
             let dataCopy = JSON.parse(JSON.stringify(data));
             let dataCopy2 = JSON.parse(JSON.stringify(data));
