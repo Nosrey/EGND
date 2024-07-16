@@ -204,6 +204,36 @@ function DashboardGastos() {
                         }
                       }
                     }
+                    if (periodoSelected.month === 24) {
+                      tot += año.volMeses[mes];
+                      if (indexHead === 3) totMarketing += año.volMeses[mes];
+                      setTypeView(month);
+                      if (tots[indexM] || tots[indexM] === 0) {
+                        tots[indexM] += año.volMeses[mes];
+                      } else {
+                        tots.push(0);
+                        tots[indexM] += año.volMeses[mes];
+                      }
+                      if (
+                        cuentas[cuenta.id][indexM] ||
+                        cuentas[cuenta.id][indexM] === 0
+                      ) {
+                        cuentas[cuenta.id][indexM] += parseInt(
+                          año.volMeses[mes],
+                        );
+                        totalPerCuenta[cuenta.id] += parseInt(
+                          año.volMeses[mes],
+                        );
+                      } else {
+                        cuentas[cuenta.id].push(0);
+                        cuentas[cuenta.id][indexM] += parseInt(
+                          año.volMeses[mes],
+                        );
+                        totalPerCuenta[cuenta.id] += parseInt(
+                          año.volMeses[mes],
+                        );
+                      }
+                    }
                   } else {
                     tot += año.volMeses[mes];
                     if (indexHead === 3) totMarketing += año.volMeses[mes];

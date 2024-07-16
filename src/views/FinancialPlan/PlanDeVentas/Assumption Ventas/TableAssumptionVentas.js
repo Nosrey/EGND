@@ -598,6 +598,7 @@ function TableAssumptionVentas({
               </span>
             )}
           </div>
+          {console.log('cccc', channels, churn)}
           <div>
             {channels && channels?.length > 0
               ? channels.map((channel, index) => (

@@ -7,6 +7,8 @@ function ProgresoCircularScroll({ title, churnProducto }) {
   const media = useMedia();
   const [percent, setPercent] = useState(0);
 
+  console.log('churn', churnProducto);
+
   useEffect(() => {
     let sum = 0;
     churnProducto.churns.map((c) => {
@@ -15,7 +17,7 @@ function ProgresoCircularScroll({ title, churnProducto }) {
         setPercent(
           (
             sum /
-            (churnProducto.churns.length * churnProducto.productos.length)
+            (churnProducto.canales.length * churnProducto.productos.length)
           ).toFixed(1),
         );
       });
@@ -34,10 +36,10 @@ function ProgresoCircularScroll({ title, churnProducto }) {
             percent={percent}
           />
           <div className="max-h-[200px] overflow-y-auto custom-scrollbar pr-[8px]">
-            {churnProducto.churns.map((churn, index) => (
+            {churnProducto.canales.map((churn, index) => (
               <div key={index} className="md:mb-0 mb-4 mx-6">
-                <span className="font-bold">{churn.channel.toUpperCase()}</span>
-                {churn.items.map((item, indxChurn) => (
+                <span className="font-bold">{churn.name.toUpperCase()}</span>
+                {churnProducto.churns[index].items.map((item, indxChurn) => (
                   <div key={indxChurn} className="md:mb-0 mb-4 mx-6">
                     <span className="cursor-default">
                       {`${churnProducto.productos[

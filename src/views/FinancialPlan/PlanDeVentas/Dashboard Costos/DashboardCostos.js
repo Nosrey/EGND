@@ -820,40 +820,49 @@ function DashboardCostos() {
                       : 'grid grid-cols-3 gap-[20px]'
                   } mt-[20px]`}
                 >
-                  <CardNumerica
-                    type="default"
-                    hasCurrency
-                    title="Costo total productos"
-                    cantidad={totalProd}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Volumen de productos"
-                    cantidad={volProd}
-                  />
-                  <CardNumerica
-                    type="default"
-                    hasCurrency
-                    title="Costo medio por producto"
-                    cantidad={volProd ? totalProd / volProd : 0}
-                  />
-                  <CardNumerica
-                    type="default"
-                    hasCurrency
-                    title="Costo de servicios"
-                    cantidad={totalServ}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Volumen de servicios"
-                    cantidad={volServ}
-                  />
-                  <CardNumerica
-                    type="default"
-                    title="Costo medio por servicio"
-                    hasCurrency
-                    cantidad={volServ ? totalServ / volServ : 0}
-                  />
+                  {totalProd > 0 && volProd > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo total productos"
+                        cantidad={totalProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Volumen de productos"
+                        cantidad={volProd}
+                      />
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo medio por producto"
+                        cantidad={volProd ? totalProd / volProd : 0}
+                      />
+                    </>
+                  )}
+
+                  {totalServ > 0 && volServ > 0 && (
+                    <>
+                      <CardNumerica
+                        type="default"
+                        hasCurrency
+                        title="Costo de servicios"
+                        cantidad={totalServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Volumen de servicios"
+                        cantidad={volServ}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Costo medio por servicio"
+                        hasCurrency
+                        cantidad={volServ ? totalServ / volServ : 0}
+                      />
+                    </>
+                  )}
                 </div>
                 <div
                   className={`flex ${
