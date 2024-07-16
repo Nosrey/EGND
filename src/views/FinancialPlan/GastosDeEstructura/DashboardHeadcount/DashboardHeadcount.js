@@ -264,7 +264,7 @@ function DashboardHeadcount() {
                   if (periodoSelected.month === 0) {
                     if (indexM === 0) {
                       tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-                      cantPers += a.volMeses[MONTHS[indexM]];
+                      cantPers += a.volMeses[MONTHS[0]];
                       if (tots[indexM] || tots[indexM] === 0) {
                         tots[indexM] += a.volMeses[MONTHS[indexM]];
                       } else {
@@ -276,8 +276,10 @@ function DashboardHeadcount() {
                   }
                   if (periodoSelected.month === 4) {
                     if (indexM < 3) {
+                      if (indexM === 2) {
+                        cantPers += a.volMeses[MONTHS[indexM]];
+                      }
                       tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-                      cantPers += a.volMeses[MONTHS[indexM]];
                       if (tots[indexM] || tots[indexM] === 0) {
                         tots[indexM] += a.volMeses[MONTHS[indexM]];
                       } else {
@@ -289,8 +291,10 @@ function DashboardHeadcount() {
                   }
                   if (periodoSelected.month === 6) {
                     if (indexM < 6) {
+                      if (indexM === 5) {
+                        cantPers += a.volMeses[MONTHS[indexM]];
+                      }
                       tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-                      cantPers += a.volMeses[MONTHS[indexM]];
                       if (tots[indexM] || tots[indexM] === 0) {
                         tots[indexM] += a.volMeses[MONTHS[indexM]];
                       } else {
@@ -302,8 +306,10 @@ function DashboardHeadcount() {
                   }
                   if (periodoSelected.month === 12) {
                     if (indexM > 5) {
+                      if (indexM === 11) {
+                        cantPers += a.volMeses[MONTHS[indexM]];
+                      }
                       tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-                      cantPers += a.volMeses[MONTHS[indexM]];
                       if (tots[indexM - 6] || tots[indexM - 6] === 0) {
                         tots[indexM - 6] += a.volMeses[MONTHS[indexM]];
                       } else {
@@ -316,7 +322,7 @@ function DashboardHeadcount() {
                   if (periodoSelected.month === 24) {
                     tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
                     if (indexM === 11) {
-                      cantPers += a.volMeses[MONTHS[indexM]];
+                      cantPers += a.volMeses[MONTHS[11]];
                     }
                     if (tots[indexM] || tots[indexM] === 0) {
                       tots[indexM] += a.volMeses[MONTHS[indexM]];
@@ -329,7 +335,6 @@ function DashboardHeadcount() {
                   }
                 } else {
                   tot += calculoTotals(a.volMeses[MONTHS[indexM]], d.total);
-                  cantPers += a.volMeses[MONTHS[indexM]];
                   setTypeView(month);
                   if (tots[indexM] || tots[indexM] === 0) {
                     tots[indexM] += a.volMeses[MONTHS[indexM]];
