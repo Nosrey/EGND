@@ -1,7 +1,12 @@
+
+import { useEffect } from 'react';
+import { getUser } from 'services/Requests';
+import { setUser } from 'store/auth/userSlice';
+
 import Layout from 'components/layout';
 import Theme from 'components/template/Theme';
 import appConfig from 'configs/app.config';
-import { Provider } from 'react-redux';
+import { Provider, useDispatch, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import './app.css';
@@ -9,6 +14,7 @@ import history from './history';
 import './locales';
 import mockServer from './mock';
 import store, { persistor } from './store';
+
 
 const environment = process.env.NODE_ENV;
 
@@ -21,6 +27,27 @@ if (environment !== 'production' && appConfig.enableMock) {
 }
 
 function App() {
+  // const currentState = useSelector((state) => state.auth.user);
+
+  // useEffect(() => {
+  //   getUser(currentState.id)
+  //     .then((data) => {
+  //       const currencyInfo = data?.businessInfo[0]?.currency;
+
+  //       if (currencyInfo) {
+  //         console.log('cargo moneda', currencyInfo)
+  //         const newState = {
+  //           ...currentState,
+  //           currency: currencyInfo,
+  //         };
+  //         dispatch(setUser(newState));
+  //       } else {
+  //         console.log('no cargo moneda')
+  //       }
+  //     })
+  //     .catch((error) => console.error(error));
+  // }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

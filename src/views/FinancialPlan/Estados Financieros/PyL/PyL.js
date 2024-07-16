@@ -34,17 +34,17 @@ function PyL({
   // traigo setIntereses de las propiedades
   setInteresesExterior,
   setAmortizacionesExterior,
-  setCmgbruta = () => {},
+  setCmgbruta = () => { },
   cmgBruta = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ebitda = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   ebit = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   rn = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  setEbitda = () => {},
-  setEbit = () => {},
-  setRn = () => {},
-  setRdoNetoValue = () => {},
-  setGrowth = () => {},
-  setGraph03Data = () => {},
+  setEbitda = () => { },
+  setEbit = () => { },
+  setRn = () => { },
+  setRdoNetoValue = () => { },
+  setGrowth = () => { },
+  setGraph03Data = () => { },
 }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);

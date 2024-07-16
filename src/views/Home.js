@@ -20,15 +20,18 @@ function Home() {
       .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    if (currencyInfo) {
-      const newState = {
-        ...currentState,
-        currency: currencyInfo,
-      };
-      dispatch(setUser(newState));
-    }
-  }, [currencyInfo]);
+  // useEffect(() => {
+  //   if (currencyInfo) {
+      
+  //     const newState = {
+  //       ...currentState,
+  //       currency: currencyInfo,
+  //     };
+  //     dispatch(setUser(newState));
+  //   } else {
+      
+  //   }
+  // }, [currencyInfo]);
 
   useEffect(() => {
     if (logoClientInfo) {
