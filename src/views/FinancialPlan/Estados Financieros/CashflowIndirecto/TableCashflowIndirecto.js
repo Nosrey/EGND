@@ -544,7 +544,7 @@ function TableCashflowIndirecto(props) {
                             handleChangeInputs('resultadoNeto', e.target.value)
                           }
                           name="initial"
-                          disabled={true}
+                          disabled
                           prefix={currency || '$'}
                         />
                       </FormItem>
@@ -863,7 +863,6 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
-                              //prefix={currency || '$'}
                               prefix={currency || '$'}
                             />
                           </FormItem>
