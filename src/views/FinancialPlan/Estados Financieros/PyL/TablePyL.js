@@ -121,8 +121,11 @@ function TablePyL(props) {
       sum += convertirAEntero(copy.gastoEnCtas[i]);
     }
     copy.gastoEnCtasTotal = sum;
-    
 
+    // ahora configuramos para setear el .BAT
+    copy.BAT = (
+      convertirAEntero(copy.EBIT) - convertirAEntero(copy.intereses)
+    ).toString();
 
     setinputsValues(copy);
   };
@@ -1839,6 +1842,7 @@ function TablePyL(props) {
                               onChange={(e) =>
                                 handleChangeInputs('BAT', e.target.value)
                               }
+                              disabled
                               name="initial"
                               prefix={currency || '$'}
                             />
