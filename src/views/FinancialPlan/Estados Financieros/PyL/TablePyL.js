@@ -75,22 +75,54 @@ function TablePyL(props) {
     RNPorcentaje: '0',
   });
 
+  function convertirAEntero(value) {
+    const numValue = parseFloat(value)
+    if (Number.isNaN(numValue)) {
+      return 0;
+    }
+    return parseInt(value);
+  }
+
   const handleChangeInputs = (key, value, indexCta) => {
     let copy = { ...inputsValues };
-    if (value.startsWith('0')) {
+    if (value?.startsWith('0')) {
       value = value.slice(1);
     }
 
     if (key === 'gastoEnCtas') {
       copy.gastoEnCtas[indexCta] = value;
-    } else {
+    } else if (key !== null) {
       copy[key] = value;
     }
 
     // setearemos para que total ventas siempre equivalga a la suma de ventas de productos y servicios en cada ejecucion de la funcion
     copy.vtasTot = (
-      parseFloat(copy.vtasProd) + parseFloat(copy.vtasServ)
+      convertirAEntero(copy.vtasProd) + convertirAEntero(copy.vtasServ)
     ).toString();
+
+    // igual para costoProduccionTotal
+    copy.costoProduccionTotal = (
+      convertirAEntero(copy.costoProd) + convertirAEntero(copy.costoServ)
+    )
+
+    // igual para costoComerciales
+    copy.costoComerciales = (
+      convertirAEntero(copy.costoImpuesto) + convertirAEntero(copy.costoComision) + convertirAEntero(copy.costoCargos)
+    )
+
+    // igual para costoTotales
+    copy.costoTotales = (
+      convertirAEntero(copy.costoProduccionTotal) + convertirAEntero(copy.costoComerciales)
+    )
+
+    // igual para gastoEnCtasTotal pero sumaré desde remuneraciones hasta marketing
+    let sum = 0;
+    for (let i = 0; i < gastoEnCtas.length; i++) {
+      sum += convertirAEntero(copy.gastoEnCtas[i]);
+    }
+    copy.gastoEnCtasTotal = sum;
+    
+
 
     setinputsValues(copy);
   };
@@ -402,427 +434,418 @@ function TablePyL(props) {
   return (
     <>
       {/* <MiContexto.Provider value={rdoNeto}> */}
-        {showLoader ? (
-          <div
-            style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}
-          >
-            <MySpinner />
-          </div>
-        ) : (
-          <>
-            {
-              <>
-                <FormContainer>
-                  <div className="flex justify-end mt-[0px] mb-[10px]">
-                    {allOpen ? (
-                      <span
-                        className="cursor-pointer text-blue-700 text-sm"
-                        onClick={closeAll}
-                      >
-                        {' '}
-                        Cerrar Todos
-                      </span>
-                    ) : (
-                      <span
-                        className="cursor-pointer text-blue-700 text-sm"
-                        onClick={openAll}
-                      >
-                        {' '}
-                        Abrir Todos
-                      </span>
-                    )}
-                  </div>
-                  <section className="contenedor pl-[25px] pr-[35px]">
-                    {!hiddenItems[0] ? (
-                      <>
-                        {/** *********** Ventas de Producto  ************ */}
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px] mt-[49px]">
+      {showLoader ? (
+        <div
+          style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}
+        >
+          <MySpinner />
+        </div>
+      ) : (
+        <>
+          {
+            <>
+              <FormContainer>
+                <div className="flex justify-end mt-[0px] mb-[10px]">
+                  {allOpen ? (
+                    <span
+                      className="cursor-pointer text-blue-700 text-sm"
+                      onClick={closeAll}
+                    >
+                      {' '}
+                      Cerrar Todos
+                    </span>
+                  ) : (
+                    <span
+                      className="cursor-pointer text-blue-700 text-sm"
+                      onClick={openAll}
+                    >
+                      {' '}
+                      Abrir Todos
+                    </span>
+                  )}
+                </div>
+                <section className="contenedor pl-[25px] pr-[35px]">
+                  {!hiddenItems[0] ? (
+                    <>
+                      {/** *********** Ventas de Producto  ************ */}
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px] mt-[49px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Ventas de Producto"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <div className="titleRow w-[130px]">
+                            <p className="cursor-default"> Año 0</p>
+                          </div>
+                          <FormItem className="mb-0">
                             <Input
-                              disabled
+                              className="w-[130px]"
                               type="text"
-                              className="capitalize"
-                              value="Ventas de Producto"
+                              value={inputsValues.vtasProd}
+                              onChange={(e) =>
+                                handleChangeInputs('vtasProd', e.target.value)
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
                             />
                           </FormItem>
-                          <div className="flex flex-col">
-                            <div className="titleRow w-[130px]">
-                              <p className="cursor-default"> Año 0</p>
-                            </div>
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.vtasProd}
-                                onChange={(e) =>
-                                  handleChangeInputs('vtasProd', e.target.value)
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {vtasProd.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <div className="titleRow w-[130px]">
-                                <p className="cursor-default">
-                                  {' '}
-                                  Año {indexYear + 1}
-                                </p>
-                              </div>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] "
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    prefix={currency || '$'}
-                                    disabled
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Ventas de Servicio  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Ventas de Servicio"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                name="initial"
-                                value={inputsValues.vtasServ}
-                                onChange={(e) =>
-                                  handleChangeInputs('vtasServ', e.target.value)
-                                }
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {vtasServ.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-                      </>
-                    ) : (
-                      <div className="flex  gap-x-3">
-                        <div className="titleRow w-[130px] ml-[280px]">
-                          <p className="cursor-default"> Año 0</p>
                         </div>
                         {vtasProd.map((año, indexYear) => (
-                          <div key={indexYear} className="titleRow w-[130px]">
-                            <p className="cursor-default">
-                              {' '}
-                              Año {indexYear + 1}
-                            </p>
+                          <div className="flex flex-col" key={indexYear}>
+                            <div className="titleRow w-[130px]">
+                              <p className="cursor-default">
+                                {' '}
+                                Año {indexYear + 1}
+                              </p>
+                            </div>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px] "
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  prefix={currency || '$'}
+                                  disabled
+                                />
+                              )}
+                            </FormItem>
                           </div>
                         ))}
                       </div>
-                    )}
-                    {/** *********** Ventas de TOTALES  ************ */}
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div
-                        className="iconDesplegable"
-                        onClick={() => playAccordion(0)}
-                      >
-                        {hiddenItems[0] ? <CiCirclePlus /> : <CiCircleMinus />}
-                      </div>
+                      {/** *********** ****************  ************ */}
 
-                      <FormItem className=" mb-1 w-[240px] ">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize font-bold bg-blue-100"
-                          value="TOTAL VENTAS"
-                        />
+                      {/** *********** Ventas de Servicio  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Ventas de Servicio"
+                          />
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Input
                               className="w-[130px]"
                               type="text"
-                              value={inputsValues.vtasTot}
+                              name="initial"
+                              value={inputsValues.vtasServ}
                               onChange={(e) =>
-                                handleChangeInputs('vtasTot', e.target.value)
+                                handleChangeInputs('vtasServ', e.target.value)
+                              }
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {vtasServ.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+                    </>
+                  ) : (
+                    <div className="flex  gap-x-3">
+                      <div className="titleRow w-[130px] ml-[280px]">
+                        <p className="cursor-default"> Año 0</p>
+                      </div>
+                      {vtasProd.map((año, indexYear) => (
+                        <div key={indexYear} className="titleRow w-[130px]">
+                          <p className="cursor-default">
+                            {' '}
+                            Año {indexYear + 1}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/** *********** Ventas de TOTALES  ************ */}
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div
+                      className="iconDesplegable"
+                      onClick={() => playAccordion(0)}
+                    >
+                      {hiddenItems[0] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>
+
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-blue-100"
+                        value="TOTAL VENTAS"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.vtasTot}
+                          onChange={(e) =>
+                            handleChangeInputs('vtasTot', e.target.value)
+                          }
+                          disabled
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </FormItem>
+                    </div>
+                    {vtasTot.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
+                              <Input
+                                className="w-[130px] font-bold text-base"
+                                type="text"
+                                value={formatNumberPrestamos(año)}
+                                name="year"
+                                disabled
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold "
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {!hiddenItems[1] && (
+                    <>
+                      {/** *********** Costos de Producto  ************ */}
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Costo de Mercaderia Vendida"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoProd}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoProd',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoProd.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  prefix={currency || '$'}
+                                  disabled
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Costos de Servicio  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Costo Servicio Prestado"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoServ}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoServ',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoServ.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Costode produccion total  ************ */}
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+
+                        <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize font-bold bg-grey-100"
+                            value="TOTAL Costos de producción"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoProduccionTotal}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoProduccionTotal',
+                                  e.target.value,
+                                )
                               }
                               disabled
                               name="initial"
                               prefix={currency || '$'}
                             />
-                        </FormItem>
-                      </div>
-                      {vtasTot.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
-                                <Input
-                                  className="w-[130px] font-bold text-base"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency || '$'}
-                                />
-                              </Tooltip>
-                            ) : (
-                              <Input
-                                className="w-[130px] font-bold "
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            )}
                           </FormItem>
                         </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {!hiddenItems[1] && (
-                      <>
-                        {/** *********** Costos de Producto  ************ */}
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Costo de Mercaderia Vendida"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
+                        {costoProduccionTotal.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoProd}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoProd',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoProd.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    prefix={currency || '$'}
-                                    disabled
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Costos de Servicio  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Costo Servicio Prestado"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoServ}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoServ',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoServ.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Costode produccion total  ************ */}
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-
-                          <FormItem className=" mb-1 w-[240px] ">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize font-bold bg-grey-100"
-                              value="TOTAL Costos de producción"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoProduccionTotal}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoProduccionTotal',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoProduccionTotal.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {Math.round(año).toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] font-bold bg-blue-100"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
+                              {Math.round(año).toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
                                     type="text"
@@ -831,364 +854,8 @@ function TablePyL(props) {
                                     disabled
                                     prefix={currency || '$'}
                                   />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Costos de Impuestos sobre ventas  ************ */}
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Impuestos sobre ventas"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoImpuesto}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoImpuesto',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoImpuesto.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Costos de Costos comerciales  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Costos comerciales"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoComision}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoComision',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoComision.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Costos de Cargos por pasarela de pago  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Cargos por pasarela de pago"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoCargos}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoCargos',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoCargos.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** total de costos de comisiones  ************ */}
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px] ">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize font-bold bg-grey-100"
-                              value="TOTAL Costos comerciales"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.costoComerciales}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'costoComerciales',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {costoComerciales.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {Math.round(año).toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] font-bold bg-blue-100"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-                      </>
-                    )}
-                    {/** *********** Total COSTOS ************ */}
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div
-                        className="iconDesplegable"
-                        onClick={() => playAccordion(1)}
-                      >
-                        {hiddenItems[1] ? <CiCirclePlus /> : <CiCircleMinus />}
-                      </div>
-                      <FormItem className=" mb-1 w-[240px] ">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize font-bold bg-blue-100"
-                          value="TOTAL COSTOS"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.costoTotales}
-                            onChange={(e) =>
-                              handleChangeInputs('costoTotales', e.target.value)
-                            }
-                            name="initial"
-                            prefix={currency || '$'}
-                          />
-                        </FormItem>
-                      </div>
-                      {costoTotales.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
-                                <Input
-                                  className="w-[130px] font-bold text-base"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency || '$'}
-                                />
-                              </Tooltip>
-                            ) : (
-                              <Input
-                                className="w-[130px] font-bold "
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {/** *********** CMG Bruta  ************ */}
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div className="iconDesplegable" />
-                      <FormItem className=" mb-1 w-[240px] ">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize font-bold bg-grey-100"
-                          value="CMG Bruta"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.MBPesos}
-                            onChange={(e) =>
-                              handleChangeInputs('MBPesos', e.target.value)
-                            }
-                            name="initial"
-                            prefix={currency || '$'}
-                          />
-                        </FormItem>
-                      </div>
-                      {MBPesos.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
+                                </Tooltip>
+                              ) : (
                                 <Input
                                   className="w-[130px] font-bold bg-blue-100"
                                   type="text"
@@ -1197,8 +864,366 @@ function TablePyL(props) {
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              </Tooltip>
-                            ) : (
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Costos de Impuestos sobre ventas  ************ */}
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Impuestos sobre ventas"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoImpuesto}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoImpuesto',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoImpuesto.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Costos de Costos comerciales  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Costos comerciales"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoComision}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoComision',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoComision.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Costos de Cargos por pasarela de pago  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Cargos por pasarela de pago"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoCargos}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoCargos',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoCargos.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** total de costos de comisiones  ************ */}
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize font-bold bg-grey-100"
+                            value="TOTAL Costos comerciales"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.costoComerciales}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'costoComerciales',
+                                  e.target.value,
+                                )
+                              }
+                              disabled
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {costoComerciales.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {Math.round(año).toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px] font-bold bg-blue-100"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px] font-bold bg-blue-100"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+                    </>
+                  )}
+                  {/** *********** Total COSTOS ************ */}
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div
+                      className="iconDesplegable"
+                      onClick={() => playAccordion(1)}
+                    >
+                      {hiddenItems[1] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-blue-100"
+                        value="TOTAL COSTOS"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.costoTotales}
+                          onChange={(e) =>
+                            handleChangeInputs('costoTotales', e.target.value)
+                          }
+                          disabled
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </FormItem>
+                    </div>
+                    {costoTotales.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
+                              <Input
+                                className="w-[130px] font-bold text-base"
+                                type="text"
+                                value={formatNumberPrestamos(año)}
+                                name="year"
+                                disabled
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold "
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {/** *********** CMG Bruta  ************ */}
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div className="iconDesplegable" />
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-grey-100"
+                        value="CMG Bruta"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.MBPesos}
+                          onChange={(e) =>
+                            handleChangeInputs('MBPesos', e.target.value)
+                          }
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </FormItem>
+                    </div>
+                    {MBPesos.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
                               <Input
                                 className="w-[130px] font-bold bg-blue-100"
                                 type="text"
@@ -1207,56 +1232,56 @@ function TablePyL(props) {
                                 disabled
                                 prefix={currency || '$'}
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {/** *********** CMG Bruta %  ************ */}
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div className="iconDesplegable" />
-                      <FormItem className=" mb-1 w-[240px]">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize"
-                          value="CMG Bruta %"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.MBPorcentaje}
-                            onChange={(e) =>
-                              handleChangeInputs('MBPorcentaje', e.target.value)
-                            }
-                            name="initial"
-                            prefix="%"
-                          />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold bg-blue-100"
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
                         </FormItem>
                       </div>
-                      {MBPorcentaje.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {año.toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={`%${formatNumberPrestamos(año)}`}
-                              >
-                                <Input
-                                  className="w-[130px]"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix="%"
-                                />
-                              </Tooltip>
-                            ) : (
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {/** *********** CMG Bruta %  ************ */}
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div className="iconDesplegable" />
+                    <FormItem className=" mb-1 w-[240px]">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize"
+                        value="CMG Bruta %"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.MBPorcentaje}
+                          onChange={(e) =>
+                            handleChangeInputs('MBPorcentaje', e.target.value)
+                          }
+                          name="initial"
+                          prefix="%"
+                        />
+                      </FormItem>
+                    </div>
+                    {MBPorcentaje.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {año.toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={`%${formatNumberPrestamos(año)}`}
+                            >
                               <Input
                                 className="w-[130px]"
                                 type="text"
@@ -1265,66 +1290,66 @@ function TablePyL(props) {
                                 disabled
                                 prefix="%"
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-                    <div className="linea" />
-                    {!hiddenItems[2] && (
-                      <>
-                        {/** *********** GASTO POR CUENTAS  ************ */}
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix="%"
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+                  <div className="linea" />
+                  {!hiddenItems[2] && (
+                    <>
+                      {/** *********** GASTO POR CUENTAS  ************ */}
 
-                        {ctasListado.map((ctaName, indexCta) => (
-                          <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                            <div className="iconDesplegable" />
-                            <FormItem className=" mb-1 w-[240px]">
+                      {ctasListado.map((ctaName, indexCta) => (
+                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                          <div className="iconDesplegable" />
+                          <FormItem className=" mb-1 w-[240px]">
+                            <Input
+                              disabled
+                              type="text"
+                              className="capitalize"
+                              value={ctaName}
+                            />
+                          </FormItem>
+                          <div className="flex flex-col">
+                            <FormItem className="mb-0">
                               <Input
-                                disabled
+                                className="w-[130px]"
                                 type="text"
-                                className="capitalize"
-                                value={ctaName}
+                                value={inputsValues.gastoEnCtas[indexCta]}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'gastoEnCtas',
+                                    e.target.value,
+                                    indexCta,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
                               />
                             </FormItem>
-                            <div className="flex flex-col">
+                          </div>
+                          {gastoEnCtas[indexCta].map((anio, indexanio) => (
+                            <div className="flex flex-col" key={indexanio}>
                               <FormItem className="mb-0">
-                                <Input
-                                  className="w-[130px]"
-                                  type="text"
-                                  value={inputsValues.gastoEnCtas[indexCta]}
-                                  onChange={(e) =>
-                                    handleChangeInputs(
-                                      'gastoEnCtas',
-                                      e.target.value,
-                                      indexCta,
-                                    )
-                                  }
-                                  name="initial"
-                                  prefix={currency || '$'}
-                                />
-                              </FormItem>
-                            </div>
-                            {gastoEnCtas[indexCta].map((anio, indexanio) => (
-                              <div className="flex flex-col" key={indexanio}>
-                                <FormItem className="mb-0">
-                                  {anio.toString().length > 5 ? (
-                                    <Tooltip
-                                      placement="top-end"
-                                      title={
-                                        currency + formatNumberPrestamos(anio)
-                                      }
-                                    >
-                                      <Input
-                                        className="w-[130px]"
-                                        type="text"
-                                        value={formatNumberPrestamos(anio)}
-                                        name="year"
-                                        disabled
-                                        prefix={currency || '$'}
-                                      />
-                                    </Tooltip>
-                                  ) : (
+                                {anio.toString().length > 5 ? (
+                                  <Tooltip
+                                    placement="top-end"
+                                    title={
+                                      currency + formatNumberPrestamos(anio)
+                                    }
+                                  >
                                     <Input
                                       className="w-[130px]"
                                       type="text"
@@ -1333,125 +1358,126 @@ function TablePyL(props) {
                                       disabled
                                       prefix={currency || '$'}
                                     />
-                                  )}
-                                </FormItem>
-                              </div>
-                            ))}
-                          </div>
-                        ))}
-                        {/** *********** ****************  ************ */}
-                      </>
-                    )}
-                    {/** *********** TOTAL GASTOS ESTRUCURAS  ************ */}
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div
-                        className="iconDesplegable"
-                        onClick={() => playAccordion(2)}
-                      >
-                        {hiddenItems[2] ? <CiCirclePlus /> : <CiCircleMinus />}
-                      </div>
-                      <FormItem className=" mb-1 w-[240px] ">
+                                  </Tooltip>
+                                ) : (
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(anio)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                )}
+                              </FormItem>
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                      {/** *********** ****************  ************ */}
+                    </>
+                  )}
+                  {/** *********** TOTAL GASTOS ESTRUCURAS  ************ */}
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div
+                      className="iconDesplegable"
+                      onClick={() => playAccordion(2)}
+                    >
+                      {hiddenItems[2] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-blue-100"
+                        value="TOTAL GASTOS ESTRUCTURA"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
                         <Input
-                          disabled
+                          className="w-[130px]"
                           type="text"
-                          className="capitalize font-bold bg-blue-100"
-                          value="TOTAL GASTOS ESTRUCTURA"
+                          value={inputsValues.gastoEnCtasTotal}
+                          disabled
+                          onChange={(e) =>
+                            handleChangeInputs(
+                              'gastoEnCtasTotal',
+                              e.target.value,
+                            )
+                          }
+                          name="initial"
+                          prefix={currency || '$'}
                         />
                       </FormItem>
-                      <div className="flex flex-col">
+                    </div>
+                    {gastoEnCtasTotal.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.gastoEnCtasTotal}
-                            onChange={(e) =>
-                              handleChangeInputs(
-                                'gastoEnCtasTotal',
-                                e.target.value,
-                              )
-                            }
-                            name="initial"
-                            prefix={currency || '$'}
-                          />
-                        </FormItem>
-                      </div>
-                      {gastoEnCtasTotal.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
-                                <Input
-                                  className="w-[130px] font-bold text-base"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency || '$'}
-                                />
-                              </Tooltip>
-                            ) : (
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
                               <Input
-                                className="w-[130px] font-bold "
+                                className="w-[130px] font-bold text-base"
                                 type="text"
                                 value={formatNumberPrestamos(año)}
                                 name="year"
                                 disabled
                                 prefix={currency || '$'}
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {/** *********** EBITDA  ************ */}
-
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div className="iconDesplegable" />
-                      <FormItem className=" mb-1 w-[240px] ">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize font-bold bg-grey-100"
-                          value="EBITDA"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.EBITDA}
-                            onChange={(e) =>
-                              handleChangeInputs('EBITDA', e.target.value)
-                            }
-                            name="initial"
-                            prefix={currency || '$'}
-                          />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold "
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
                         </FormItem>
                       </div>
-                      {EBITDA.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
-                                <Input
-                                  className="w-[130px] font-bold bg-blue-100"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency || '$'}
-                                />
-                              </Tooltip>
-                            ) : (
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {/** *********** EBITDA  ************ */}
+
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div className="iconDesplegable" />
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-grey-100"
+                        value="EBITDA"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.EBITDA}
+                          onChange={(e) =>
+                            handleChangeInputs('EBITDA', e.target.value)
+                          }
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </FormItem>
+                    </div>
+                    {EBITDA.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
                               <Input
                                 className="w-[130px] font-bold bg-blue-100"
                                 type="text"
@@ -1460,60 +1486,60 @@ function TablePyL(props) {
                                 disabled
                                 prefix={currency || '$'}
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {/** *********** EBITDA %  ************ */}
-
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div className="iconDesplegable" />
-                      <FormItem className=" mb-1 w-[240px]">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize"
-                          value="EBITDA %"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.EBITDAPorcentaje}
-                            onChange={(e) =>
-                              handleChangeInputs(
-                                'EBITDAPorcentaje',
-                                e.target.value,
-                              )
-                            }
-                            name="initial"
-                            prefix="%"
-                          />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold bg-blue-100"
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
                         </FormItem>
                       </div>
-                      {EBITDAPorcentaje.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {año.toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={`%${formatNumberPrestamos(año)}`}
-                              >
-                                <Input
-                                  className="w-[130px]"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix="%"
-                                />
-                              </Tooltip>
-                            ) : (
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {/** *********** EBITDA %  ************ */}
+
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div className="iconDesplegable" />
+                    <FormItem className=" mb-1 w-[240px]">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize"
+                        value="EBITDA %"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.EBITDAPorcentaje}
+                          onChange={(e) =>
+                            handleChangeInputs(
+                              'EBITDAPorcentaje',
+                              e.target.value,
+                            )
+                          }
+                          name="initial"
+                          prefix="%"
+                        />
+                      </FormItem>
+                    </div>
+                    {EBITDAPorcentaje.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {año.toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={`%${formatNumberPrestamos(año)}`}
+                            >
                               <Input
                                 className="w-[130px]"
                                 type="text"
@@ -1522,64 +1548,64 @@ function TablePyL(props) {
                                 disabled
                                 prefix="%"
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-                    {!hiddenItems[3] && (
-                      <>
-                        {/** *********** Amortizaciones  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          {' '}
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
+                            </Tooltip>
+                          ) : (
                             <Input
-                              disabled
+                              className="w-[130px]"
                               type="text"
-                              className="capitalize"
-                              value="Amortizaciones"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix="%"
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+                  {!hiddenItems[3] && (
+                    <>
+                      {/** *********** Amortizaciones  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        {' '}
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Amortizaciones"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.amortizaciones}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'amortizaciones',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
                             />
                           </FormItem>
-                          <div className="flex flex-col">
+                        </div>
+                        {amortizaciones.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.amortizaciones}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'amortizaciones',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {amortizaciones.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
                                   <Input
                                     className="w-[130px]"
                                     type="text"
@@ -1588,59 +1614,59 @@ function TablePyL(props) {
                                     disabled
                                     prefix={currency || '$'}
                                   />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** EBIT  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px] ">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize font-bold bg-grey-100"
-                              value="EBIT"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.EBIT}
-                                onChange={(e) =>
-                                  handleChangeInputs('EBIT', e.target.value)
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
                             </FormItem>
                           </div>
-                          {EBIT.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {Math.round(año).toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] font-bold bg-blue-100"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** EBIT  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize font-bold bg-grey-100"
+                            value="EBIT"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.EBIT}
+                              onChange={(e) =>
+                                handleChangeInputs('EBIT', e.target.value)
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {EBIT.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {Math.round(año).toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
                                     type="text"
@@ -1649,60 +1675,60 @@ function TablePyL(props) {
                                     disabled
                                     prefix={currency || '$'}
                                   />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** EBIT %  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="EBIT %"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.EBITPorcentaje}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'EBITPorcentaje',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix="%"
-                              />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px] font-bold bg-blue-100"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
                             </FormItem>
                           </div>
-                          {EBITPorcentaje.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={`%${formatNumberPrestamos(año)}`}
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix="%"
-                                    />
-                                  </Tooltip>
-                                ) : (
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** EBIT %  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="EBIT %"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.EBITPorcentaje}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'EBITPorcentaje',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix="%"
+                            />
+                          </FormItem>
+                        </div>
+                        {EBITPorcentaje.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={`%${formatNumberPrestamos(año)}`}
+                                >
                                   <Input
                                     className="w-[130px]"
                                     type="text"
@@ -1711,299 +1737,8 @@ function TablePyL(props) {
                                     disabled
                                     prefix="%"
                                   />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** Intereses  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="Intereses"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.intereses}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'intereses',
-                                    e.target.value,
-                                  )
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {intereses.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** BAT  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px] ">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize font-bold bg-grey-100"
-                              value="BAT"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.BAT}
-                                onChange={(e) =>
-                                  handleChangeInputs('BAT', e.target.value)
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {BAT.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {Math.round(año).toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] font-bold bg-blue-100"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-
-                        {/** *********** IIGG  ************ */}
-
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                          <div className="iconDesplegable" />
-                          <FormItem className=" mb-1 w-[240px]">
-                            <Input
-                              disabled
-                              type="text"
-                              className="capitalize"
-                              value="IIGG"
-                            />
-                          </FormItem>
-                          <div className="flex flex-col">
-                            <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.IIGG}
-                                onChange={(e) =>
-                                  handleChangeInputs('IIGG', e.target.value)
-                                }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
-                            </FormItem>
-                          </div>
-                          {IIGG.map((año, indexYear) => (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                {año.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                )}
-                              </FormItem>
-                            </div>
-                          ))}
-                        </div>
-                        {/** *********** ****************  ************ */}
-                      </>
-                    )}
-
-                    {/** *********** Resultado Neto  ************ */}
-
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div
-                        className="iconDesplegable"
-                        onClick={() => playAccordion(3)}
-                      >
-                        {hiddenItems[3] ? <CiCirclePlus /> : <CiCircleMinus />}
-                      </div>
-                      <FormItem className=" mb-1 w-[240px] ">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize font-bold bg-grey-100"
-                          value="Resultado Neto"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.rdoNeto}
-                            onChange={(e) =>
-                              handleChangeInputs('rdoNeto', e.target.value)
-                            }
-                            name="initial"
-                            prefix={currency || '$'}
-                          />
-                        </FormItem>
-                      </div>
-                      {rdoNeto.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {Math.round(año).toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={currency + formatNumberPrestamos(año)}
-                              >
-                                <Input
-                                  className="w-[130px] font-bold bg-blue-100"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency || '$'}
-                                />
-                              </Tooltip>
-                            ) : (
-                              <Input
-                                className="w-[130px] font-bold bg-blue-100"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-
-                    {/** *********** RN %  ************ */}
-
-                    <div className="flex  gap-x-3 gap-y-3  mb-6 ">
-                      <div className="iconDesplegable" />
-                      <FormItem className=" mb-1 w-[240px]">
-                        <Input
-                          disabled
-                          type="text"
-                          className="capitalize"
-                          value="RN %"
-                        />
-                      </FormItem>
-                      <div className="flex flex-col">
-                        <FormItem className="mb-0">
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={inputsValues.RNPorcentaje}
-                            onChange={(e) =>
-                              handleChangeInputs('RNPorcentaje', e.target.value)
-                            }
-                            name="initial"
-                            prefix="%"
-                          />
-                        </FormItem>
-                      </div>
-                      {RNPorcentaje.map((año, indexYear) => (
-                        <div className="flex flex-col" key={indexYear}>
-                          <FormItem className="mb-0">
-                            {año.toString().length > 5 ? (
-                              <Tooltip
-                                placement="top-end"
-                                title={`%${formatNumberPrestamos(año)}`}
-                              >
+                                </Tooltip>
+                              ) : (
                                 <Input
                                   className="w-[130px]"
                                   type="text"
@@ -2012,8 +1747,299 @@ function TablePyL(props) {
                                   disabled
                                   prefix="%"
                                 />
-                              </Tooltip>
-                            ) : (
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** Intereses  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="Intereses"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.intereses}
+                              onChange={(e) =>
+                                handleChangeInputs(
+                                  'intereses',
+                                  e.target.value,
+                                )
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {intereses.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** BAT  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px] ">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize font-bold bg-grey-100"
+                            value="BAT"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.BAT}
+                              onChange={(e) =>
+                                handleChangeInputs('BAT', e.target.value)
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {BAT.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {Math.round(año).toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px] font-bold bg-blue-100"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px] font-bold bg-blue-100"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+
+                      {/** *********** IIGG  ************ */}
+
+                      <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                        <div className="iconDesplegable" />
+                        <FormItem className=" mb-1 w-[240px]">
+                          <Input
+                            disabled
+                            type="text"
+                            className="capitalize"
+                            value="IIGG"
+                          />
+                        </FormItem>
+                        <div className="flex flex-col">
+                          <FormItem className="mb-0">
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.IIGG}
+                              onChange={(e) =>
+                                handleChangeInputs('IIGG', e.target.value)
+                              }
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                          </FormItem>
+                        </div>
+                        {IIGG.map((año, indexYear) => (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              {año.toString().length > 5 ? (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
+                                >
+                                  <Input
+                                    className="w-[130px]"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency || '$'}
+                                  />
+                                </Tooltip>
+                              ) : (
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency || '$'}
+                                />
+                              )}
+                            </FormItem>
+                          </div>
+                        ))}
+                      </div>
+                      {/** *********** ****************  ************ */}
+                    </>
+                  )}
+
+                  {/** *********** Resultado Neto  ************ */}
+
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div
+                      className="iconDesplegable"
+                      onClick={() => playAccordion(3)}
+                    >
+                      {hiddenItems[3] ? <CiCirclePlus /> : <CiCircleMinus />}
+                    </div>
+                    <FormItem className=" mb-1 w-[240px] ">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize font-bold bg-grey-100"
+                        value="Resultado Neto"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.rdoNeto}
+                          onChange={(e) =>
+                            handleChangeInputs('rdoNeto', e.target.value)
+                          }
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </FormItem>
+                    </div>
+                    {rdoNeto.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {Math.round(año).toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={currency + formatNumberPrestamos(año)}
+                            >
+                              <Input
+                                className="w-[130px] font-bold bg-blue-100"
+                                type="text"
+                                value={formatNumberPrestamos(año)}
+                                name="year"
+                                disabled
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px] font-bold bg-blue-100"
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix={currency || '$'}
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+
+                  {/** *********** RN %  ************ */}
+
+                  <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <div className="iconDesplegable" />
+                    <FormItem className=" mb-1 w-[240px]">
+                      <Input
+                        disabled
+                        type="text"
+                        className="capitalize"
+                        value="RN %"
+                      />
+                    </FormItem>
+                    <div className="flex flex-col">
+                      <FormItem className="mb-0">
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          value={inputsValues.RNPorcentaje}
+                          onChange={(e) =>
+                            handleChangeInputs('RNPorcentaje', e.target.value)
+                          }
+                          name="initial"
+                          prefix="%"
+                        />
+                      </FormItem>
+                    </div>
+                    {RNPorcentaje.map((año, indexYear) => (
+                      <div className="flex flex-col" key={indexYear}>
+                        <FormItem className="mb-0">
+                          {año.toString().length > 5 ? (
+                            <Tooltip
+                              placement="top-end"
+                              title={`%${formatNumberPrestamos(año)}`}
+                            >
                               <Input
                                 className="w-[130px]"
                                 type="text"
@@ -2022,27 +2048,37 @@ function TablePyL(props) {
                                 disabled
                                 prefix="%"
                               />
-                            )}
-                          </FormItem>
-                        </div>
-                      ))}
-                    </div>
-                    {/** *********** ****************  ************ */}
-                  </section>
-                </FormContainer>
-                <Button
-                  className="border mt-6b btnSubmitTable mt-[40px]"
-                  variant="solid"
-                  type="submit"
-                  onClick={submitInfoForm}
-                >
-                  Guardar
-                </Button>
-              </>
-            }
-          </>
-        )}
-      
+                            </Tooltip>
+                          ) : (
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={formatNumberPrestamos(año)}
+                              name="year"
+                              disabled
+                              prefix="%"
+                            />
+                          )}
+                        </FormItem>
+                      </div>
+                    ))}
+                  </div>
+                  {/** *********** ****************  ************ */}
+                </section>
+              </FormContainer>
+              <Button
+                className="border mt-6b btnSubmitTable mt-[40px]"
+                variant="solid"
+                type="submit"
+                onClick={submitInfoForm}
+              >
+                Guardar
+              </Button>
+            </>
+          }
+        </>
+      )}
+
     </>
   );
 }
