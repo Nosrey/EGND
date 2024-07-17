@@ -127,6 +127,11 @@ function TablePyL(props) {
       convertirAEntero(copy.EBIT) - convertirAEntero(copy.intereses)
     ).toString();
 
+    // ahora configuramos para setear el .IIGG pero asumimos que
+    copy.IIGG = (
+      convertirAEntero(copy.BAT) * impGanancias / 100
+    ).toString();
+
     setinputsValues(copy);
   };
 
@@ -1904,6 +1909,7 @@ function TablePyL(props) {
                               onChange={(e) =>
                                 handleChangeInputs('IIGG', e.target.value)
                               }
+                              disabled
                               name="initial"
                               prefix={currency || '$'}
                             />
