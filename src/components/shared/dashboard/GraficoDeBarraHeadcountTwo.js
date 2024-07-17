@@ -2,6 +2,7 @@ import { MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useSelector } from 'react-redux';
+import { formatNumberGrafics } from 'utils/formatTotalsValues';
 
 function GraficoDeBarraHeadcountTwo({
   typeView,
@@ -145,6 +146,40 @@ function GraficoDeBarraHeadcountTwo({
     setDataView(head);
   }, [periodoSelected, yearSelected]);
 
+  const formatDataValues = (info) => {
+    const data = [...info];
+    const sufijos = {
+      0: '',
+      3: 'K',
+      6: 'M',
+      9: 'B',
+      12: 'T',
+      15: 'Qa',
+    };
+    for (let i = 0; i < data.length; i++) {
+      for (let j = 0; j < data[i].data.length; j++) {
+        let num;
+        if (typeof data[i].data[j] === 'string') {
+          num = parseInt(data[i].data[j].replace(/\./g, ''));
+        } else {
+          num = data[i].data[j];
+        }
+
+        let exp = 0;
+
+        while (num >= 1000 && exp < 15) {
+          num /= 1000;
+          exp += 3;
+        }
+
+        const numeroFormateado = exp >= 3 ? num.toFixed(2) : num.toFixed(0);
+        data[i].data[j] = `${numeroFormateado} ${sufijos[exp]}`;
+      }
+    }
+
+    return data;
+  };
+
   return (
     <div>
       <Chart
@@ -178,7 +213,7 @@ function GraficoDeBarraHeadcountTwo({
           dataLabels: {
             enabled: true,
             formatter(value) {
-              return `${currency}${value}`;
+              return `${currency}${formatNumberGrafics(value)}`;
             },
           },
           xaxis: {

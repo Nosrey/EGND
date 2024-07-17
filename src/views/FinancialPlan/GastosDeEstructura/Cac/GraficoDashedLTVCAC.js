@@ -54,6 +54,13 @@ function GraficoDashedLTVCAC(props) {
             'Año 10',
           ],
         },
+        yaxis: {
+          labels: {
+            formatter(value) {
+              return `${value.toFixed(2)}`;
+            },
+          },
+        },
         tooltip: {
           y: [
             {
