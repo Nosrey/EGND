@@ -127,9 +127,19 @@ function TablePyL(props) {
       convertirAEntero(copy.EBIT) - convertirAEntero(copy.intereses)
     ).toString();
 
-    // ahora configuramos para setear el .IIGG pero asumimos que
+    // ahora configuramos para setear el .IIGG
     copy.IIGG = (
       convertirAEntero(copy.BAT) * impGanancias / 100
+    ).toString();
+
+    // ahora configuramos para setear .rdoNeto
+    copy.rdoNeto = (
+      convertirAEntero(copy.BAT) - convertirAEntero(copy.IIGG)
+    ).toString();
+
+    // seteamos RNPorcentaje
+    copy.RNPorcentaje = (
+      convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
     ).toString();
 
     setinputsValues(copy);
@@ -1978,6 +1988,7 @@ function TablePyL(props) {
                           onChange={(e) =>
                             handleChangeInputs('rdoNeto', e.target.value)
                           }
+                          disabled
                           name="initial"
                           prefix={currency || '$'}
                         />
@@ -2037,6 +2048,7 @@ function TablePyL(props) {
                           onChange={(e) =>
                             handleChangeInputs('RNPorcentaje', e.target.value)
                           }
+                          disabled
                           name="initial"
                           prefix="%"
                         />
