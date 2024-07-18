@@ -31,6 +31,7 @@ function TableCashflowIndirecto(props) {
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
   const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [prueba, setPrueba] = useState();
 
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
@@ -93,16 +94,17 @@ function TableCashflowIndirecto(props) {
 
   const handleChangeCyB = (value) => {
     // const copy = [...cajaYBancos]
+    let valueTemp = value
     if (value.startsWith('0') && value.length > 1) {
-      value = value.slice(1);
+      valueTemp = valueTemp.slice(1);
     }
-    if (Number.isNaN(value) || value === '') {
-      value = 0;
+    if (Number.isNaN(Number(valueTemp)) || valueTemp === '') {
+      valueTemp = 0;
     }
     const copy = { ...inputsValues };
-    copy.cajaYBancosAnioUno = value;
+    copy.cajaYBancosAnioUno = valueTemp;
     setinputsValues(copy);
-    setCajaYBancosInicioManual(parseInt(value));
+    setCajaYBancosInicioManual(parseInt(valueTemp));
   };
 
   // ***************** ACORDION ******************
@@ -460,7 +462,7 @@ function TableCashflowIndirecto(props) {
                           <p className="cursor-default"> Año {indexYear + 1}</p>
                         </div>
                         <FormItem className="mb-0">
-                          {año.toString().length > 5 ? (
+                          { (
                             <Tooltip
                               placement="top-end"
                               title={currency + formatNumberPrestamos(año)}
@@ -471,8 +473,7 @@ function TableCashflowIndirecto(props) {
                                 value={
                                   indexYear !== 0 ?
                                     formatNumberPrestamos(cajaYBancosAlCierre[indexYear - 1])
-                                    : formatNumberPrestamos(cajaYBancosInicioManual)
-
+                                    : cajaYBancosInicioManual
                                 }
                                 name="year"
                                 disabled={indexYear !== 0}
@@ -482,21 +483,23 @@ function TableCashflowIndirecto(props) {
                                 }
                               />
                             </Tooltip>
-                          ) : (
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={
-                                indexYear !== 0
-                                  ? formatNumberPrestamos(año)
-                                  : año
-                              }
-                              name="year"
-                              prefix={currency || '$'}
-                              disabled={indexYear !== 0}
-                              onChange={(e) => handleChangeCyB(e.target.value)}
-                            />
-                          )}
+                          ) 
+                          // : (
+                          //   <Input
+                          //     className="w-[130px]"
+                          //     type="text"
+                          //     value={
+                          //       indexYear !== 0
+                          //         ? formatNumberPrestamos(año)
+                          //         : año
+                          //     }
+                          //     name="year"
+                          //     prefix={currency || '$'}
+                          //     disabled={indexYear !== 0}
+                          //     onChange={(e) => handleChangeCyB(e.target.value)}
+                          //   />
+                          // )
+                          }
                         </FormItem>
                       </div>
                     ))}
