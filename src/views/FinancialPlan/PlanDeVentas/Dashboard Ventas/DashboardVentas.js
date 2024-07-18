@@ -350,6 +350,25 @@ function DashboardVentas() {
                                   indexProd,
                                 );
                         }
+                      } else if (periodoSelected.month === 24) {
+                        if (indexMes === 11) {
+                          tot += Math.floor(
+                            a.volMeses[MONTHS[indexMes]] /
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
+                          );
+                        }
+
+                        newC +=
+                          indexMes === 0
+                            ? 0
+                            : calcNewClients(
+                                p,
+                                indexY,
+                                indexMes,
+                                indexChannel,
+                                indexProd,
+                              );
                       }
                     } else {
                       // CODIGO PARA EL AÑO COMPLETO

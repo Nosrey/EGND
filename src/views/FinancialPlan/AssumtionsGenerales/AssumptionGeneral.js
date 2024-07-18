@@ -334,8 +334,8 @@ function AssumptionGeneral() {
                                   marginTop: '5px',
                                 }}
                               >
-                                Puede tardar unos minutos en impactar en la
-                                interfáz.
+                                Cierre la sesión y vuelva a ingresar para ver
+                                este cambio reflejado en su cuenta.
                               </p>
                             </>
                           )}
