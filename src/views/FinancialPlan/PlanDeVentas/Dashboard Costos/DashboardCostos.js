@@ -132,6 +132,12 @@ function DashboardCostos() {
                           totS += Number(a.volMeses[MONTHS[indexM]]);
                         }
                       }
+                    } else if (periodoSelected.month === 24) {
+                      if (dataAssump.productos[indexP].type === 'producto') {
+                        totV += Number(a.volMeses[MONTHS[indexM]]);
+                      } else {
+                        totS += Number(a.volMeses[MONTHS[indexM]]);
+                      }
                     }
                   } else if (dataAssump.productos[indexP].type === 'producto') {
                     totV += Number(a.volTotal);
@@ -583,6 +589,110 @@ function DashboardCostos() {
                           ].años[indexYear].volMeses[m],
                         );
                       }
+                    } else if (periodoSelected.month === 24) {
+                      if (canalSelected && productoSelected && paisSelected) {
+                        if (
+                          d.countryName === paisSelected.value &&
+                          s.canalName === canalSelected.value &&
+                          p.name === productoSelected.value
+                        ) {
+                          volGrafSem[indexM] +=
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m] *
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].años[indexYear].volMeses[m];
+
+                          comisionGrafSem[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].comision,
+                          );
+
+                          impuestoGrafSem[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].impuesto,
+                          );
+
+                          cargoGrafSem[indexM] += resolveResul(
+                            a.volMeses[m],
+                            volumenData[indexInicial].stats[indexStats]
+                              .productos[indexP].años[indexYear].volMeses[m],
+                            costoData[indexInicial].stats[indexStats].productos[
+                              indexP
+                            ].cargos,
+                          );
+                          setVolGrafico(volGrafSem);
+                          setComisionGrafico(comisionGrafSem);
+                          setImpuestoGrafico(impuestoGrafSem);
+                          setCargasGrafico(cargoGrafSem);
+                          setTypeViewGraf(secondSem);
+                        }
+                      }
+                      if (dataAssump.productos[indexP].type === 'producto') {
+                        totProd += calcCostos(
+                          a.volMeses[m],
+                          volumenData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].comision,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].impuesto,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].cargos,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                        );
+                      } else {
+                        totServ += calcCostos(
+                          a.volMeses[m],
+                          volumenData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].comision,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].impuesto,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].cargos,
+                          costoData[indexInicial].stats[indexStats].productos[
+                            indexP
+                          ].años[indexYear].volMeses[m],
+                        );
+                      }
+                      tot += calcCostos(
+                        a.volMeses[m],
+                        volumenData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].años[indexYear].volMeses[m],
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].comision,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].impuesto,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].cargos,
+                        costoData[indexInicial].stats[indexStats].productos[
+                          indexP
+                        ].años[indexYear].volMeses[m],
+                      );
                     }
                   }
                 }
