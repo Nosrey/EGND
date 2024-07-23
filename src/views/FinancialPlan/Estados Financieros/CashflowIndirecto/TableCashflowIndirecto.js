@@ -7,7 +7,7 @@ import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
   getUser,
-  getPyLInfo,
+  getPyLInfo
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
@@ -30,9 +30,8 @@ function TableCashflowIndirecto(props) {
   const [pagoPrestamos, setPagoPrestamos] = useState([]);
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
-  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-  ]);
+  const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [prueba, setPrueba] = useState();
 
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
@@ -67,18 +66,16 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
-    console.log('copy: ', copy);
-    console.log('valor: ', valorFOp.toString());
+    console.log('copy: ', copy)
+    console.log('valor: ', valorFOp.toString())
 
-    let valorFFinanciacion = 0;
+    let valorFFinanciacion = 0
     // parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
     // si el valor de pagoPrestamos es positivo, lo paso a negativo y sumo a financiacion
     if (parseInt(copy.pagoPrestamos) >= 0) {
-      valorFFinanciacion =
-        parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
+      valorFFinanciacion = parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
     } else {
-      valorFFinanciacion =
-        parseInt(copy.financiacion) + parseInt(copy.pagoPrestamos);
+      valorFFinanciacion = parseInt(copy.financiacion) + parseInt(copy.pagoPrestamos);
     }
     copy.FEfinanciacion = Number.isNaN(valorFFinanciacion)
       ? '0'
@@ -97,16 +94,17 @@ function TableCashflowIndirecto(props) {
 
   const handleChangeCyB = (value) => {
     // const copy = [...cajaYBancos]
+    let valueTemp = value
     if (value.startsWith('0') && value.length > 1) {
-      value = value.slice(1);
+      valueTemp = valueTemp.slice(1);
     }
-    if (Number.isNaN(value) || value === '') {
-      value = 0;
+    if (Number.isNaN(Number(valueTemp)) || valueTemp === '') {
+      valueTemp = 0;
     }
     const copy = { ...inputsValues };
-    copy.cajaYBancosAnioUno = value;
+    copy.cajaYBancosAnioUno = valueTemp;
     setinputsValues(copy);
-    setCajaYBancosInicioManual(parseInt(value));
+    setCajaYBancosInicioManual(parseInt(valueTemp));
   };
 
   // ***************** ACORDION ******************
@@ -161,28 +159,18 @@ function TableCashflowIndirecto(props) {
   const currency = useSelector((state) => state.auth.user.currency);
 
   useEffect(() => {
-    let resultadoNetoFinal = props?.resultadoNeto?.length
-      ? props?.resultadoNeto
-      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let resultadoNetoFinal = props?.resultadoNeto?.length ? props?.resultadoNeto : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setResultadoNeto(resultadoNetoFinal);
-    let amortizacionesFinal = props?.amortizaciones?.length
-      ? props?.amortizaciones
-      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let amortizacionesFinal = props?.amortizaciones?.length ? props?.amortizaciones : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setAmortizaciones(amortizacionesFinal);
-    let interesesPagadosFinal = props?.interesesPagados?.length
-      ? props?.interesesPagados
-      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let interesesPagadosFinal = props?.interesesPagados?.length ? props?.interesesPagados : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setInteresesPagados(interesesPagadosFinal);
     let inversionesFinal = props?.inversiones ?? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    setInversiones(arrayNegativos(inversionesFinal));
-    let financiacionFinal = props?.financiacion?.length
-      ? props?.financiacion
-      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    setInversiones(arrayNegativos(inversionesFinal))
+    let financiacionFinal = props?.financiacion?.length ? props?.financiacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setFinanciacion(financiacionFinal);
     // para variacion tambien
-    let variacionFinal = props?.variacion?.length
-      ? props?.variacion
-      : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let variacionFinal = props?.variacion?.length ? props?.variacion : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     setVariacion(variacionFinal);
   }, [props]);
 
@@ -212,9 +200,7 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           resultadoNeto[i] +
-            amortizaciones[i] +
-            interesesPagados[i] +
-            variacion[i],
+          amortizaciones[i] + interesesPagados[i] + variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -227,7 +213,7 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(interesesPagados[i] + financiacion[i]);
       }
-      setPagoPrestamos(arrayNegativos(resultado));
+      setPagoPrestamos(arrayNegativos(resultado))
     }
   }, [interesesPagados, financiacion]);
 
@@ -257,6 +243,7 @@ function TableCashflowIndirecto(props) {
   }, [FEOperativas, FEfinanciacion, inversiones]);
   // ---------------------------------
 
+
   useEffect(() => {
     if (variacionCajaYBco) {
       let resultado = [];
@@ -273,7 +260,7 @@ function TableCashflowIndirecto(props) {
       }
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -320,6 +307,7 @@ function TableCashflowIndirecto(props) {
       });
   };
 
+
   // --------------
 
   useEffect(() => {
@@ -329,6 +317,7 @@ function TableCashflowIndirecto(props) {
           // hago una copia de los valores de data[0] para no modificar el original y a la propiedad FEOperativas le sumo los valores de amortizaciones, intereses pagados y variacion
           let copy = { ...data[0] };
 
+
           getPyLInfo(currentState.id)
             .then((data) => {
               if (data.length !== 0) {
@@ -337,18 +326,17 @@ function TableCashflowIndirecto(props) {
                 } else {
                   copy.resultadoNeto = 0;
                 }
-                copy.FEOperativas =
-                  parseFloat(copy.amortizaciones) +
-                  parseFloat(copy.interesesPagados) +
-                  parseFloat(copy.variacion) +
-                  parseFloat(copy.resultadoNeto);
+                copy.FEOperativas = parseFloat(copy.amortizaciones) + parseFloat(copy.interesesPagados) + parseFloat(copy.variacion) + parseFloat(copy.resultadoNeto);
                 setinputsValues(copy);
                 setCajaYBancosInicioManual(copy.cajaYBancosAnioUno);
+
               } else {
                 copy.resultadoNeto = 0;
               }
             })
             .catch((error) => console.error(error));
+
+
         }
       })
       .catch((error) => console.error(error));
@@ -384,7 +372,7 @@ function TableCashflowIndirecto(props) {
     //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
     //         cajaYBancosAlCierreFinal[i] = 0;
     //       } else {
-    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)
+    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)          
     //       }
     //     }
     //   }
@@ -468,16 +456,13 @@ function TableCashflowIndirecto(props) {
                         />
                       </FormItem>
                     </div>
-                    {[
-                      cajaYBancosInicioManual,
-                      ...cajaYBancosAlCierre.slice(0, 9),
-                    ]?.map((año, indexYear) => (
+                    {[cajaYBancosInicioManual, ...cajaYBancosAlCierre.slice(0, 9)]?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <div className="titleRow w-[130px]">
                           <p className="cursor-default"> Año {indexYear + 1}</p>
                         </div>
                         <FormItem className="mb-0">
-                          {año.toString().length > 5 ? (
+                          { (
                             <Tooltip
                               placement="top-end"
                               title={currency + formatNumberPrestamos(año)}
@@ -486,13 +471,9 @@ function TableCashflowIndirecto(props) {
                                 className="w-[130px] "
                                 type="text"
                                 value={
-                                  indexYear !== 0
-                                    ? formatNumberPrestamos(
-                                        cajaYBancosAlCierre[indexYear - 1],
-                                      )
-                                    : formatNumberPrestamos(
-                                        cajaYBancosInicioManual,
-                                      )
+                                  indexYear !== 0 ?
+                                    formatNumberPrestamos(cajaYBancosAlCierre[indexYear - 1])
+                                    : cajaYBancosInicioManual
                                 }
                                 name="year"
                                 disabled={indexYear !== 0}
@@ -502,21 +483,23 @@ function TableCashflowIndirecto(props) {
                                 }
                               />
                             </Tooltip>
-                          ) : (
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={
-                                indexYear !== 0
-                                  ? formatNumberPrestamos(año)
-                                  : año
-                              }
-                              name="year"
-                              prefix={currency || '$'}
-                              disabled={indexYear !== 0}
-                              onChange={(e) => handleChangeCyB(e.target.value)}
-                            />
-                          )}
+                          ) 
+                          // : (
+                          //   <Input
+                          //     className="w-[130px]"
+                          //     type="text"
+                          //     value={
+                          //       indexYear !== 0
+                          //         ? formatNumberPrestamos(año)
+                          //         : año
+                          //     }
+                          //     name="year"
+                          //     prefix={currency || '$'}
+                          //     disabled={indexYear !== 0}
+                          //     onChange={(e) => handleChangeCyB(e.target.value)}
+                          //   />
+                          // )
+                          }
                         </FormItem>
                       </div>
                     ))}
@@ -544,7 +527,7 @@ function TableCashflowIndirecto(props) {
                             handleChangeInputs('resultadoNeto', e.target.value)
                           }
                           name="initial"
-                          disabled
+                          disabled={true}
                           prefix={currency || '$'}
                         />
                       </FormItem>
@@ -863,6 +846,7 @@ function TableCashflowIndirecto(props) {
                                 )
                               }
                               name="initial"
+                              //prefix={currency || '$'}
                               prefix={currency || '$'}
                             />
                           </FormItem>
