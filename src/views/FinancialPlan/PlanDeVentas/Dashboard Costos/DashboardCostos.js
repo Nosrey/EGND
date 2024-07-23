@@ -5,6 +5,7 @@ import { MenuItem, Select } from 'components/ui';
 import {
   año,
   firstSem,
+  month,
   oneMonth,
   periodo,
   secondSem,
@@ -596,14 +597,14 @@ function DashboardCostos() {
                           s.canalName === canalSelected.value &&
                           p.name === productoSelected.value
                         ) {
-                          volGrafSem[indexM] +=
+                          volGrafYear[indexM] +=
                             volumenData[indexInicial].stats[indexStats]
                               .productos[indexP].años[indexYear].volMeses[m] *
                             costoData[indexInicial].stats[indexStats].productos[
                               indexP
                             ].años[indexYear].volMeses[m];
 
-                          comisionGrafSem[indexM] += resolveResul(
+                          comisionGrafYear[indexM] += resolveResul(
                             a.volMeses[m],
                             volumenData[indexInicial].stats[indexStats]
                               .productos[indexP].años[indexYear].volMeses[m],
@@ -612,7 +613,7 @@ function DashboardCostos() {
                             ].comision,
                           );
 
-                          impuestoGrafSem[indexM] += resolveResul(
+                          impuestoGrafYear[indexM] += resolveResul(
                             a.volMeses[m],
                             volumenData[indexInicial].stats[indexStats]
                               .productos[indexP].años[indexYear].volMeses[m],
@@ -621,7 +622,7 @@ function DashboardCostos() {
                             ].impuesto,
                           );
 
-                          cargoGrafSem[indexM] += resolveResul(
+                          cargoGrafYear[indexM] += resolveResul(
                             a.volMeses[m],
                             volumenData[indexInicial].stats[indexStats]
                               .productos[indexP].años[indexYear].volMeses[m],
@@ -629,11 +630,11 @@ function DashboardCostos() {
                               indexP
                             ].cargos,
                           );
-                          setVolGrafico(volGrafSem);
-                          setComisionGrafico(comisionGrafSem);
-                          setImpuestoGrafico(impuestoGrafSem);
-                          setCargasGrafico(cargoGrafSem);
-                          setTypeViewGraf(secondSem);
+                          setVolGrafico(volGrafYear);
+                          setComisionGrafico(comisionGrafYear);
+                          setImpuestoGrafico(impuestoGrafYear);
+                          setCargasGrafico(cargoGrafYear);
+                          setTypeViewGraf(month);
                         }
                       }
                       if (dataAssump.productos[indexP].type === 'producto') {
