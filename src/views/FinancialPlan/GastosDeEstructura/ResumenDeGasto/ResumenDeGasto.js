@@ -180,6 +180,7 @@ function ResumenDeGasto() {
       });
     }
   };
+
   return (
     <>
       {showLoader ? (
@@ -339,10 +340,7 @@ function ResumenDeGasto() {
                                                 type="number"
                                                 disabled
                                                 prefix={currency}
-                                                value={
-                                                  sumAnio( head,
-                                                    indexYear)
-                                                }
+                                                value={sumAnio(head, indexYear)}
                                               />
                                             </FormItem>
                                           </div>

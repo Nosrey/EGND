@@ -68,8 +68,6 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
-    console.log('copy: ', copy);
-    console.log('valor: ', valorFOp.toString());
 
     let valorFFinanciacion = 0;
     // parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
