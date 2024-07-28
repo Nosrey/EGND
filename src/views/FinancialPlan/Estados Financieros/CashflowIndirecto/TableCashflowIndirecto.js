@@ -31,7 +31,7 @@ function TableCashflowIndirecto(props) {
   const [FEfinanciacion, setFEfinanciacion] = useState([]);
   const [variacionCajaYBco, setVariacionCajaYBco] = useState([]);
   const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [prueba, setPrueba] = useState();
+  const [primeraEdicionCajaInicio, setPrimeraEdicionCajaInicio] = useState(true);
 
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
@@ -328,7 +328,6 @@ function TableCashflowIndirecto(props) {
                 }
                 copy.FEOperativas = parseFloat(copy.amortizaciones) + parseFloat(copy.interesesPagados) + parseFloat(copy.variacion) + parseFloat(copy.resultadoNeto);
                 setinputsValues(copy);
-                setCajaYBancosInicioManual(copy.cajaYBancosAnioUno);
 
               } else {
                 copy.resultadoNeto = 0;
@@ -341,6 +340,8 @@ function TableCashflowIndirecto(props) {
       })
       .catch((error) => console.error(error));
   }, []);
+
+
 
   useEffect(() => {
     // console.log('props?.variacionCajaYBco', variacionCajaYBco)
@@ -396,6 +397,13 @@ function TableCashflowIndirecto(props) {
       },
     ]);
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
+
+  useEffect(() => {
+    // if (primeraEdicionCajaInicio) {
+    // setPrimeraEdicionCajaInicio(false);
+    setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
+    // }
+  }, [inputsValues.cajaYBancosAlCierre]);
 
   return (
     <>
@@ -462,7 +470,7 @@ function TableCashflowIndirecto(props) {
                           <p className="cursor-default"> Año {indexYear + 1}</p>
                         </div>
                         <FormItem className="mb-0">
-                          { (
+                          {(
                             <Tooltip
                               placement="top-end"
                               title={currency + formatNumberPrestamos(año)}
@@ -483,22 +491,22 @@ function TableCashflowIndirecto(props) {
                                 }
                               />
                             </Tooltip>
-                          ) 
-                          // : (
-                          //   <Input
-                          //     className="w-[130px]"
-                          //     type="text"
-                          //     value={
-                          //       indexYear !== 0
-                          //         ? formatNumberPrestamos(año)
-                          //         : año
-                          //     }
-                          //     name="year"
-                          //     prefix={currency || '$'}
-                          //     disabled={indexYear !== 0}
-                          //     onChange={(e) => handleChangeCyB(e.target.value)}
-                          //   />
-                          // )
+                          )
+                            // : (
+                            //   <Input
+                            //     className="w-[130px]"
+                            //     type="text"
+                            //     value={
+                            //       indexYear !== 0
+                            //         ? formatNumberPrestamos(año)
+                            //         : año
+                            //     }
+                            //     name="year"
+                            //     prefix={currency || '$'}
+                            //     disabled={indexYear !== 0}
+                            //     onChange={(e) => handleChangeCyB(e.target.value)}
+                            //   />
+                            // )
                           }
                         </FormItem>
                       </div>
