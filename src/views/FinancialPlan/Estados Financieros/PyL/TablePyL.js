@@ -137,10 +137,17 @@ function TablePyL(props) {
       convertirAEntero(copy.BAT) - convertirAEntero(copy.IIGG)
     ).toString();
 
-    // seteamos RNPorcentaje
-    copy.RNPorcentaje = (
-      convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
-    ).toString();
+    // seteamos RNPorcentaje}
+    if (convertirAEntero(copy.vtasTot) === 0) {
+      copy.RNPorcentaje = (
+        convertirAEntero(copy.rdoNeto) / 1 * 100
+      )
+    }
+    else {
+      copy.RNPorcentaje = (
+        convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
+      ).toString();
+    }
 
     setinputsValues(copy);
   };
@@ -442,7 +449,13 @@ function TablePyL(props) {
     getPyLInfo(currentState.id)
       .then((data) => {
         if (data.length !== 0) {
-          setinputsValues(data[0]);
+          console.log('soy la data: ', data[0]);
+          let inputsEditados = {
+            ...data[0],            
+            vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
+          }
+
+          setinputsValues(inputsEditados);
         }
       })
       .catch((error) => console.error(error));
