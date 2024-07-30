@@ -498,13 +498,13 @@ function DashboardCostos() {
                             s.canalName === canalSelected.value &&
                             p.name === productoSelected.value
                           ) {
-                            volGrafSem[indexM] +=
+                            volGrafSem[indexM - 6] +=
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m] *
                               costoData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m];
 
-                            comisionGrafSem[indexM] += resolveResul(
+                            comisionGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
@@ -512,7 +512,7 @@ function DashboardCostos() {
                                 .productos[indexP].comision,
                             );
 
-                            impuestoGrafSem[indexM] += resolveResul(
+                            impuestoGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
@@ -520,7 +520,7 @@ function DashboardCostos() {
                                 .productos[indexP].impuesto,
                             );
 
-                            cargoGrafSem[indexM] += resolveResul(
+                            cargoGrafSem[indexM - 6] += resolveResul(
                               a.volMeses[m],
                               volumenData[indexInicial].stats[indexStats]
                                 .productos[indexP].años[indexYear].volMeses[m],
