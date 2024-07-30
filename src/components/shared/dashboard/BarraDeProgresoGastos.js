@@ -12,6 +12,7 @@ function BarraDeProgresoGastos({
   const [dataView, setDataView] = useState([]);
 
   useEffect(() => {
+    setDataView([]);
     let cuentas = [];
     data.forEach((d, indexD) => {
       cuentas.push({
@@ -31,7 +32,7 @@ function BarraDeProgresoGastos({
         return 0;
       }),
     );
-  }, [periodoSelected, yearSelected]);
+  }, [periodoSelected, yearSelected, data, totalVentas]);
 
   return (
     <div>
