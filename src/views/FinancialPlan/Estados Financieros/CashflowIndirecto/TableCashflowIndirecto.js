@@ -33,7 +33,8 @@ function TableCashflowIndirecto(props) {
   const [cajaYBancosAlCierre, setCajaYBancosAlCierre] = useState([
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   ]);
-  const [prueba, setPrueba] = useState();
+  const [primeraEdicionCajaInicio, setPrimeraEdicionCajaInicio] =
+    useState(true);
 
   const [cajaYBancosInicioManual, setCajaYBancosInicioManual] = useState(0);
 
@@ -68,6 +69,8 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
+    console.log('copy: ', copy);
+    console.log('valor: ', valorFOp.toString());
 
     let valorFFinanciacion = 0;
     // parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
@@ -343,7 +346,6 @@ function TableCashflowIndirecto(props) {
                   parseFloat(copy.variacion) +
                   parseFloat(copy.resultadoNeto);
                 setinputsValues(copy);
-                setCajaYBancosInicioManual(copy.cajaYBancosAnioUno);
               } else {
                 copy.resultadoNeto = 0;
               }
@@ -408,6 +410,13 @@ function TableCashflowIndirecto(props) {
       },
     ]);
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
+
+  useEffect(() => {
+    // if (primeraEdicionCajaInicio) {
+    // setPrimeraEdicionCajaInicio(false);
+    setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
+    // }
+  }, [inputsValues.cajaYBancosAlCierre]);
 
   return (
     <>
