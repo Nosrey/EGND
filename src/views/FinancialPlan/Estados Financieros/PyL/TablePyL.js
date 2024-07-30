@@ -453,6 +453,8 @@ function TablePyL(props) {
           let inputsEditados = {
             ...data[0],            
             vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
+            costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
+            gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
           }
 
           setinputsValues(inputsEditados);

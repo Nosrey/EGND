@@ -31,7 +31,6 @@ function DashboardGastos() {
   const [totalsView, setTotalsView] = useState();
   const [infoForm, setInfoForm] = useState();
   const [infoFormVentas, setInfoFormVentas] = useState();
-  const [cantPers, setCantPers] = useState(0);
   const [dataCuentasView, setDataCuentasView] = useState();
   const [totalPorCuenta, setTotalPorCuenta] = useState([]);
   const [nameDataView, setNameDataView] = useState([]);
@@ -173,10 +172,11 @@ function DashboardGastos() {
                       }
                     }
                     if (periodoSelected.month === 12) {
+                      setTypeView(secondSem);
                       if (indexM > 5) {
                         tot += año.volMeses[mes];
                         if (indexHead === 3) totMarketing += año.volMeses[mes];
-                        setTypeView(secondSem);
+
                         if (tots[indexM - 6] || tots[indexM - 6] === 0) {
                           tots[indexM - 6] += año.volMeses[mes];
                         } else {
@@ -184,10 +184,10 @@ function DashboardGastos() {
                           tots[indexM - 6] += año.volMeses[mes];
                         }
                         if (
-                          cuentas[cuenta.id][indexM] ||
-                          cuentas[cuenta.id][indexM] === 0
+                          cuentas[cuenta.id][indexM - 6] ||
+                          cuentas[cuenta.id][indexM - 6] === 0
                         ) {
-                          cuentas[cuenta.id][indexM] += parseInt(
+                          cuentas[cuenta.id][indexM - 6] += parseInt(
                             año.volMeses[mes],
                           );
                           totalPerCuenta[cuenta.id] += parseInt(
@@ -195,7 +195,7 @@ function DashboardGastos() {
                           );
                         } else {
                           cuentas[cuenta.id].push(0);
-                          cuentas[cuenta.id][indexM] += parseInt(
+                          cuentas[cuenta.id][indexM - 6] += parseInt(
                             año.volMeses[mes],
                           );
                           totalPerCuenta[cuenta.id] += parseInt(
