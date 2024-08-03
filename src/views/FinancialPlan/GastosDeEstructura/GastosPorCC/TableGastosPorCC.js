@@ -45,6 +45,7 @@ function TablePuestosPxQ(props) {
         { id: 8, values: [] },
         { id: 9, values: [] },
       ];
+
       for (let i = 0; i < head.puestos.length; i++) {
         for (let j = 0; j < head.puestos[i].años.length; j++) {
           for (let s = 0; s < MONTHS.length; s++) {
@@ -54,9 +55,6 @@ function TablePuestosPxQ(props) {
 
             if (arrayvalores[j].values[s] >= 0) {
               arrayvalores[j].values[s] += valor;
-              arrayvalores[j].values[s] = Number(
-                arrayvalores[j].values[s],
-              ).toFixed(2);
             } else {
               arrayvalores[j].values.push(valor);
             }
