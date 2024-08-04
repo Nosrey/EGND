@@ -449,6 +449,8 @@ function TablePyL(props) {
     getPyLInfo(currentState.id)
       .then((data) => {
         if (data.length !== 0) {
+          console.log('soy la data: ', data[0]);
+
           // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
           let gastoEnCtas = data[0]?.gastoEnCtas || [];
           if (gastoEnCtas?.length <= 11) {
@@ -456,6 +458,7 @@ function TablePyL(props) {
               gastoEnCtas.push('0');
             }
           }
+          console.log('gastoEnCtas: ', gastoEnCtas);
 
           let inputsEditados = {
             ...data[0],
