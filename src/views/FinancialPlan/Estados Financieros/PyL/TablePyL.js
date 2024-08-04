@@ -466,6 +466,7 @@ function TablePyL(props) {
             costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
             gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
             gastoEnCtas: gastoEnCtas,
+            rdoNeto: Number((isNaN(data[0].BAT) ? 0 : data[0].BAT) - (isNaN(data[0].IIGG) ? 0 : data[0].IIGG)),
           }
 
           setinputsValues(inputsEditados);
