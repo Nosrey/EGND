@@ -449,12 +449,20 @@ function TablePyL(props) {
     getPyLInfo(currentState.id)
       .then((data) => {
         if (data.length !== 0) {
-          console.log('soy la data: ', data[0]);
+          // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
+          let gastoEnCtas = data[0]?.gastoEnCtas || [];
+          if (gastoEnCtas?.length <= 11) {
+            while (gastoEnCtas?.length <= 11) {
+              gastoEnCtas.push('0');
+            }
+          }
+
           let inputsEditados = {
-            ...data[0],            
+            ...data[0],
             vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
             costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
             gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
+            gastoEnCtas: gastoEnCtas,
           }
 
           setinputsValues(inputsEditados);
