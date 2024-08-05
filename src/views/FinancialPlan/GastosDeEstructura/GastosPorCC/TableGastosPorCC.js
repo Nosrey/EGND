@@ -61,6 +61,7 @@ function TablePuestosPxQ(props) {
           }
         }
       }
+      console.log('arrat', arrayvalores);
       setVolTotal(arrayvalores);
     }
   };
@@ -73,6 +74,7 @@ function TablePuestosPxQ(props) {
         );
       }
     }
+    console.log('info', infoForm);
   };
 
   // Logica para mostrar las SUMATORIAS VERTICALES ,
@@ -295,8 +297,12 @@ function TablePuestosPxQ(props) {
     if (typeof numero !== 'string') {
       numero = numero.toString();
     }
-    const inputNumero = Number(numero.replace(/\D/g, ''));
-    const nuevoNum = inputNumero.toLocaleString('es-AR');
+    // Remover caracteres no numéricos excepto puntos decimales
+    const inputNumero = Number(numero.replace(/[^0-9.]/g, ''));
+    const nuevoNum = inputNumero.toLocaleString('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 20,
+    });
     return nuevoNum;
   };
 

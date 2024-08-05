@@ -21,7 +21,6 @@ function ResumenDeGasto() {
   const [sumVerticales, setSumVerticales] = useState({});
   const [showLoader, setShowLoader] = useState(true);
   const [info, setInfo] = useState(null);
-  const [cuentasSum, setCuentasSum] = useState();
 
   // Logica para mostrar las SUMATORIAS VERTICALES ,
   const generateSumVertical = () => {
@@ -92,6 +91,7 @@ function ResumenDeGasto() {
           estructura[cc] = JSON.parse(JSON.stringify(h));
         }
       });
+
       setInfoForm(() => ({ ...estructura }));
     }
   }, [info]);
@@ -128,14 +128,26 @@ function ResumenDeGasto() {
       .catch((error) => console.error(error));
   }, []);
 
-  const sumMes = (cta, year, mes) => {
+  const sumMes = (cta, year, mes, index) => {
     const arrayKeys = Object.keys(infoForm);
     let sum = 0;
-    for (let i = 0; i < arrayKeys.length; i++) {
-      sum += Math.round(
-        infoForm[arrayKeys[i]].cuentas[cta].años[year].volMeses[mes],
-      );
+
+    if (index === 0) {
+      for (let i = 0; i < arrayKeys.length; i++) {
+        for (let j = 0; j < puestosP[arrayKeys[i]].puestos.length; j++) {
+          sum +=
+            Number(puestosP[arrayKeys[i]].puestos[j].años[year].volMeses[mes]) *
+              Number(puestosP[arrayKeys[i]].puestos[j].total) || 0;
+        }
+      }
+    } else {
+      for (let i = 0; i < arrayKeys.length; i++) {
+        sum += Math.round(
+          infoForm[arrayKeys[i]].cuentas[cta].años[year].volMeses[mes],
+        );
+      }
     }
+
     return sum;
   };
   const sumAnio = (cta, year) => {
@@ -157,7 +169,7 @@ function ResumenDeGasto() {
           let head = {};
           head.id = indexC;
           head.name = c.name;
-          head['años'] = [...AÑOS];
+          head['años'] = JSON.parse(JSON.stringify(AÑOS));
           cuentas.push(head);
         }
       });
@@ -326,6 +338,7 @@ function ResumenDeGasto() {
                                                           Object.keys(
                                                             año.volMeses,
                                                           )[indexMes],
+                                                          index,
                                                         )}
                                                         name="month"
                                                         prefix={currency}
