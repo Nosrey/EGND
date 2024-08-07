@@ -45,6 +45,7 @@ function TablePuestosPxQ(props) {
         { id: 8, values: [] },
         { id: 9, values: [] },
       ];
+
       for (let i = 0; i < head.puestos.length; i++) {
         for (let j = 0; j < head.puestos[i].años.length; j++) {
           for (let s = 0; s < MONTHS.length; s++) {
@@ -54,15 +55,13 @@ function TablePuestosPxQ(props) {
 
             if (arrayvalores[j].values[s] >= 0) {
               arrayvalores[j].values[s] += valor;
-              arrayvalores[j].values[s] = Number(
-                arrayvalores[j].values[s],
-              ).toFixed(2);
             } else {
               arrayvalores[j].values.push(valor);
             }
           }
         }
       }
+      console.log('arrat', arrayvalores);
       setVolTotal(arrayvalores);
     }
   };
@@ -75,6 +74,7 @@ function TablePuestosPxQ(props) {
         );
       }
     }
+    console.log('info', infoForm);
   };
 
   // Logica para mostrar las SUMATORIAS VERTICALES ,
@@ -297,8 +297,12 @@ function TablePuestosPxQ(props) {
     if (typeof numero !== 'string') {
       numero = numero.toString();
     }
-    const inputNumero = Number(numero.replace(/\D/g, ''));
-    const nuevoNum = inputNumero.toLocaleString('es-AR');
+    // Remover caracteres no numéricos excepto puntos decimales
+    const inputNumero = Number(numero.replace(/[^0-9.]/g, ''));
+    const nuevoNum = inputNumero.toLocaleString('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 20,
+    });
     return nuevoNum;
   };
 

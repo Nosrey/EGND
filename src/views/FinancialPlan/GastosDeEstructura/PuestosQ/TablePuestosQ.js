@@ -339,7 +339,7 @@ function TablePuestosQ(props) {
             props.addPuesto({
               name: '',
               isNew: true,
-              años: [...AÑOS],
+              años: JSON.parse(JSON.stringify(AÑOS)),
               id: Math.floor(Math.random() * 1000),
               precioInicial: 0,
               incremento: 0,
