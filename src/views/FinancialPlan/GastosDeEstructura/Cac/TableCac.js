@@ -2,11 +2,13 @@
 import { FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useState } from 'react';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
+import { useSelector } from 'react-redux';
 
 function TableCac(props) {
   const [cac, setCac] = useState(props.cac);
   const [ltv, setLtv] = useState(props.ltv);
   const [ltvCac, setLtvCac] = useState(props.ltvcac);
+  const currency = useSelector((state) => state.auth.user.currency);
 
   return (
     <>
@@ -39,6 +41,7 @@ function TableCac(props) {
                           type="text"
                           value={formatNumberPrestamos(año)}
                           name="year"
+                          prefix={currency || '$'}
                           disabled
                         />
                       </Tooltip>
@@ -49,6 +52,7 @@ function TableCac(props) {
                         value={formatNumberPrestamos(año)}
                         name="year"
                         disabled
+                        prefix={currency || '$'}
                       />
                     )}
                   </FormItem>
@@ -73,6 +77,7 @@ function TableCac(props) {
                         <Input
                           className="w-[90px]"
                           type="text"
+                          prefix={currency || '$'}
                           value={formatNumberPrestamos(año)}
                           name="year"
                           disabled
@@ -82,6 +87,7 @@ function TableCac(props) {
                       <Input
                         className="w-[90px]"
                         type="text"
+                        prefix={currency || '$'}
                         value={formatNumberPrestamos(año)}
                         name="year"
                         disabled

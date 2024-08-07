@@ -6,15 +6,12 @@ import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
-  getUser,
   getPyLInfo,
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { addResult } from 'store/cajaYBcoCierre/cajaYBcoCierreSlice';
 import { addCajaCierre } from 'store/tableBalanceCajaCierre/tableBalanceCajaCierreSlice';
-import { calcularDeudasComerciales, calcularBienesDeCambio } from 'utils/calcs';
-import { current } from '@reduxjs/toolkit';
 
 function TableCashflowIndirecto(props) {
   const dispatch = useDispatch();
