@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Chart from 'react-apexcharts';
+import { useSelector } from 'react-redux';
 
 function GraficoDashed(props) {
   const [cac, setCac] = useState(props.cac);
   const [ltv, setLtv] = useState(props.ltv);
+  const currency = useSelector((state) => state.auth.user.currency);
+
   const data = [
     {
       name: 'CAC',
@@ -63,17 +66,17 @@ function GraficoDashed(props) {
           y: [
             {
               title: {
-                formatter: (val) => `${val}`,
+                formatter: (val) => `${val} ${currency}`,
               },
             },
             {
               title: {
-                formatter: (val) => `${val}`,
+                formatter: (val) => `${val} ${currency}`,
               },
             },
             {
               title: {
-                formatter: (val) => `${val}`,
+                formatter: (val) => `${val} ${currency}`,
               },
             },
           ],

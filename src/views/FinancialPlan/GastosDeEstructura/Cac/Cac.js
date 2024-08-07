@@ -373,6 +373,10 @@ function Cac() {
                   <span className="cursor-default">Gastos de Estructura</span>
                 </div>
                 <div className="container-countries">
+                  <p style={{ fontSize: '12px', color: 'grey' }}>
+                    * Para el cálculo de CAC es necesario tener activos y con
+                    datos los centros de costo Comercial y/o Marketing.
+                  </p>
                   <FormContainer className="cont-countries">
                     <ContainerScrollable
                       contenido={
