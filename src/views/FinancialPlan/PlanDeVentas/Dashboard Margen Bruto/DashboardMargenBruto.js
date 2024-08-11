@@ -152,7 +152,6 @@ function DashboardMargenBruto() {
     let margenByClient = 0;
     let percent = 0;
     let totPerMonth = [];
-    let cantidadMeses = 0;
 
     if (infoForm) {
       Object.values(infoForm).map((m, indexCountry) => {
@@ -402,15 +401,16 @@ function DashboardMargenBruto() {
                     if (!totPerMonth[j]) {
                       totPerMonth.push(0);
                     }
-                    totPerMonth[j] += Math.round(
-                      getMargenBrutoResult(
-                        indexCountry,
-                        indexChannel,
-                        indexO,
-                        j,
-                        i,
-                      ),
-                    );
+                    totPerMonth[j] +=
+                      Math.round(
+                        getMargenBrutoResult(
+                          indexCountry,
+                          indexChannel,
+                          indexO,
+                          j,
+                          i,
+                        ),
+                      ) / 100;
                     margenByClient = getAcumulateClients(i, j);
                   }
                 }
