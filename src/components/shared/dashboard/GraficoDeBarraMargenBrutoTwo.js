@@ -18,9 +18,12 @@ function GraficoDeBarraMargenBrutoTwo({
   precioData,
   volumenData,
   costoData,
+  margenPercent,
+  setMargenPercent,
 }) {
   const [dataView, setDataView] = useState([]);
-  const [typeView, setTypeView] = useState(year);
+  const [typeView, setTypeView] = useState(trimn);
+  const [cantidadMeses, setCantidadMeses] = useState(3);
 
   const getVentasResult = (
     indexCountry,
@@ -104,41 +107,46 @@ function GraficoDeBarraMargenBrutoTwo({
                 if (periodoSelected.month || periodoSelected.month === 0) {
                   if (periodoSelected.month === 0) {
                     if (indexM === 0 && yearSelected.year === indexY) {
+                      console.log('entra');
                       setTypeView(oneMonth);
+                      setCantidadMeses(1);
                     }
                   } else if (periodoSelected.month === 4) {
                     if (indexM < 4 && yearSelected.year === indexY) {
                       setTypeView(trimn);
+                      setCantidadMeses(3);
                     }
                   } else if (periodoSelected.month === 6) {
                     if (indexM < 6 && yearSelected.year === indexY) {
                       setTypeView(firstSem);
+                      setCantidadMeses(6);
                     }
                   } else if (periodoSelected.month === 12) {
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
+                      setCantidadMeses(6);
                     }
                   } else if (periodoSelected.month === 24) {
                     if (yearSelected.year === indexY) {
                       setTypeView(month);
+                      setCantidadMeses(12);
                     }
                   }
                 }
-
-                if (!periodoSelected.month) {
-                  setTypeView(month);
-                }
               } else {
+                console.log('hola');
                 setTypeView(year);
+                setCantidadMeses(120);
               }
             });
           });
         });
       });
     });
-  }, [yearSelected, periodoSelected]);
+  }, [yearSelected, periodoSelected, infoForm]);
 
   useEffect(() => {
+    setMargenPercent(0);
     let head = [];
     let margenBruto = [];
     let ventas = [];
@@ -480,8 +488,11 @@ function GraficoDeBarraMargenBrutoTwo({
       });
     });
 
+    const cant = head.reduce((a, b) => a + b, 0);
+
+    setMargenPercent(cant / cantidadMeses);
     setDataView(head);
-  }, [yearSelected, periodoSelected]);
+  }, [yearSelected, periodoSelected, infoForm, cantidadMeses]);
 
   const data = [
     {
