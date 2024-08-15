@@ -164,84 +164,98 @@ function Gastos() {
         </Alert>
       )}
 
-      {showLoader ?
-            <MySpinner/>
-      : (
-      <><div className="border-b-2 mb-8 pb-1">
+      {showLoader ? (
+        <MySpinner />
+      ) : (
+        <>
+          <div className="border-b-2 mb-8 pb-1">
             <h4 className="cursor-default">Supuesto de Gasto de Estructura</h4>
             <span className="cursor-default">Gastos de Estructura</span>
-          </div><div className="border-solid border-2 border-#e5e7eb rounded-lg">
-              <div className="border-b-2 px-4 py-1">
-                <h6 className="cursor-default">Seleccione sus Centros de Costos</h6>
-              </div>
-              <form onSubmit={handleSubmit} className="p-8">
-                <div className={`flex ${media === 'mobile' ? 'flex-col' : ' '}`}>
-                  <div
-                    className={`w-1/2 flex flex-col justify-center gap-y-2.5 pr-8 ${media === 'mobile' ? 'w-[100%]' : ''}`}
-                  >
-                    {Object.keys(initialValues.centroDeGastos).map(
-                      (checkbox, index) => (
-                        <div className="flex items-center gap-x-2">
-                          <input
-                            className="border border-opacity-100 border-gray-300 rounded-sm shadow-sm shadow-colored cursor-pointer h-5 w-5"
-                            type="checkbox"
-                            key={index}
-                            id={index}
-                            name={checkbox}
-                            checked={initialValues.centroDeGastos[checkbox]}
-                            onChange={(e) => handleCheckboxChange(checkbox, e.target.checked)} />
-                          <label htmlFor={checkbox}>
-                            {checkbox === 'PandD'
-                              ? 'P & D'
-                              : checkbox.charAt(0).toUpperCase() + checkbox.slice(1)}
-                          </label>
-                        </div>
-                      )
-                    )}
-
-                    <p className=" pt-7">Crear nuevo CC :</p>
-                    <div className="flex items-center gap-x-4 ">
-                      <Input
-                        size="sm"
-                        placeholder="Nombre"
-                        type="string"
-                        onChange={(e) => setNewNameCheckbox(e.target.value)}
-                        value={newNameCheckbox}
-                        disabled={inputDisabled} />
-                      <Button onClick={handleCreateCheckbox} variant="twoTone">
-                        Crear
-                      </Button>
-                    </div>
-                  </div>
-                  <div
-                    className={`w-1/2 pl-8 ${media === 'mobile' ? 'w-[100%] pl-0 mt-8' : ''}`}
-                  >
-                    <div className="flex flex-col gap-y-3">
-                      <span className="cursor-default">
-                        Incremento cargas sociales
-                      </span>
-                      <div className="w-[30%]">
-                        <Input
-                          type="number"
-                          value={initialValues.cargasSociales}
-                          suffix="%"
-                          onChange={(e) => handleInputNumberChange(e.target.value)} />
+          </div>
+          <div className="border-solid border-2 border-#e5e7eb rounded-lg">
+            <div className="border-b-2 px-4 py-1">
+              <h6 className="cursor-default">
+                Seleccione sus Centros de Costos
+              </h6>
+            </div>
+            <form onSubmit={handleSubmit} className="p-8">
+              <div className={`flex ${media === 'mobile' ? 'flex-col' : ' '}`}>
+                <div
+                  className={`w-1/2 flex flex-col justify-center gap-y-2.5 pr-8 ${
+                    media === 'mobile' ? 'w-[100%]' : ''
+                  }`}
+                >
+                  {Object.keys(initialValues.centroDeGastos).map(
+                    (checkbox, index) => (
+                      <div className="flex items-center gap-x-2">
+                        <input
+                          className="border border-opacity-100 border-gray-300 rounded-sm shadow-sm shadow-colored cursor-pointer h-5 w-5"
+                          type="checkbox"
+                          key={index}
+                          id={index}
+                          name={checkbox}
+                          checked={initialValues.centroDeGastos[checkbox]}
+                          onChange={(e) =>
+                            handleCheckboxChange(checkbox, e.target.checked)
+                          }
+                        />
+                        <label htmlFor={checkbox}>
+                          {checkbox === 'PandD'
+                            ? 'P & D'
+                            : checkbox.charAt(0).toUpperCase() +
+                              checkbox.slice(1)}
+                        </label>
                       </div>
-                      <span className="cursor-default">
-                        *Es el aumento sobre el sueldo en concepto de cargas sociales
-                        para determinar el costo empresa de cada recurso
-                      </span>
-                    </div>
+                    ),
+                  )}
+
+                  <p className=" pt-7">Crear nuevo CC :</p>
+                  <div className="flex items-center gap-x-4 ">
+                    <Input
+                      size="sm"
+                      placeholder="Nombre"
+                      type="string"
+                      onChange={(e) => setNewNameCheckbox(e.target.value)}
+                      value={newNameCheckbox}
+                      disabled={inputDisabled}
+                    />
+                    <Button onClick={handleCreateCheckbox} variant="twoTone">
+                      Crear
+                    </Button>
                   </div>
                 </div>
-                <div className="flex w-full justify-end pt-6">
-                  <Button variant="solid">Guardar</Button>
+                <div
+                  className={`w-1/2 pl-8 ${
+                    media === 'mobile' ? 'w-[100%] pl-0 mt-8' : ''
+                  }`}
+                >
+                  <div className="flex flex-col gap-y-3">
+                    <span className="cursor-default">Cargas sociales</span>
+                    <div className="w-[30%]">
+                      <Input
+                        type="number"
+                        value={initialValues.cargasSociales}
+                        suffix="%"
+                        onChange={(e) =>
+                          handleInputNumberChange(e.target.value)
+                        }
+                      />
+                    </div>
+                    <span className="cursor-default">
+                      *Es el aumento sobre el sueldo en concepto de cargas
+                      sociales para determinar el costo empresa de cada recurso
+                    </span>
+                  </div>
                 </div>
-              </form>
-            </div></>
+              </div>
+              <div className="flex w-full justify-end pt-6">
+                <Button variant="solid">Guardar</Button>
+              </div>
+            </form>
+          </div>
+        </>
       )}
     </div>
-      
   );
 }
 
