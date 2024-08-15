@@ -68,7 +68,18 @@ function TablePuestosP(props) {
   }, [infoForm]);
 
   useEffect(() => {
-    if (props.data) setInfoForm(props.data);
+    if (props.data) {
+      let data = { ...props.data };
+
+      Object.values(data).map((d) => {
+        d.puestos.map((p) => {
+          p.cargaSocial = (p.precioInicial * props.cargaSocial) / 100;
+          p.total = Number(p.precioInicial) + Number(p.cargaSocial);
+        });
+      });
+
+      setInfoForm(props.data);
+    }
     initialConfig();
   }, [props]);
 
@@ -170,7 +181,6 @@ function TablePuestosP(props) {
                                   ? 'capitalize mt-10'
                                   : 'capitalize mt-5'
                               }`}
-                              
                               disabled
                               type="text"
                               name="name"
@@ -188,7 +198,7 @@ function TablePuestosP(props) {
                           <div className="flex flex-col">
                             {index === 0 && (
                               <div className="titleRow min-w-[62px]">
-                                <p className='cursor-default'> Rem</p>
+                                <p className="cursor-default"> Rem</p>
                               </div>
                             )}
 
@@ -199,32 +209,32 @@ function TablePuestosP(props) {
                                   : 'mt-[20px] w-[100px]'
                               }`}
                             >
-                                <Input
-                                  placeholder="Rem"
-                                  type="text"
-                                  name="precioInicial"
-                                  prefix={currency}
-                                  value={formatearNumero(
-                                    infoForm[cc].puestos[head].precioInicial,
-                                  )}
-                                  onChange={(e) =>
-                                    handleOnChangeInitialValue(
-                                      cc,
-                                      infoForm[cc].puestos[head].id,
-                                      e.target.value,
-                                      'precioInicial',
-                                      null,
-                                      null,
-                                    )
-                                  }
-                                />
+                              <Input
+                                placeholder="Rem"
+                                type="text"
+                                name="precioInicial"
+                                prefix={currency}
+                                value={formatearNumero(
+                                  infoForm[cc].puestos[head].precioInicial,
+                                )}
+                                onChange={(e) =>
+                                  handleOnChangeInitialValue(
+                                    cc,
+                                    infoForm[cc].puestos[head].id,
+                                    e.target.value,
+                                    'precioInicial',
+                                    null,
+                                    null,
+                                  )
+                                }
+                              />
                             </FormItem>
                           </div>
 
                           <div className="flex flex-col">
                             {index === 0 && (
                               <div className="titleRow min-w-[62px]">
-                                <p className='cursor-default'> Cargas S.</p>
+                                <p className="cursor-default"> Cargas S.</p>
                               </div>
                             )}
 
@@ -237,11 +247,15 @@ function TablePuestosP(props) {
                             >
                               <Tooltip
                                 placement="top-end"
-                                title={currency + formatearNumero(
-                                  Math.round(
-                                    infoForm[cc].puestos[head].cargaSocial || 0,
-                                  ),
-                                )}
+                                title={
+                                  currency +
+                                  formatearNumero(
+                                    Math.round(
+                                      infoForm[cc].puestos[head].cargaSocial ||
+                                        0,
+                                    ),
+                                  )
+                                }
                               >
                                 <Input
                                   placeholder="Precio inicial"
@@ -251,7 +265,8 @@ function TablePuestosP(props) {
                                   prefix={currency}
                                   value={formatearNumero(
                                     Math.round(
-                                      infoForm[cc].puestos[head].cargaSocial || 0,
+                                      infoForm[cc].puestos[head].cargaSocial ||
+                                        0,
                                     ),
                                   )}
                                 />
@@ -262,7 +277,7 @@ function TablePuestosP(props) {
                           <div className="flex flex-col">
                             {index === 0 && (
                               <div className="titleRow min-w-[62px]">
-                                <p className='cursor-default'>TOTAL</p>
+                                <p className="cursor-default">TOTAL</p>
                               </div>
                             )}
 
@@ -275,11 +290,14 @@ function TablePuestosP(props) {
                             >
                               <Tooltip
                                 placement="top-end"
-                                title={currency + formatearNumero(
-                                  Math.round(
-                                    infoForm[cc].puestos[head].total || 0,
-                                  ),
-                                )}
+                                title={
+                                  currency +
+                                  formatearNumero(
+                                    Math.round(
+                                      infoForm[cc].puestos[head].total || 0,
+                                    ),
+                                  )
+                                }
                               >
                                 <Input
                                   type="text"
@@ -292,7 +310,6 @@ function TablePuestosP(props) {
                                     ),
                                   )}
                                 />
-
                               </Tooltip>
                             </FormItem>
                           </div>
@@ -300,7 +317,9 @@ function TablePuestosP(props) {
                           <div className="flex flex-col">
                             {index === 0 && (
                               <div className="titleRow min-w-[100px]">
-                                <p className='cursor-default'>Incremento anual</p>
+                                <p className="cursor-default">
+                                  Incremento anual
+                                </p>
                               </div>
                             )}
 

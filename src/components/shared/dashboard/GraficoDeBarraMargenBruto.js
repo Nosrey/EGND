@@ -96,7 +96,7 @@ function GraficoDeBarraMargenBruto({
         yaxis: {
           labels: {
             formatter: function (value) {
-              return `${currency}${value}`;
+              return `${currency}${Number(value).toFixed(2)}`;
             },
           },
         },
