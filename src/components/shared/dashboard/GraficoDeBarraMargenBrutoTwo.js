@@ -18,9 +18,12 @@ function GraficoDeBarraMargenBrutoTwo({
   precioData,
   volumenData,
   costoData,
+  margenPercent,
+  setMargenPercent,
 }) {
   const [dataView, setDataView] = useState([]);
-  const [typeView, setTypeView] = useState(year);
+  const [typeView, setTypeView] = useState(trimn);
+  const [cantidadMeses, setCantidadMeses] = useState(3);
 
   const getVentasResult = (
     indexCountry,
@@ -82,23 +85,8 @@ function GraficoDeBarraMargenBrutoTwo({
     return rdo;
   };
 
-  const calculatePercent = (
-    indexCountry,
-    indexCanal,
-    indexP,
-    indexYear,
-    indexMes,
-  ) => {
-    let percent =
-      (getMargenBrutoResult(
-        indexCountry,
-        indexCanal,
-        indexP,
-        indexYear,
-        indexMes,
-      ) *
-        100) /
-      getVentasResult(indexCountry, indexCanal, indexP, indexYear, indexMes);
+  const calculatePercent = (margenBrunto, ventas) => {
+    let percent = (margenBrunto * 100) / ventas;
 
     if (percent === -Infinity) {
       percent = -100;
@@ -119,42 +107,49 @@ function GraficoDeBarraMargenBrutoTwo({
                 if (periodoSelected.month || periodoSelected.month === 0) {
                   if (periodoSelected.month === 0) {
                     if (indexM === 0 && yearSelected.year === indexY) {
+                      console.log('entra');
                       setTypeView(oneMonth);
+                      setCantidadMeses(1);
                     }
                   } else if (periodoSelected.month === 4) {
                     if (indexM < 4 && yearSelected.year === indexY) {
                       setTypeView(trimn);
+                      setCantidadMeses(3);
                     }
                   } else if (periodoSelected.month === 6) {
                     if (indexM < 6 && yearSelected.year === indexY) {
                       setTypeView(firstSem);
+                      setCantidadMeses(6);
                     }
                   } else if (periodoSelected.month === 12) {
                     if (indexM > 5 && yearSelected.year === indexY) {
                       setTypeView(secondSem);
+                      setCantidadMeses(6);
                     }
                   } else if (periodoSelected.month === 24) {
                     if (yearSelected.year === indexY) {
                       setTypeView(month);
+                      setCantidadMeses(12);
                     }
                   }
                 }
-
-                if (!periodoSelected.month) {
-                  setTypeView(month);
-                }
               } else {
+                console.log('hola');
                 setTypeView(year);
+                setCantidadMeses(120);
               }
             });
           });
         });
       });
     });
-  }, [yearSelected, periodoSelected]);
+  }, [yearSelected, periodoSelected, infoForm]);
 
   useEffect(() => {
+    setMargenPercent(0);
     let head = [];
+    let margenBruto = [];
+    let ventas = [];
     Object.keys(infoForm).map((pais, indexCountry) => {
       infoForm[pais].map((canal, indexCanal) => {
         canal.productos.map((producto, indexP) => {
@@ -166,21 +161,47 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (periodoSelected.month === 0) {
                       if (indexM === 0) {
                         if (head[indexM] || head[indexM] === 0) {
-                          head[indexM] += calculatePercent(
+                          ventas[indexM] += getVentasResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
                           );
-                        } else {
-                          head.push(0);
-                          head[indexM] += calculatePercent(
+                          margenBruto[indexM] += getMargenBrutoResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
+                          );
+                        } else {
+                          head.push(0);
+                          margenBruto.push(0);
+                          ventas.push(0);
+                          ventas[indexM] += getVentasResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                          margenBruto[indexM] += getMargenBrutoResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
                           );
                         }
                       }
@@ -188,21 +209,47 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (periodoSelected.month === 4) {
                       if (indexM < 3) {
                         if (head[indexM] || head[indexM] === 0) {
-                          head[indexM] += calculatePercent(
+                          ventas[indexM] += getVentasResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
                           );
-                        } else {
-                          head.push(0);
-                          head[indexM] += calculatePercent(
+                          margenBruto[indexM] += getMargenBrutoResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
+                          );
+                        } else {
+                          head.push(0);
+                          margenBruto.push(0);
+                          ventas.push(0);
+                          ventas[indexM] += getVentasResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                          margenBruto[indexM] += getMargenBrutoResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
                           );
                         }
                       }
@@ -210,21 +257,47 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (periodoSelected.month === 6) {
                       if (indexM < 6) {
                         if (head[indexM] || head[indexM] === 0) {
-                          head[indexM] += calculatePercent(
+                          ventas[indexM] += getVentasResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
                           );
-                        } else {
-                          head.push(0);
-                          head[indexM] += calculatePercent(
+                          margenBruto[indexM] += getMargenBrutoResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
+                          );
+                        } else {
+                          head.push(0);
+                          margenBruto.push(0);
+                          ventas.push(0);
+                          ventas[indexM] += getVentasResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                          margenBruto[indexM] += getMargenBrutoResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+
+                          head[indexM] = calculatePercent(
+                            margenBruto[indexM],
+                            ventas[indexM],
                           );
                         }
                       }
@@ -232,21 +305,47 @@ function GraficoDeBarraMargenBrutoTwo({
                     if (periodoSelected.month === 12) {
                       if (indexM > 5) {
                         if (head[indexM - 6] || head[indexM - 6] === 0) {
-                          head[indexM - 6] += calculatePercent(
+                          ventas[indexM - 6] += getVentasResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
                           );
-                        } else {
-                          head.push(0);
-                          head[indexM - 6] += calculatePercent(
+                          margenBruto[indexM - 6] += getMargenBrutoResult(
                             indexCountry,
                             indexCanal,
                             indexP,
                             indexY,
                             indexM,
+                          );
+
+                          head[indexM - 6] = calculatePercent(
+                            margenBruto[indexM - 6],
+                            ventas[indexM - 6],
+                          );
+                        } else {
+                          head.push(0);
+                          margenBruto.push(0);
+                          ventas.push(0);
+                          ventas[indexM - 6] += getVentasResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+                          margenBruto[indexM - 6] += getMargenBrutoResult(
+                            indexCountry,
+                            indexCanal,
+                            indexP,
+                            indexY,
+                            indexM,
+                          );
+
+                          head[indexM - 6] = calculatePercent(
+                            margenBruto[indexM - 6],
+                            ventas[indexM - 6],
                           );
                         }
                       }
@@ -254,62 +353,134 @@ function GraficoDeBarraMargenBrutoTwo({
 
                     if (periodoSelected.month === 24) {
                       if (head[indexM] || head[indexM] === 0) {
-                        head[indexM] += calculatePercent(
+                        ventas[indexM] += getVentasResult(
                           indexCountry,
                           indexCanal,
                           indexP,
                           indexY,
                           indexM,
                         );
-                      } else {
-                        head.push(0);
-                        head[indexM] += calculatePercent(
+                        margenBruto[indexM] += getMargenBrutoResult(
                           indexCountry,
                           indexCanal,
                           indexP,
                           indexY,
                           indexM,
+                        );
+
+                        head[indexM] = calculatePercent(
+                          margenBruto[indexM],
+                          ventas[indexM],
+                        );
+                      } else {
+                        head.push(0);
+                        margenBruto.push(0);
+                        ventas.push(0);
+                        ventas[indexM] += getVentasResult(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+                        margenBruto[indexM] += getMargenBrutoResult(
+                          indexCountry,
+                          indexCanal,
+                          indexP,
+                          indexY,
+                          indexM,
+                        );
+
+                        head[indexM] = calculatePercent(
+                          margenBruto[indexM],
+                          ventas[indexM],
                         );
                       }
                     }
                   } else if (head[indexM] || head[indexM] === 0) {
-                    head[indexM] += calculatePercent(
+                    ventas[indexM] += getVentasResult(
                       indexCountry,
                       indexCanal,
                       indexP,
                       indexY,
                       indexM,
                     );
-                  } else {
-                    head.push(0);
-                    head[indexM] += calculatePercent(
+                    margenBruto[indexM] += getMargenBrutoResult(
                       indexCountry,
                       indexCanal,
                       indexP,
                       indexY,
                       indexM,
+                    );
+
+                    head[indexM] = calculatePercent(
+                      margenBruto[indexM],
+                      ventas[indexM],
+                    );
+                  } else {
+                    head.push(0);
+                    margenBruto.push(0);
+                    ventas.push(0);
+                    ventas[indexM] += getVentasResult(
+                      indexCountry,
+                      indexCanal,
+                      indexP,
+                      indexY,
+                      indexM,
+                    );
+                    margenBruto[indexM] += getMargenBrutoResult(
+                      indexCountry,
+                      indexCanal,
+                      indexP,
+                      indexY,
+                      indexM,
+                    );
+
+                    head[indexM] = calculatePercent(
+                      margenBruto[indexM],
+                      ventas[indexM],
                     );
                   }
                 }
               } else if (head[indexY] || head[indexY] === 0) {
-                head[indexY] +=
-                  calculatePercent(
-                    indexCountry,
-                    indexCanal,
-                    indexP,
-                    indexY,
-                    indexM,
-                  ) / 12;
+                ventas[indexY] += getVentasResult(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+                margenBruto[indexY] += getMargenBrutoResult(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+
+                head[indexY] =
+                  calculatePercent(margenBruto[indexY], ventas[indexY]) / 12;
               } else {
                 head.push(0);
-                head[indexY] +=
-                  calculatePercent(
-                    indexCountry,
-                    indexCanal,
-                    indexP,
-                    indexY,
-                    indexM,
-                  ) / 12;
+                margenBruto.push(0);
+                ventas.push(0);
+                ventas[indexY] += getVentasResult(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+                margenBruto[indexY] += getMargenBrutoResult(
+                  indexCountry,
+                  indexCanal,
+                  indexP,
+                  indexY,
+                  indexM,
+                );
+
+                head[indexY] =
+                  calculatePercent(margenBruto[indexY], ventas[indexY]) / 12;
               }
             });
           });
@@ -317,8 +488,11 @@ function GraficoDeBarraMargenBrutoTwo({
       });
     });
 
+    const cant = head.reduce((a, b) => a + b, 0);
+
+    setMargenPercent(cant / cantidadMeses);
     setDataView(head);
-  }, [yearSelected, periodoSelected]);
+  }, [yearSelected, periodoSelected, infoForm, cantidadMeses]);
 
   const data = [
     {
