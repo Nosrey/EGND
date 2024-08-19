@@ -87,6 +87,7 @@ function GraficoDeBarraMargenBrutoTwo({
 
   const calculatePercent = (margenBrunto, ventas) => {
     let percent = (margenBrunto * 100) / ventas;
+    console.log('data', margenBrunto, ventas, percent);
 
     if (percent === -Infinity) {
       percent = -100;
@@ -107,7 +108,6 @@ function GraficoDeBarraMargenBrutoTwo({
                 if (periodoSelected.month || periodoSelected.month === 0) {
                   if (periodoSelected.month === 0) {
                     if (indexM === 0 && yearSelected.year === indexY) {
-                      console.log('entra');
                       setTypeView(oneMonth);
                       setCantidadMeses(1);
                     }
@@ -134,7 +134,6 @@ function GraficoDeBarraMargenBrutoTwo({
                   }
                 }
               } else {
-                console.log('hola');
                 setTypeView(year);
                 setCantidadMeses(120);
               }
@@ -458,8 +457,10 @@ function GraficoDeBarraMargenBrutoTwo({
                   indexM,
                 );
 
-                head[indexY] =
-                  calculatePercent(margenBruto[indexY], ventas[indexY]) / 12;
+                head[indexY] = calculatePercent(
+                  margenBruto[indexY],
+                  ventas[indexY],
+                );
               } else {
                 head.push(0);
                 margenBruto.push(0);
@@ -479,8 +480,10 @@ function GraficoDeBarraMargenBrutoTwo({
                   indexM,
                 );
 
-                head[indexY] =
-                  calculatePercent(margenBruto[indexY], ventas[indexY]) / 12;
+                head[indexY] = calculatePercent(
+                  margenBruto[indexY],
+                  ventas[indexY],
+                );
               }
             });
           });
@@ -489,6 +492,8 @@ function GraficoDeBarraMargenBrutoTwo({
     });
 
     const cant = head.reduce((a, b) => a + b, 0);
+
+    console.log('head', head);
 
     setMargenPercent(cant / cantidadMeses);
     setDataView(head);
