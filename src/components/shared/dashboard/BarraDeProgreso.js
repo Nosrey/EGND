@@ -54,7 +54,7 @@ function BarraDeProgreso({ data, totalVentas, selectYear, periodoSelected }) {
               }
             });
           }
-          if (periodoSelected.month === 24 && selectYear.value === 'todo') {
+          if (selectYear.value === 'todo') {
             paises[indexD].total += Number(a.ventasTotal);
           }
         });
@@ -71,6 +71,8 @@ function BarraDeProgreso({ data, totalVentas, selectYear, periodoSelected }) {
     }
     return 0;
   });
+
+  console.log('data', paises);
 
   return (
     <div>
