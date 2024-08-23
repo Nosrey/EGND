@@ -325,6 +325,7 @@ export const calcAmortizaciones = (PxQCapex) => {
             (opcion) => opcion.value === PxQCapex[j].bien,
           );
           const anioAmort = objetoEncontrado.amortizacion;
+          console.log('soy objeto encontrado', objetoEncontrado);
           let cantMeses = anioAmort * 12;
           valorMensual = valorBien / cantMeses;
 
@@ -333,7 +334,7 @@ export const calcAmortizaciones = (PxQCapex) => {
             mesesRestantesPrimerAnio * valorMensual;
           myArrayAmort[a] += pcioAmortizadoPrimerAnio;
 
-          for (let x = 1; x < anioAmort - 1; x++) {
+          for (let x = 1; x < anioAmort; x++) {
             const pcioAmortizado = 12 * valorMensual;
             const anioCurrent = a + x;
 
@@ -342,6 +343,7 @@ export const calcAmortizaciones = (PxQCapex) => {
               myArrayAmort[anioCurrent] += pcioAmortizado;
             }
           }
+          console.log('llevamos amortizado', myArrayAmort);
 
           if (anioAmort > 1) {
             const mesesRestantesUltimoAnio =
@@ -352,7 +354,7 @@ export const calcAmortizaciones = (PxQCapex) => {
 
             if (anioUltimo <= 9) {
               // dentro del plazo planteado
-              myArrayAmort[anioUltimo] += pcioAmortizadoUltimoAnio;
+              myArrayAmort[anioUltimo + 1] += pcioAmortizadoUltimoAnio;
             }
           }
         }
