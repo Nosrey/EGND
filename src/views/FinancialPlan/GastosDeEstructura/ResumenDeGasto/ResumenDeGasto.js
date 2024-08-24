@@ -137,7 +137,7 @@ function ResumenDeGasto() {
         for (let j = 0; j < puestosP[arrayKeys[i]].puestos.length; j++) {
           sum +=
             Number(puestosP[arrayKeys[i]].puestos[j].años[year].volMeses[mes]) *
-              Number(puestosP[arrayKeys[i]].puestos[j].total) || 0;
+            Number(puestosP[arrayKeys[i]].puestos[j].total) || 0;
         }
       }
     } else {
@@ -226,18 +226,16 @@ function ResumenDeGasto() {
                                     key={head.name}
                                   >
                                     <FormItem
-                                      className={`${
-                                        index === 0
+                                      className={`${index === 0
                                           ? 'mt-12 w-[210px]'
                                           : 'mb-2  w-[210px]'
-                                      }`}
+                                        }`}
                                     >
                                       <Input
-                                        className={`${
-                                          index === 0
+                                        className={`${index === 0
                                             ? 'capitalize mt-10'
                                             : 'capitalize mt-5'
-                                        }`}
+                                          }`}
                                         disabled={
                                           !infoForm['Administración'].cuentas[
                                             head
@@ -315,18 +313,16 @@ function ResumenDeGasto() {
                                               Object.keys(año.volMeses).map(
                                                 (mes, indexMes) => (
                                                   <FormItem
-                                                    className={`${
-                                                      index === 0
+                                                    className={`${index === 0
                                                         ? 'mb-0'
                                                         : 'mb-0'
-                                                    }`}
+                                                      }`}
                                                     key={indexMes}
                                                   >
                                                     <Tooltip
                                                       placement="top-end"
-                                                      title={`${mes} - año ${
-                                                        indexYear + 1
-                                                      }`}
+                                                      title={`${mes} - año ${indexYear + 1
+                                                        }`}
                                                     >
                                                       <Input
                                                         className="w-[90px]"

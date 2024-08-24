@@ -4,7 +4,7 @@ import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { createContext, useEffect, useState } from 'react';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPyL, getPyLInfo } from 'services/Requests';
+import { createPyL, getPyLInfo, getUser } from 'services/Requests';
 import { addResult } from 'store/netoResult/netoResultSlice';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
@@ -448,9 +448,7 @@ function TablePyL(props) {
   useEffect(() => {
     getPyLInfo(currentState.id)
       .then((data) => {
-        if (data.length !== 0) {
-          console.log('soy la data: ', data[0]);
-
+        if (data.length !== 0) {          
           // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
           let gastoEnCtas = data[0]?.gastoEnCtas || [];
           if (gastoEnCtas?.length <= 11) {
@@ -465,14 +463,26 @@ function TablePyL(props) {
             vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
             costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
             gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
-            gastoEnCtas: gastoEnCtas,
-            rdoNeto: Number((isNaN(data[0].BAT) ? 0 : data[0].BAT) - (isNaN(data[0].IIGG) ? 0 : data[0].IIGG)),
+            gastoEnCtas,
+            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),
           }
 
           setinputsValues(inputsEditados);
         }
       })
       .catch((error) => console.error(error));
+
+    getUser(currentState.id)
+    .then((data) => {
+      if (data?.gastosPorCCData.length !== 0) {
+        console.log('data?.gastosPorCCData[0].centroDeCostos[0]: ', data?.gastosPorCCData[0].centroDeCostos[0]);
+        setGastoEnCtas(() => (
+          [data?.gastosPorCCData[0].centroDeCostos[0]]
+        ));
+      } else {
+        console.log('no entré')
+      } })
+    .catch((error) => console.error(error));
     // eslint-disable-next-line
   }, []);
 
@@ -1353,11 +1363,19 @@ function TablePyL(props) {
                   {/** *********** ****************  ************ */}
                   <div className="linea" />
                   {!hiddenItems[2] && (
-                    <>
-                      {/** *********** GASTO POR CUENTAS  ************ */}
+                      <>
+                        {/** *********** GASTO POR CUENTAS  ************ */}
+                        <Button
+                          onClick={() => {
+                            console.log('ctasListado', ctasListado
+                              , 'gastoEnCtas', gastoEnCtas
 
-                      {ctasListado.map((ctaName, indexCta) => (
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                            );
+                          }}>
+                          prueba
+                        </Button>
+                        {ctasListado.map((ctaName, indexCta) => (
+                          <div className="flex  gap-x-3 gap-y-3  mb-6 ">
                           <div className="iconDesplegable" />
                           <FormItem className=" mb-1 w-[240px]">
                             <Input
