@@ -8,7 +8,8 @@ import { createPyL, getPyLInfo, getUser } from 'services/Requests';
 import { addResult } from 'store/netoResult/netoResultSlice';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
-import PyLInputComponent from './PyLInputComponent';
+import { calcularRemuneraciones } from 'utils/calcs';
+import { set } from 'lodash';
 
 const impGanancias = 20;
 function TablePyL(props) {
@@ -43,6 +44,8 @@ function TablePyL(props) {
   const [rdoNeto, setRdoNeto] = useState([]);
   const [RNPorcentaje, setRNPorcentaje] = useState([]);
   const [prueba, setPrueba] = useState();
+  // abreviamos Remuneraciones Y Cargas Sociales
+  const [remYcargas, setRemYcargas] = useState([0,0,0,0,0,0,0,0,0,0]);
   const currentState = useSelector((state) => state.auth.user);
 
   // ***************** INPUTS ANIO 0 ******************
@@ -473,16 +476,13 @@ function TablePyL(props) {
       .catch((error) => console.error(error));
 
     getUser(currentState.id)
-    .then((data) => {
-      if (data?.gastosPorCCData.length !== 0) {
-        console.log('data?.gastosPorCCData[0].centroDeCostos[0]: ', data?.gastosPorCCData[0].centroDeCostos[0]);
-        setGastoEnCtas(() => (
-          [data?.gastosPorCCData[0].centroDeCostos[0]]
-        ));
-      } else {
-        console.log('no entré')
-      } })
-    .catch((error) => console.error(error));
+      .then((data) => {
+        console.log('data?.puestosPData[0].puestosp[0]: ', data?.puestosPData[0].puestosp[0]);
+        let remuneraciones = calcularRemuneraciones(data?.puestosPData[0].puestosp[0]);
+        console.log('remuneraciones: ', remuneraciones);
+        setRemYcargas(remuneraciones);
+      })
+      .catch((error) => console.error(error));
     // eslint-disable-next-line
   }, []);
 
@@ -1364,16 +1364,7 @@ function TablePyL(props) {
                   <div className="linea" />
                   {!hiddenItems[2] && (
                       <>
-                        {/** *********** GASTO POR CUENTAS  ************ */}
-                        <Button
-                          onClick={() => {
-                            console.log('ctasListado', ctasListado
-                              , 'gastoEnCtas', gastoEnCtas
-
-                            );
-                          }}>
-                          prueba
-                        </Button>
+                        {/** *********** GASTO POR CUENTAS  ************ */}                       
                         {ctasListado.map((ctaName, indexCta) => (
                           <div className="flex  gap-x-3 gap-y-3  mb-6 ">
                           <div className="iconDesplegable" />
@@ -1403,7 +1394,7 @@ function TablePyL(props) {
                               />
                             </FormItem>
                           </div>
-                          {gastoEnCtas[indexCta].map((anio, indexanio) => (
+                          {(indexCta === 0 ? remYcargas : gastoEnCtas[indexCta])?.map((anio, indexanio) => (
                             <div className="flex flex-col" key={indexanio}>
                               <FormItem className="mb-0">
                                 {anio.toString().length > 5 ? (

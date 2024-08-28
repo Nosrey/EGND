@@ -227,14 +227,14 @@ function ResumenDeGasto() {
                                   >
                                     <FormItem
                                       className={`${index === 0
-                                          ? 'mt-12 w-[210px]'
-                                          : 'mb-2  w-[210px]'
+                                        ? 'mt-12 w-[210px]'
+                                        : 'mb-2  w-[210px]'
                                         }`}
                                     >
                                       <Input
                                         className={`${index === 0
-                                            ? 'capitalize mt-10'
-                                            : 'capitalize mt-5'
+                                          ? 'capitalize mt-10'
+                                          : 'capitalize mt-5'
                                           }`}
                                         disabled={
                                           !infoForm['Administración'].cuentas[
@@ -314,8 +314,8 @@ function ResumenDeGasto() {
                                                 (mes, indexMes) => (
                                                   <FormItem
                                                     className={`${index === 0
-                                                        ? 'mb-0'
-                                                        : 'mb-0'
+                                                      ? 'mb-0'
+                                                      : 'mb-0'
                                                       }`}
                                                     key={indexMes}
                                                   >
