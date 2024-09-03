@@ -32,8 +32,8 @@ function TableVolumen(props) {
   // productos donde tengo adentro de cada producto el atributo sum que es un array de las sumatorias
   // verticales de ese producto. No existe la relacion producto -canal porque es una suma de las
   // cantidades de cada producto teniendo en cuenta todo los canales.
-  const initialConfig = () => {
-    if (infoForm && props.country && infoProducts) {
+  const initialConfig = (productos) => {
+    if (infoForm && props.country) {
       const pais = [...infoForm[props.country]];
       const arrayP = [];
       const arrayCanales = [];
@@ -75,7 +75,7 @@ function TableVolumen(props) {
         for (let x = 0; x < props.productos.length; x++) {
           arrayProdAgrupados.push(agrupados[props.productos[x].uniqueId]);
         }
-        const copy = [...infoProducts];
+        const copy = [...productos];
         let volumenTotal = 0;
 
         arrayProdAgrupados.map((prod) => {
@@ -111,16 +111,27 @@ function TableVolumen(props) {
   };
 
   useEffect(() => {
-    initialConfig();
+    if (props?.productos) {
+      console.log('productos', props.productos) 
+      initialConfig([...props.productos]);
+    }
   }, [infoForm]);
 
   useEffect(() => {
     if (props?.productos) {
-      setInfoProducts(() => [...props.productos]);
+      // setInfoProducts(() => [...props.productos]);
+      console.log('productos', props.productos) 
+      console.log('si entré')
+      initialConfig([...props.productos]);
+    } else {
+      console.log('no entré')
     }
     if (props?.data) setInfoForm(props?.data);
-    initialConfig();
   }, [props]);
+
+  useEffect(() => {
+    console.log('infoProducts', infoProducts);  
+  }, [infoProducts]);
 
   const hideYear = (index) => {
     setVisibleItems((prevItems) => {
