@@ -4,11 +4,12 @@ import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { createContext, useEffect, useState } from 'react';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import { useDispatch, useSelector } from 'react-redux';
-import { createPyL, getPyLInfo } from 'services/Requests';
+import { createPyL, getPyLInfo, getUser } from 'services/Requests';
 import { addResult } from 'store/netoResult/netoResultSlice';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
-import PyLInputComponent from './PyLInputComponent';
+import { calcularRemuneraciones } from 'utils/calcs';
+import { set } from 'lodash';
 
 const impGanancias = 20;
 function TablePyL(props) {
@@ -43,6 +44,8 @@ function TablePyL(props) {
   const [rdoNeto, setRdoNeto] = useState([]);
   const [RNPorcentaje, setRNPorcentaje] = useState([]);
   const [prueba, setPrueba] = useState();
+  // abreviamos Remuneraciones Y Cargas Sociales
+  const [remYcargas, setRemYcargas] = useState([0,0,0,0,0,0,0,0,0,0]);
   const currentState = useSelector((state) => state.auth.user);
 
   // ***************** INPUTS ANIO 0 ******************
@@ -76,7 +79,7 @@ function TablePyL(props) {
   });
 
   function convertirAEntero(value) {
-    const numValue = parseFloat(value);
+    const numValue = parseFloat(value)
     if (Number.isNaN(numValue)) {
       return 0;
     }
@@ -101,19 +104,19 @@ function TablePyL(props) {
     ).toString();
 
     // igual para costoProduccionTotal
-    copy.costoProduccionTotal =
-      convertirAEntero(copy.costoProd) + convertirAEntero(copy.costoServ);
+    copy.costoProduccionTotal = (
+      convertirAEntero(copy.costoProd) + convertirAEntero(copy.costoServ)
+    )
 
     // igual para costoComerciales
-    copy.costoComerciales =
-      convertirAEntero(copy.costoImpuesto) +
-      convertirAEntero(copy.costoComision) +
-      convertirAEntero(copy.costoCargos);
+    copy.costoComerciales = (
+      convertirAEntero(copy.costoImpuesto) + convertirAEntero(copy.costoComision) + convertirAEntero(copy.costoCargos)
+    )
 
     // igual para costoTotales
-    copy.costoTotales =
-      convertirAEntero(copy.costoProduccionTotal) +
-      convertirAEntero(copy.costoComerciales);
+    copy.costoTotales = (
+      convertirAEntero(copy.costoProduccionTotal) + convertirAEntero(copy.costoComerciales)
+    )
 
     // igual para gastoEnCtasTotal pero sumaré desde remuneraciones hasta marketing
     let sum = 0;
@@ -128,7 +131,9 @@ function TablePyL(props) {
     ).toString();
 
     // ahora configuramos para setear el .IIGG
-    copy.IIGG = ((convertirAEntero(copy.BAT) * impGanancias) / 100).toString();
+    copy.IIGG = (
+      convertirAEntero(copy.BAT) * impGanancias / 100
+    ).toString();
 
     // ahora configuramos para setear .rdoNeto
     copy.rdoNeto = (
@@ -137,11 +142,13 @@ function TablePyL(props) {
 
     // seteamos RNPorcentaje}
     if (convertirAEntero(copy.vtasTot) === 0) {
-      copy.RNPorcentaje = (convertirAEntero(copy.rdoNeto) / 1) * 100;
-    } else {
       copy.RNPorcentaje = (
-        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) *
-        100
+        convertirAEntero(copy.rdoNeto) / 1 * 100
+      )
+    }
+    else {
+      copy.RNPorcentaje = (
+        convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
       ).toString();
     }
 
@@ -262,7 +269,7 @@ function TablePyL(props) {
     }
     if (amortizaciones) {
       if (props?.setAmortizacionesExterior) {
-        props?.setAmortizacionesExterior(amortizaciones);
+        props?.setAmortizacionesExterior(amortizaciones)
       }
     }
   }, [EBITDA, amortizaciones]);
@@ -289,7 +296,7 @@ function TablePyL(props) {
     }
     if (intereses) {
       if (props?.setInteresesExterior) {
-        props?.setInteresesExterior(intereses);
+        props?.setInteresesExterior(intereses)
       }
     }
   }, [EBIT, intereses]);
@@ -307,6 +314,7 @@ function TablePyL(props) {
       dispatch(addIIGG(resultado));
     }
   }, [BAT]);
+
 
   useEffect(() => {
     if (BAT && IIGG) {
@@ -443,9 +451,7 @@ function TablePyL(props) {
   useEffect(() => {
     getPyLInfo(currentState.id)
       .then((data) => {
-        if (data.length !== 0) {
-          console.log('soy la data: ', data[0]);
-
+        if (data.length !== 0) {          
           // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
           let gastoEnCtas = data[0]?.gastoEnCtas || [];
           if (gastoEnCtas?.length <= 11) {
@@ -458,22 +464,23 @@ function TablePyL(props) {
           let inputsEditados = {
             ...data[0],
             vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
-            costoTotales:
-              Number(data[0].costoProduccionTotal) +
-              Number(data[0].costoComerciales),
-            gastoEnCtasTotal: data[0].gastoEnCtas.reduce(
-              (acc, curr) => Number(acc) + Number(curr),
-              0,
-            ),
+            costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
+            gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
             gastoEnCtas,
-            rdoNeto: Number(
-              (Number.isNaN(data[0].BAT) ? 0 : data[0].BAT) -
-                (Number.isNaN(data[0].IIGG) ? 0 : data[0].IIGG),
-            ),
-          };
+            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),
+          }
 
           setinputsValues(inputsEditados);
         }
+      })
+      .catch((error) => console.error(error));
+
+    getUser(currentState.id)
+      .then((data) => {
+        console.log('data?.puestosPData[0].puestosp[0]: ', data?.puestosPData[0].puestosp[0]);
+        let remuneraciones = calcularRemuneraciones(data?.puestosPData[0].puestosp[0]);
+        console.log('remuneraciones: ', remuneraciones);
+        setRemYcargas(remuneraciones);
       })
       .catch((error) => console.error(error));
     // eslint-disable-next-line
@@ -483,7 +490,9 @@ function TablePyL(props) {
     <>
       {/* <MiContexto.Provider value={rdoNeto}> */}
       {showLoader ? (
-        <div style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}>
+        <div
+          style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}
+        >
           <MySpinner />
         </div>
       ) : (
@@ -553,7 +562,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px] "
@@ -612,7 +623,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -646,7 +659,10 @@ function TablePyL(props) {
                       </div>
                       {vtasProd.map((año, indexYear) => (
                         <div key={indexYear} className="titleRow w-[130px]">
-                          <p className="cursor-default"> Año {indexYear + 1}</p>
+                          <p className="cursor-default">
+                            {' '}
+                            Año {indexYear + 1}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -736,7 +752,10 @@ function TablePyL(props) {
                               type="text"
                               value={inputsValues.costoProd}
                               onChange={(e) =>
-                                handleChangeInputs('costoProd', e.target.value)
+                                handleChangeInputs(
+                                  'costoProd',
+                                  e.target.value,
+                                )
                               }
                               name="initial"
                               prefix={currency || '$'}
@@ -749,7 +768,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -795,7 +816,10 @@ function TablePyL(props) {
                               type="text"
                               value={inputsValues.costoServ}
                               onChange={(e) =>
-                                handleChangeInputs('costoServ', e.target.value)
+                                handleChangeInputs(
+                                  'costoServ',
+                                  e.target.value,
+                                )
                               }
                               name="initial"
                               prefix={currency || '$'}
@@ -808,7 +832,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -871,7 +897,9 @@ function TablePyL(props) {
                               {Math.round(año).toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
@@ -932,7 +960,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -994,7 +1024,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -1056,7 +1088,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -1118,7 +1152,9 @@ function TablePyL(props) {
                               {Math.round(año).toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
@@ -1327,11 +1363,10 @@ function TablePyL(props) {
                   {/** *********** ****************  ************ */}
                   <div className="linea" />
                   {!hiddenItems[2] && (
-                    <>
-                      {/** *********** GASTO POR CUENTAS  ************ */}
-
-                      {ctasListado.map((ctaName, indexCta) => (
-                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                      <>
+                        {/** *********** GASTO POR CUENTAS  ************ */}                       
+                        {ctasListado.map((ctaName, indexCta) => (
+                          <div className="flex  gap-x-3 gap-y-3  mb-6 ">
                           <div className="iconDesplegable" />
                           <FormItem className=" mb-1 w-[240px]">
                             <Input
@@ -1359,7 +1394,7 @@ function TablePyL(props) {
                               />
                             </FormItem>
                           </div>
-                          {gastoEnCtas[indexCta].map((anio, indexanio) => (
+                          {(indexCta === 0 ? remYcargas : gastoEnCtas[indexCta])?.map((anio, indexanio) => (
                             <div className="flex flex-col" key={indexanio}>
                               <FormItem className="mb-0">
                                 {anio.toString().length > 5 ? (
@@ -1621,7 +1656,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -1680,7 +1717,9 @@ function TablePyL(props) {
                               {Math.round(año).toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
@@ -1788,7 +1827,10 @@ function TablePyL(props) {
                               type="text"
                               value={inputsValues.intereses}
                               onChange={(e) =>
-                                handleChangeInputs('intereses', e.target.value)
+                                handleChangeInputs(
+                                  'intereses',
+                                  e.target.value,
+                                )
                               }
                               name="initial"
                               prefix={currency || '$'}
@@ -1801,7 +1843,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -1861,7 +1905,9 @@ function TablePyL(props) {
                               {Math.round(año).toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px] font-bold bg-blue-100"
@@ -1921,7 +1967,9 @@ function TablePyL(props) {
                               {año.toString().length > 5 ? (
                                 <Tooltip
                                   placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
+                                  title={
+                                    currency + formatNumberPrestamos(año)
+                                  }
                                 >
                                   <Input
                                     className="w-[130px]"
@@ -2088,6 +2136,7 @@ function TablePyL(props) {
           }
         </>
       )}
+
     </>
   );
 }

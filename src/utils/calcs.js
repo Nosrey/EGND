@@ -325,6 +325,7 @@ export const calcAmortizaciones = (PxQCapex) => {
             (opcion) => opcion.value === PxQCapex[j].bien,
           );
           const anioAmort = objetoEncontrado.amortizacion;
+          console.log('soy objeto encontrado', objetoEncontrado);
           let cantMeses = anioAmort * 12;
           valorMensual = valorBien / cantMeses;
 
@@ -333,7 +334,7 @@ export const calcAmortizaciones = (PxQCapex) => {
             mesesRestantesPrimerAnio * valorMensual;
           myArrayAmort[a] += pcioAmortizadoPrimerAnio;
 
-          for (let x = 1; x < anioAmort - 1; x++) {
+          for (let x = 1; x < anioAmort; x++) {
             const pcioAmortizado = 12 * valorMensual;
             const anioCurrent = a + x;
 
@@ -342,6 +343,7 @@ export const calcAmortizaciones = (PxQCapex) => {
               myArrayAmort[anioCurrent] += pcioAmortizado;
             }
           }
+          console.log('llevamos amortizado', myArrayAmort);
 
           if (anioAmort > 1) {
             const mesesRestantesUltimoAnio =
@@ -352,7 +354,7 @@ export const calcAmortizaciones = (PxQCapex) => {
 
             if (anioUltimo <= 9) {
               // dentro del plazo planteado
-              myArrayAmort[anioUltimo] += pcioAmortizadoUltimoAnio;
+              myArrayAmort[anioUltimo + 1] += pcioAmortizadoUltimoAnio;
             }
           }
         }
@@ -3878,7 +3880,7 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
   for (let i = 0; i < prestamoscalculados.length; i++) {
     // en minuscula
 
-    let mesInicio = (typeof(prestamoscalculados[i]?.mesInicio) === 'string' ? prestamoscalculados[i]?.mesInicio.toLowerCase() : prestamoscalculados[i]?.mesInicio);
+    let mesInicio = (typeof (prestamoscalculados[i]?.mesInicio) === 'string' ? prestamoscalculados[i]?.mesInicio.toLowerCase() : prestamoscalculados[i]?.mesInicio);
     let yearInicio = Number(prestamoscalculados[i]?.yearInicio);
     let monto = Number(prestamoscalculados[i]?.monto);
     let plazo = Number(prestamoscalculados[i]?.plazo);
@@ -3902,7 +3904,7 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
             ...prestamosArray[j][mesInicio],
             ingreso: prestamosArray[j][mesInicio].ingreso ? prestamosArray[j][mesInicio].ingreso + monto : monto,
           },
-          
+
         }
       }
     }
@@ -3977,3 +3979,25 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
   setFinal(final);
   setShowLoader(false);
 };
+
+export const calcularRemuneraciones = (data) => {
+  const arrayKeys = Object.keys(data);
+  let sum = [];
+
+  for (let i = 0; i < arrayKeys.length; i++) {
+    for (let j = 0; j < data[arrayKeys[i]].puestos.length; j++) {
+      for (let k = 0; k < data[arrayKeys[i]].puestos[j].años.length; k++) {
+        let totalAño = 0;
+        let volMesesKeys = Object.keys(data[arrayKeys[i]].puestos[j].años[k].volMeses);
+        for (let l = 0; l < volMesesKeys.length; l++) {
+          const volMes = Number(data[arrayKeys[i]].puestos[j].años[k].volMeses[volMesesKeys[l]]);
+          const total = Number(data[arrayKeys[i]].puestos[j].total);      
+          totalAño += (volMes * (Number.isNaN(Number(total)) ? 0 : total));    
+        }
+        sum[k] = sum[k] ? sum[k] + totalAño : totalAño;
+      }
+    }
+  }
+
+  return sum;
+}

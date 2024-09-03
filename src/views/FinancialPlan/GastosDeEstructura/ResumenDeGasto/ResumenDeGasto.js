@@ -137,7 +137,7 @@ function ResumenDeGasto() {
         for (let j = 0; j < puestosP[arrayKeys[i]].puestos.length; j++) {
           sum +=
             Number(puestosP[arrayKeys[i]].puestos[j].años[year].volMeses[mes]) *
-              Number(puestosP[arrayKeys[i]].puestos[j].total) || 0;
+            Number(puestosP[arrayKeys[i]].puestos[j].total) || 0;
         }
       }
     } else {
@@ -150,14 +150,12 @@ function ResumenDeGasto() {
 
     return sum;
   };
-  const sumAnio = (cta, year) => {
-    const arrayKeys = Object.keys(infoForm);
+  const sumAnio = (cta, year, index) => {
     let sum = 0;
-    for (let i = 0; i < arrayKeys.length; i++) {
-      sum += Math.round(
-        infoForm[arrayKeys[i]].cuentas[cta].años[year].volTotal,
-      );
+    for (let i = 0; i < 12; i++) {
+      sum += sumMes(cta, year, MONTHS[i], index);
     }
+
     return sum;
   };
 
@@ -226,18 +224,16 @@ function ResumenDeGasto() {
                                     key={head.name}
                                   >
                                     <FormItem
-                                      className={`${
-                                        index === 0
-                                          ? 'mt-12 w-[210px]'
-                                          : 'mb-2  w-[210px]'
-                                      }`}
+                                      className={`${index === 0
+                                        ? 'mt-12 w-[210px]'
+                                        : 'mb-2  w-[210px]'
+                                        }`}
                                     >
                                       <Input
-                                        className={`${
-                                          index === 0
-                                            ? 'capitalize mt-10'
-                                            : 'capitalize mt-5'
-                                        }`}
+                                        className={`${index === 0
+                                          ? 'capitalize mt-10'
+                                          : 'capitalize mt-5'
+                                          }`}
                                         disabled={
                                           !infoForm['Administración'].cuentas[
                                             head
@@ -315,18 +311,16 @@ function ResumenDeGasto() {
                                               Object.keys(año.volMeses).map(
                                                 (mes, indexMes) => (
                                                   <FormItem
-                                                    className={`${
-                                                      index === 0
-                                                        ? 'mb-0'
-                                                        : 'mb-0'
-                                                    }`}
+                                                    className={`${index === 0
+                                                      ? 'mb-0'
+                                                      : 'mb-0'
+                                                      }`}
                                                     key={indexMes}
                                                   >
                                                     <Tooltip
                                                       placement="top-end"
-                                                      title={`${mes} - año ${
-                                                        indexYear + 1
-                                                      }`}
+                                                      title={`${mes} - año ${indexYear + 1
+                                                        }`}
                                                     >
                                                       <Input
                                                         className="w-[90px]"
@@ -348,13 +342,26 @@ function ResumenDeGasto() {
                                                 ),
                                               )}
                                             <FormItem className="mb-0">
-                                              <Input
-                                                className="w-[90px]"
-                                                type="number"
-                                                disabled
-                                                prefix={currency}
-                                                value={sumAnio(head, indexYear)}
-                                              />
+                                              <Tooltip
+                                                placement="top-end"
+                                                title={`${currency}${sumAnio(
+                                                  head,
+                                                  indexYear,
+                                                  index,
+                                                )}`}
+                                              >
+                                                <Input
+                                                  className="w-[90px]"
+                                                  type="number"
+                                                  disabled
+                                                  prefix={currency}
+                                                  value={sumAnio(
+                                                    head,
+                                                    indexYear,
+                                                    index,
+                                                  )}
+                                                />
+                                              </Tooltip>
                                             </FormItem>
                                           </div>
                                         </div>

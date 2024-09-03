@@ -7,8 +7,6 @@ function ProgresoCircularScroll({ title, churnProducto }) {
   const media = useMedia();
   const [percent, setPercent] = useState(0);
 
-  console.log('churn', churnProducto);
-
   useEffect(() => {
     let sum = 0;
     churnProducto.churns.map((c) => {
@@ -22,7 +20,7 @@ function ProgresoCircularScroll({ title, churnProducto }) {
         );
       });
     });
-  }, []);
+  }, [churnProducto]);
 
   return (
     <Card className={`${media === 'mobile' ? 'w-[100%]' : 'w-[50%]'}`}>
