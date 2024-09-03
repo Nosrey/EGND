@@ -87,7 +87,6 @@ function GraficoDeBarraMargenBrutoTwo({
 
   const calculatePercent = (margenBrunto, ventas) => {
     let percent = (margenBrunto * 100) / ventas;
-    console.log('data', margenBrunto, ventas, percent);
 
     if (percent === -Infinity) {
       percent = -100;
@@ -135,7 +134,7 @@ function GraficoDeBarraMargenBrutoTwo({
                 }
               } else {
                 setTypeView(year);
-                setCantidadMeses(120);
+                setCantidadMeses(10);
               }
             });
           });
@@ -492,8 +491,6 @@ function GraficoDeBarraMargenBrutoTwo({
     });
 
     const cant = head.reduce((a, b) => a + b, 0);
-
-    console.log('head', head);
 
     setMargenPercent(cant / cantidadMeses);
     setDataView(head);

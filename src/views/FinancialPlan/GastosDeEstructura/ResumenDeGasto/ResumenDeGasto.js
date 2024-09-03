@@ -150,14 +150,12 @@ function ResumenDeGasto() {
 
     return sum;
   };
-  const sumAnio = (cta, year) => {
-    const arrayKeys = Object.keys(infoForm);
+  const sumAnio = (cta, year, index) => {
     let sum = 0;
-    for (let i = 0; i < arrayKeys.length; i++) {
-      sum += Math.round(
-        infoForm[arrayKeys[i]].cuentas[cta].años[year].volTotal,
-      );
+    for (let i = 0; i < 12; i++) {
+      sum += sumMes(cta, year, MONTHS[i], index);
     }
+
     return sum;
   };
 
@@ -344,13 +342,26 @@ function ResumenDeGasto() {
                                                 ),
                                               )}
                                             <FormItem className="mb-0">
-                                              <Input
-                                                className="w-[90px]"
-                                                type="number"
-                                                disabled
-                                                prefix={currency}
-                                                value={sumAnio(head, indexYear)}
-                                              />
+                                              <Tooltip
+                                                placement="top-end"
+                                                title={`${currency}${sumAnio(
+                                                  head,
+                                                  indexYear,
+                                                  index,
+                                                )}`}
+                                              >
+                                                <Input
+                                                  className="w-[90px]"
+                                                  type="number"
+                                                  disabled
+                                                  prefix={currency}
+                                                  value={sumAnio(
+                                                    head,
+                                                    indexYear,
+                                                    index,
+                                                  )}
+                                                />
+                                              </Tooltip>
                                             </FormItem>
                                           </div>
                                         </div>

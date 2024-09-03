@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
 import { showMultiplicacionPxQ } from 'utils/calcs';
+import formatNumber from 'utils/formatTotalsValues';
 
 function DashboardGastos() {
   const [showLoader, setShowLoader] = useState(true);
@@ -35,6 +36,9 @@ function DashboardGastos() {
   const [totalPorCuenta, setTotalPorCuenta] = useState([]);
   const [nameDataView, setNameDataView] = useState([]);
   const [typeView, setTypeView] = useState();
+  const [dataAssump, setDataAssump] = useState();
+  const [infoVolToCalculateClient, setInfoVolToCalculateClient] = useState();
+  const [newClients, setNewClients] = useState(0);
 
   const [yearSelected, setYearSelected] = useState({
     value: 'año 1',
@@ -53,6 +57,168 @@ function DashboardGastos() {
 
   const selectPeriodo = (event) => {
     setPeriodoSelected(event);
+  };
+
+  const calcNewClients = (data, indexY, indexMes, indexChannel, indexProd) =>
+    Number(
+      formatNumber(
+        data.años[indexY].volMeses[MONTHS[indexMes]] /
+          dataAssump.canales[indexChannel].items[indexProd].volumen -
+          (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
+            dataAssump.canales[indexChannel].items[indexProd].volumen -
+            ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
+              dataAssump.canales[indexChannel].items[indexProd].volumen) *
+              dataAssump.churns[indexChannel].items[indexProd]
+                .porcentajeChurn) /
+              100),
+      ),
+    );
+
+  const calcClentes = () => {
+    let tot = 0;
+    let newC = 0;
+    if (infoForm && dataAssump) {
+      Object.values(infoVolToCalculateClient).map((d, indexPais) => {
+        d.map((i, indexChannel) => {
+          i.productos.map((p, indexProd) => {
+            p.años.map((a, indexY) => {
+              if (yearSelected.year || yearSelected.year === 0) {
+                if (yearSelected.year === indexY) {
+                  MONTHS.map((o, indexMes) => {
+                    if (periodoSelected.month || periodoSelected.month === 0) {
+                      if (periodoSelected.month === 0 && indexMes === 0) {
+                        tot += Math.floor(
+                          a.volMeses[MONTHS[indexMes]] /
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
+                        );
+                      } else if (periodoSelected.month === 4) {
+                        if (indexMes === 2) {
+                          tot += Math.floor(
+                            a.volMeses[MONTHS[indexMes]] /
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
+                          );
+                        }
+                        if (indexMes < 3) {
+                          newC +=
+                            indexMes === 0
+                              ? 0
+                              : calcNewClients(
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
+                        }
+                      } else if (periodoSelected.month === 6) {
+                        if (indexMes === 5) {
+                          tot += Math.floor(
+                            a.volMeses[MONTHS[indexMes]] /
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
+                          );
+                        }
+                        if (indexMes < 6) {
+                          newC +=
+                            indexMes === 0
+                              ? 0
+                              : calcNewClients(
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
+                        }
+                      } else if (periodoSelected.month === 12) {
+                        if (indexMes === 11) {
+                          tot += Math.floor(
+                            a.volMeses[MONTHS[indexMes]] /
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
+                          );
+                        }
+                        if (indexMes > 5) {
+                          newC +=
+                            indexMes === 0
+                              ? 0
+                              : calcNewClients(
+                                  p,
+                                  indexY,
+                                  indexMes,
+                                  indexChannel,
+                                  indexProd,
+                                );
+                        }
+                      } else if (periodoSelected.month === 24) {
+                        if (indexMes === 11) {
+                          tot += Math.floor(
+                            a.volMeses[MONTHS[indexMes]] /
+                              dataAssump.canales[indexChannel].items[indexProd]
+                                .volumen,
+                          );
+                        }
+
+                        newC +=
+                          indexMes === 0
+                            ? 0
+                            : calcNewClients(
+                                p,
+                                indexY,
+                                indexMes,
+                                indexChannel,
+                                indexProd,
+                              );
+                      }
+                    } else {
+                      // CODIGO PARA EL AÑO COMPLETO
+                      if (indexMes === 11) {
+                        tot += Math.floor(
+                          a.volMeses[MONTHS[indexMes]] /
+                            dataAssump.canales[indexChannel].items[indexProd]
+                              .volumen,
+                        );
+                      }
+                      newC +=
+                        indexMes === 0
+                          ? 0
+                          : calcNewClients(
+                              p,
+                              indexY,
+                              indexMes,
+                              indexChannel,
+                              indexProd,
+                            );
+                    }
+                  });
+                }
+              } else {
+                MONTHS.map((o, indexMes) => {
+                  if (indexMes === 11) {
+                    tot +=
+                      a.volMeses[MONTHS[indexMes]] /
+                      dataAssump.canales[indexChannel].items[indexProd].volumen;
+                  }
+                  newC +=
+                    indexMes === 0
+                      ? 0
+                      : calcNewClients(
+                          p,
+                          indexY,
+                          indexMes,
+                          indexChannel,
+                          indexProd,
+                        );
+                });
+              }
+            });
+          });
+        });
+      });
+    }
+    setNewClients(newC);
   };
 
   const calcTotals = () => {
@@ -320,6 +486,8 @@ function DashboardGastos() {
                         if (indexM > 5) {
                           tot += Number(a.volMeses[MONTHS[indexM]]);
                         }
+                      } else if (periodoSelected.month === 24) {
+                        tot += Number(a.volMeses[MONTHS[indexM]]);
                       }
                     } else {
                       tot += Number(a.ventasTotal);
@@ -347,6 +515,9 @@ function DashboardGastos() {
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
+        if (data.assumptionData[0]) {
+          setDataAssump(data.assumptionData[0]);
+        }
         if (data?.gastosGeneralData.length !== 0) {
           if (data.gastosPorCCData.length !== 0) {
             // tengo data precargada en este form
@@ -371,6 +542,7 @@ function DashboardGastos() {
             datosPrecargadosVol[volDataOrdenada[i].countryName] =
               volDataOrdenada[i].stats;
           }
+          setInfoVolToCalculateClient(() => ({ ...datosPrecargadosVol }));
           // **********************************
           // **********************************
 
@@ -392,6 +564,7 @@ function DashboardGastos() {
           // **********************************
 
           calcTotalsVentas();
+          calcClentes();
         }
         setShowLoader(false);
       })
@@ -449,7 +622,7 @@ function DashboardGastos() {
                   <CardNumerica
                     type="default"
                     title="Nuevos clientes"
-                    cantidad={12}
+                    cantidad={newClients}
                   />
                 </div>
 
@@ -471,7 +644,9 @@ function DashboardGastos() {
                           title="Gasto en MKT sobre Ventas"
                           data={
                             totalVentas !== 0
-                              ? (totalMarkenting * 100) / totalVentas
+                              ? ((totalMarkenting * 100) / totalVentas).toFixed(
+                                  2,
+                                )
                               : 0
                           }
                         />
