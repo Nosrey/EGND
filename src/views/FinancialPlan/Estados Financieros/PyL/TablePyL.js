@@ -17,6 +17,7 @@ function TablePyL(props) {
   const [showLoader, setShowLoader] = useState(true);
   // const MiContexto = createContext();
 
+  const [gatillo, setGatillo] = useState(false);
   const [vtasTot, setVtasTot] = useState([]);
   const [vtasProd, setVtasProd] = useState([]);
   const [vtasServ, setVtasServ] = useState([]);
@@ -88,19 +89,30 @@ function TablePyL(props) {
 
   const handleChangeInputs = (key, value, indexCta) => {
     let copy = { ...inputsValues };
-    if (value?.startsWith('0')) {
-      value = value.slice(1);
-    }
 
     if (key === 'gastoEnCtas') {
       copy.gastoEnCtas[indexCta] = value;
-    } else if (key !== null) {
+    }
+    else if (key !== null) {
       copy[key] = value;
     }
+
+    console.log('copy: ', copy);
+
+
 
     // setearemos para que total ventas siempre equivalga a la suma de ventas de productos y servicios en cada ejecucion de la funcion
     copy.vtasTot = (
       convertirAEntero(copy.vtasProd) + convertirAEntero(copy.vtasServ)
+    ).toString();
+
+    // seteamos .EBITDA en base a CMG BRUTA menos la suma de todos los gastoEnCtas al recorrerlos 
+    let sumGastos = 0;
+    for (let i = 0; i < gastoEnCtas.length; i++) {
+      sumGastos += convertirAEntero(copy.gastoEnCtas[i]);
+    }
+    copy.EBITDA = (
+      convertirAEntero(copy.MBPesos) - sumGastos
     ).toString();
 
     // igual para costoProduccionTotal
@@ -117,7 +129,7 @@ function TablePyL(props) {
     copy.costoTotales = (
       convertirAEntero(copy.costoProduccionTotal) + convertirAEntero(copy.costoComerciales)
     )
-
+    
     // igual para gastoEnCtasTotal pero sumaré desde remuneraciones hasta marketing
     let sum = 0;
     for (let i = 0; i < gastoEnCtas.length; i++) {
@@ -141,15 +153,49 @@ function TablePyL(props) {
     ).toString();
 
     // seteamos RNPorcentaje}
+
+    // ebitda porcentaje es igual a ebitda dividido por ventas totales
+    // copy.EBITDAPorcentaje = (
+    //   convertirAEntero(copy.EBITDA) / (copy.vtasTot !== 0 ? convertirAEntero(copy.vtasTot) : 1) * 100
+    // ).toString();
+
+    // seteamos MBPorcentaje en base a MBPesos dividido por vtasTot
+    // copy.MBPorcentaje = (
+    //   convertirAEntero(copy.MBPesos) / (copy.vtasTot !== 0 ? convertirAEntero(copy.vtasTot) : 1) * 100
+    // ).toString();
+
     if (convertirAEntero(copy.vtasTot) === 0) {
       copy.RNPorcentaje = (
         convertirAEntero(copy.rdoNeto) / 1 * 100
+      )
+      copy.EBITDAPorcentaje = (
+        convertirAEntero(copy.EBITDA) / 1 * 100
+      )
+      copy.MBPorcentaje = (
+        convertirAEntero(copy.MBPesos) / 1 * 100
       )
     }
     else {
       copy.RNPorcentaje = (
         convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
       ).toString();
+      copy.EBITDAPorcentaje = (
+        convertirAEntero(copy.EBITDA) / convertirAEntero(copy.vtasTot) * 100
+      ).toString();
+      copy.MBPorcentaje = (
+        convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot) * 100
+      ).toString();
+    }
+
+    
+    if (value?.startsWith('0')) {
+      value = value.slice(1);
+    }
+
+    if (key === 'gastoEnCtas') {
+      copy.gastoEnCtas[indexCta] = value;
+    } else if (key !== null) {
+      copy[key] = value;
     }
 
     setinputsValues(copy);
@@ -467,12 +513,18 @@ function TablePyL(props) {
             costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
             gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
             gastoEnCtas,
-            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),
+            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),            
           }
 
           setinputsValues(inputsEditados);
+          // set gatillo en true en 5 segundos
+          setTimeout(() => {
+            console.log('apague gatillo')
+            setGatillo(true);
+          }, 5000);
         }
       })
+    
       .catch((error) => console.error(error));
 
     getUser(currentState.id)
@@ -485,6 +537,13 @@ function TablePyL(props) {
       .catch((error) => console.error(error));
     // eslint-disable-next-line
   }, []);
+
+  useEffect(() => {
+    if (gatillo === false) {
+      handleChangeInputs(null, null);
+      console.log('entre con gatillo');
+    }
+  }, [inputsValues, gatillo]);
 
   return (
     <>
