@@ -115,7 +115,7 @@ function TableVolumen(props) {
       console.log('productos', props.productos) 
       initialConfig([...props.productos]);
     }
-  }, [infoForm]);
+  }, [infoForm, props?.country]);
 
   useEffect(() => {
     if (props?.productos) {
