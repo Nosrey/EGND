@@ -61,7 +61,6 @@ function TablePuestosPxQ(props) {
           }
         }
       }
-      console.log('arrat', arrayvalores);
       setVolTotal(arrayvalores);
     }
   };
@@ -74,7 +73,6 @@ function TablePuestosPxQ(props) {
         );
       }
     }
-    console.log('info', infoForm);
   };
 
   // Logica para mostrar las SUMATORIAS VERTICALES ,
