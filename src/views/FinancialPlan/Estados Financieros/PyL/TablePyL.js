@@ -44,9 +44,8 @@ function TablePyL(props) {
   const [IIGG, setIIGG] = useState([]);
   const [rdoNeto, setRdoNeto] = useState([]);
   const [RNPorcentaje, setRNPorcentaje] = useState([]);
-  const [prueba, setPrueba] = useState();
   // abreviamos Remuneraciones Y Cargas Sociales
-  const [remYcargas, setRemYcargas] = useState([0,0,0,0,0,0,0,0,0,0]);
+  const [remYcargas, setRemYcargas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const currentState = useSelector((state) => state.auth.user);
 
   // ***************** INPUTS ANIO 0 ******************
@@ -96,10 +95,7 @@ function TablePyL(props) {
     else if (key !== null) {
       copy[key] = value;
     }
-
     console.log('copy: ', copy);
-
-
 
     // setearemos para que total ventas siempre equivalga a la suma de ventas de productos y servicios en cada ejecucion de la funcion
     copy.vtasTot = (
@@ -111,6 +107,7 @@ function TablePyL(props) {
     for (let i = 0; i < gastoEnCtas.length; i++) {
       sumGastos += convertirAEntero(copy.gastoEnCtas[i]);
     }
+
     copy.EBITDA = (
       convertirAEntero(copy.MBPesos) - sumGastos
     ).toString();
@@ -129,23 +126,30 @@ function TablePyL(props) {
     copy.costoTotales = (
       convertirAEntero(copy.costoProduccionTotal) + convertirAEntero(copy.costoComerciales)
     )
-    
+
     // igual para gastoEnCtasTotal pero sumaré desde remuneraciones hasta marketing
     let sum = 0;
     for (let i = 0; i < gastoEnCtas.length; i++) {
       sum += convertirAEntero(copy.gastoEnCtas[i]);
     }
+
     copy.gastoEnCtasTotal = sum;
+
+    // ahora con EBIT que es igual a EBITDA menos amortizaciones
+    copy.EBIT = (
+      convertirAEntero(copy.EBITDA) - convertirAEntero(copy.amortizaciones)
+    ).toString();
 
     // ahora configuramos para setear el .BAT
     copy.BAT = (
       convertirAEntero(copy.EBIT) - convertirAEntero(copy.intereses)
     ).toString();
 
-    // ahora configuramos para setear el .IIGG
+    // ahora configuramos para setear el .IIGG usando impGanancias
     copy.IIGG = (
       convertirAEntero(copy.BAT) * impGanancias / 100
     ).toString();
+
 
     // ahora configuramos para setear .rdoNeto
     copy.rdoNeto = (
@@ -166,28 +170,45 @@ function TablePyL(props) {
 
     if (convertirAEntero(copy.vtasTot) === 0) {
       copy.RNPorcentaje = (
-        convertirAEntero(copy.rdoNeto) / 1 * 100
+        // (convertirAEntero(copy.rdoNeto) / 1) * 100
+        0
       )
       copy.EBITDAPorcentaje = (
-        convertirAEntero(copy.EBITDA) / 1 * 100
+        0
       )
       copy.MBPorcentaje = (
-        convertirAEntero(copy.MBPesos) / 1 * 100
+        0
+      )
+      // ebit porcentaje
+      copy.EBITPorcentaje = (
+        0
+      )
+      // RN porcentaje
+      copy.RNPorcentaje = (
+        0
       )
     }
     else {
       copy.RNPorcentaje = (
-        convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot) * 100
+        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) * 100
       ).toString();
       copy.EBITDAPorcentaje = (
-        convertirAEntero(copy.EBITDA) / convertirAEntero(copy.vtasTot) * 100
+        (convertirAEntero(copy.EBITDA) / convertirAEntero(copy.vtasTot)) * 100
       ).toString();
       copy.MBPorcentaje = (
-        convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot) * 100
+        (convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot)) * 100
+      ).toString();
+      // ebit porcentaje
+      copy.EBITPorcentaje = (
+        (convertirAEntero(copy.EBIT) / convertirAEntero(copy.vtasTot)) * 100
+      ).toString();
+      // RN porcentaje
+      copy.RNPorcentaje = (
+        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) * 100
       ).toString();
     }
 
-    
+
     if (value?.startsWith('0')) {
       value = value.slice(1);
     }
@@ -497,7 +518,7 @@ function TablePyL(props) {
   useEffect(() => {
     getPyLInfo(currentState.id)
       .then((data) => {
-        if (data.length !== 0) {          
+        if (data.length !== 0) {
           // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
           let gastoEnCtas = data[0]?.gastoEnCtas || [];
           if (gastoEnCtas?.length <= 11) {
@@ -513,18 +534,17 @@ function TablePyL(props) {
             costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
             gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
             gastoEnCtas,
-            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),            
+            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),
           }
 
           setinputsValues(inputsEditados);
           // set gatillo en true en 5 segundos
-          setTimeout(() => {
-            console.log('apague gatillo')
-            setGatillo(true);
-          }, 5000);
+
+          setGatillo(true);
+
         }
       })
-    
+
       .catch((error) => console.error(error));
 
     getUser(currentState.id)
@@ -539,11 +559,13 @@ function TablePyL(props) {
   }, []);
 
   useEffect(() => {
-    if (gatillo === false) {
-      handleChangeInputs(null, null);
+    if (gatillo === true) {
+      setTimeout(() => {
+        handleChangeInputs(null, null);
+      }, 5000);
       console.log('entre con gatillo');
     }
-  }, [inputsValues, gatillo]);
+  }, [gatillo]);
 
   return (
     <>
@@ -1422,10 +1444,10 @@ function TablePyL(props) {
                   {/** *********** ****************  ************ */}
                   <div className="linea" />
                   {!hiddenItems[2] && (
-                      <>
-                        {/** *********** GASTO POR CUENTAS  ************ */}                       
-                        {ctasListado.map((ctaName, indexCta) => (
-                          <div className="flex  gap-x-3 gap-y-3  mb-6 ">
+                    <>
+                      {/** *********** GASTO POR CUENTAS  ************ */}
+                      {ctasListado.map((ctaName, indexCta) => (
+                        <div className="flex  gap-x-3 gap-y-3  mb-6 ">
                           <div className="iconDesplegable" />
                           <FormItem className=" mb-1 w-[240px]">
                             <Input
@@ -1570,6 +1592,7 @@ function TablePyL(props) {
                       />
                     </FormItem>
                     <div className="flex flex-col">
+
                       <FormItem className="mb-0">
                         <Input
                           className="w-[130px]"
@@ -1580,6 +1603,7 @@ function TablePyL(props) {
                           }
                           name="initial"
                           prefix={currency || '$'}
+                          disabled
                         />
                       </FormItem>
                     </div>
@@ -1642,6 +1666,7 @@ function TablePyL(props) {
                           }
                           name="initial"
                           prefix="%"
+                          disabled
                         />
                       </FormItem>
                     </div>
@@ -1767,6 +1792,7 @@ function TablePyL(props) {
                               }
                               name="initial"
                               prefix={currency || '$'}
+                              disabled
                             />
                           </FormItem>
                         </div>
@@ -1831,6 +1857,7 @@ function TablePyL(props) {
                               }
                               name="initial"
                               prefix="%"
+                              disabled
                             />
                           </FormItem>
                         </div>
