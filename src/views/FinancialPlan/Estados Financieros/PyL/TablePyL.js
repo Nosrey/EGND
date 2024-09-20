@@ -11,7 +11,6 @@ import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
 import { calcularRemuneraciones } from 'utils/calcs';
 import { set } from 'lodash';
 
-const impGanancias = 20;
 function TablePyL(props) {
   const dispatch = useDispatch();
   const [showLoader, setShowLoader] = useState(true);
@@ -41,12 +40,13 @@ function TablePyL(props) {
   const [EBITPorcentaje, setEBITPorcentaje] = useState([]);
   const [intereses, setIntereses] = useState([]);
   const [BAT, setBAT] = useState([]);
-  const [IIGG, setIIGG] = useState([]);
+  const [IIGG, setIIGG] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [rdoNeto, setRdoNeto] = useState([]);
   const [RNPorcentaje, setRNPorcentaje] = useState([]);
   // abreviamos Remuneraciones Y Cargas Sociales
   const [remYcargas, setRemYcargas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const currentState = useSelector((state) => state.auth.user);
+  const [impGanancias, setImpGanancias] = useState(0);
 
   // ***************** INPUTS ANIO 0 ******************
   const [inputsValues, setinputsValues] = useState({
@@ -209,7 +209,7 @@ function TablePyL(props) {
     }
 
 
-    if (value?.startsWith('0')) {
+    if (value?.startsWith('00')) {
       value = value.slice(1);
     }
 
@@ -380,7 +380,7 @@ function TablePyL(props) {
       setIIGG(resultado);
       dispatch(addIIGG(resultado));
     }
-  }, [BAT]);
+  }, [BAT, impGanancias]);
 
 
   useEffect(() => {
@@ -560,10 +560,17 @@ function TablePyL(props) {
 
   useEffect(() => {
     if (gatillo === true) {
-      setTimeout(() => {
-        handleChangeInputs(null, null);
-      }, 5000);
-      console.log('entre con gatillo');
+      getUser(currentState.id)
+        .then((data) => {
+          let impuestosTemp = data?.assumpFinancierasData[0]?.impGanancias;
+          setImpGanancias(impuestosTemp)
+          setTimeout(() => {
+            handleChangeInputs(null, null, null, impuestosTemp);
+          }, 5000);
+          console.log('entre con gatillo');
+        }
+        )
+        .catch((error) => console.error(error));
     }
   }, [gatillo]);
 

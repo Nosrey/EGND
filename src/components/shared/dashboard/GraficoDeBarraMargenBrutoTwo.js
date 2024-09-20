@@ -95,7 +95,7 @@ function GraficoDeBarraMargenBrutoTwo({
       percent = 100;
     }
 
-    return isNaN(percent) ? 0 : Math.round(percent);
+    return isNaN(percent) ? 0 : percent;
   };
   useEffect(() => {
     Object.values(infoForm).map((d) => {
@@ -493,7 +493,7 @@ function GraficoDeBarraMargenBrutoTwo({
     const cant = head.reduce((a, b) => a + b, 0);
 
     setMargenPercent(cant / cantidadMeses);
-    setDataView(head);
+    setDataView(head.map(e => Math.round(e)));
   }, [yearSelected, periodoSelected, infoForm, cantidadMeses]);
 
   const data = [
