@@ -319,8 +319,14 @@ function ResumenDeGasto() {
                                                   >
                                                     <Tooltip
                                                       placement="top-end"
-                                                      title={`${mes} - año ${indexYear + 1
-                                                        }`}
+                                                      title={`${currency}${sumMes(
+                                                        head,
+                                                        indexYear,
+                                                        Object.keys(
+                                                          año.volMeses,
+                                                        )[indexMes],
+                                                        index,
+                                                      )}`}
                                                     >
                                                       <Input
                                                         className="w-[90px]"

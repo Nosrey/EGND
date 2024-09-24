@@ -261,16 +261,23 @@ function TableWorkingCapital(props) {
                       <p className="cursor-default"> Año 0</p>
                     </div>
                     <FormItem className="mb-0">
-                      <Input
-                        className="w-[130px]"
-                        type="text"
-                        value={inputsValues.creditosVentas}
-                        onChange={(e) =>
-                          handleChangeInputs('creditosVentas', e.target.value)
-                        }
-                        name="initial"
-                        prefix="$"
-                      />
+                    <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(inputsValues.creditosVentas)
+                                }
+                                >
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.creditosVentas}
+                              onChange={(e) =>
+                                handleChangeInputs('creditosVentas', e.target.value)
+                              }                              
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                            </Tooltip>
                     </FormItem>
                   </div>
                   {creditosVentas.map((año, indexYear) => (
@@ -279,8 +286,7 @@ function TableWorkingCapital(props) {
                         <p className="cursor-default"> Año {indexYear + 1}</p>
                       </div>
                       <FormItem className="mb-0">
-                        {año.toString().length > 5 ? (
-                          <Tooltip
+                      <Tooltip
                             placement="top-end"
                             title={currency + formatNumberPrestamos(año)}
                           >
@@ -293,16 +299,6 @@ function TableWorkingCapital(props) {
                               prefix={currency}
                             />
                           </Tooltip>
-                        ) : (
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={formatNumberPrestamos(año)}
-                            name="year"
-                            prefix={currency}
-                            disabled
-                          />
-                        )}
                       </FormItem>
                     </div>
                   ))}
@@ -321,21 +317,27 @@ function TableWorkingCapital(props) {
                   </FormItem>
                   <div className="flex flex-col">
                     <FormItem className="mb-0">
-                      <Input
-                        className="w-[130px]"
-                        type="text"
-                        value={inputsValues.bienesDeCambio}
-                        onChange={(e) => handleBienesDeCambio(e.target.value)}
-                        name="initial"
-                        prefix="$"
-                      />
+                    <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(inputsValues.bienesDeCambio)
+                                }
+                                >
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.bienesDeCambio}
+                              onChange={(e) => handleBienesDeCambio(e.target.value)}                            
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                            </Tooltip>
                     </FormItem>
                   </div>
                   {bienesDeCambio.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                        {año.toString().length > 5 ? (
-                          <Tooltip
+                      <Tooltip
                             placement="top-end"
                             title={currency + formatNumberPrestamos(año)}
                           >
@@ -348,16 +350,6 @@ function TableWorkingCapital(props) {
                               prefix={currency}
                             />
                           </Tooltip>
-                        ) : (
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={formatNumberPrestamos(año)}
-                            name="year"
-                            prefix={currency}
-                            disabled
-                          />
-                        )}
                       </FormItem>
                     </div>
                   ))}
@@ -377,26 +369,32 @@ function TableWorkingCapital(props) {
                   </FormItem>
                   <div className="flex flex-col">
                     <FormItem className="mb-0">
-                      <Input
-                        className="w-[130px]"
-                        type="text"
-                        value={inputsValues.deudasComerciales}
+                    <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(inputsValues.deudasComerciales)
+                                }
+                                >
+                            <Input
+                              className="w-[130px]"
+                              type="text"
+                              value={inputsValues.deudasComerciales}
                         onChange={(e) =>
                           handleChangeInputs(
                             'deudasComerciales',
                             e.target.value,
                           )
-                        }
-                        name="initial"
-                        prefix="$"
-                      />
+                        }                            
+                              name="initial"
+                              prefix={currency || '$'}
+                            />
+                            </Tooltip>
                     </FormItem>
                   </div>
                   {deudasComerciales.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                        {año.toString().length > 5 ? (
-                          <Tooltip
+                      <Tooltip
                             placement="top-end"
                             title={currency + formatNumberPrestamos(año)}
                           >
@@ -409,16 +407,6 @@ function TableWorkingCapital(props) {
                               prefix={currency}
                             />
                           </Tooltip>
-                        ) : (
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={formatNumberPrestamos(año)}
-                            name="year"
-                            prefix={currency}
-                            disabled
-                          />
-                        )}
                       </FormItem>
                     </div>
                   ))}
@@ -440,8 +428,7 @@ function TableWorkingCapital(props) {
                   {posicionAlCierre.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                        {Math.round(año).toString().length > 5 ? (
-                          <Tooltip
+                      <Tooltip
                             placement="top-end"
                             title={currency + formatNumberPrestamos(año)}
                           >
@@ -454,16 +441,6 @@ function TableWorkingCapital(props) {
                               prefix={currency}
                             />
                           </Tooltip>
-                        ) : (
-                          <Input
-                            className="w-[130px] font-bold "
-                            type="text"
-                            value={formatNumberPrestamos(año)}
-                            name="year"
-                            disabled
-                            prefix={currency}
-                          />
-                        )}
                       </FormItem>
                     </div>
                   ))}
@@ -494,8 +471,7 @@ function TableWorkingCapital(props) {
                   {variacion.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                        {año.toString().length > 5 ? (
-                          <Tooltip
+                      <Tooltip
                             placement="top-end"
                             title={currency + formatNumberPrestamos(año)}
                           >
@@ -508,16 +484,6 @@ function TableWorkingCapital(props) {
                               prefix={currency}
                             />
                           </Tooltip>
-                        ) : (
-                          <Input
-                            className="w-[130px]"
-                            type="text"
-                            value={formatNumberPrestamos(año)}
-                            name="year"
-                            prefix={currency}
-                            disabled
-                          />
-                        )}
                       </FormItem>
                     </div>
                   ))}

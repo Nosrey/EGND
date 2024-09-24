@@ -31,30 +31,20 @@ function TableCac(props) {
                     <p className="cursor-default"> Año {indexYear + 1}</p>
                   </div>
                   <FormItem className="mb-0">
-                    {año.toString().length > 4 ? (
-                      <Tooltip
-                        placement="top-end"
-                        title={formatNumberPrestamos(año)}
-                      >
-                        <Input
-                          className="w-[90px]"
-                          type="text"
-                          value={formatNumberPrestamos(año)}
-                          name="year"
-                          prefix={currency || '$'}
-                          disabled
-                        />
-                      </Tooltip>
-                    ) : (
+                    <Tooltip
+                      placement="top-end"
+                      title={`${currency || '$'}${formatNumberPrestamos(año)}`}
+                    >
                       <Input
                         className="w-[90px]"
                         type="text"
+                        prefix={currency || '$'}
                         value={formatNumberPrestamos(año)}
                         name="year"
                         disabled
-                        prefix={currency || '$'}
                       />
-                    )}
+                    </Tooltip>
+
                   </FormItem>
                 </div>
               ))}
@@ -72,18 +62,10 @@ function TableCac(props) {
               {ltv.map((año, indexYear) => (
                 <div className="flex flex-col" key={indexYear}>
                   <FormItem className="mb-0">
-                    {año.toString().length > 4 ? (
-                      <Tooltip placement="top-end" title={año}>
-                        <Input
-                          className="w-[90px]"
-                          type="text"
-                          prefix={currency || '$'}
-                          value={formatNumberPrestamos(año)}
-                          name="year"
-                          disabled
-                        />
-                      </Tooltip>
-                    ) : (
+                    <Tooltip
+                      placement="top-end"
+                      title={`${currency || '$'}${formatNumberPrestamos(año)}`}
+                    >
                       <Input
                         className="w-[90px]"
                         type="text"
@@ -92,7 +74,8 @@ function TableCac(props) {
                         name="year"
                         disabled
                       />
-                    )}
+                    </Tooltip>
+
                   </FormItem>
                 </div>
               ))}
@@ -110,25 +93,20 @@ function TableCac(props) {
               {ltvCac.map((año, indexYear) => (
                 <div className="flex flex-col" key={indexYear}>
                   <FormItem className="mb-0">
-                    {Math.round(año).toString().length > 4 ? (
-                      <Tooltip placement="top-end" title={año}>
-                        <Input
-                          className="w-[90px]"
-                          type="text"
-                          value={formatNumberPrestamos(año)}
-                          name="year"
-                          disabled
-                        />
-                      </Tooltip>
-                    ) : (
+                    <Tooltip
+                      placement="top-end"
+                      title={`${currency || '$'}${formatNumberPrestamos(año)}`}
+                    >
                       <Input
                         className="w-[90px]"
                         type="text"
+                        prefix={currency || '$'}
                         value={formatNumberPrestamos(año)}
                         name="year"
                         disabled
                       />
-                    )}
+                    </Tooltip>
+
                   </FormItem>
                 </div>
               ))}

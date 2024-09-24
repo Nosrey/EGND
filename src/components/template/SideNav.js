@@ -118,7 +118,11 @@ function SideNav() {
           ) : (
             <div className="side-nav-content">
               <ScrollBar autoHide direction={direction}>
-                {menuContent}
+                <div
+                  style={{ height: '300vh' }}>
+
+                  {menuContent}
+                </div>
               </ScrollBar>
             </div>
           )}
