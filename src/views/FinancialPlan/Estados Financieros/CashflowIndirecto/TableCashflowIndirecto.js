@@ -212,9 +212,9 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           resultadoNeto[i] +
-            amortizaciones[i] +
-            interesesPagados[i] +
-            variacion[i],
+          amortizaciones[i] +
+          interesesPagados[i] +
+          variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -462,16 +462,23 @@ function TableCashflowIndirecto(props) {
                         <p className="cursor-default"> Año 0</p>
                       </div>
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.cajaYBancos}
-                          onChange={(e) =>
-                            handleChangeInputs('cajaYBancos', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.cajaYBancos)
                           }
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.cajaYBancos}
+                            onChange={(e) =>
+                              handleChangeInputs('cajaYBancos', e.target.value)
+                            }
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {[
@@ -494,8 +501,8 @@ function TableCashflowIndirecto(props) {
                                 value={
                                   indexYear !== 0
                                     ? formatNumberPrestamos(
-                                        cajaYBancosAlCierre[indexYear - 1],
-                                      )
+                                      cajaYBancosAlCierre[indexYear - 1],
+                                    )
                                     : cajaYBancosInicioManual
                                 }
                                 name="year"
@@ -541,46 +548,42 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.resultadoNeto}
-                          onChange={(e) =>
-                            handleChangeInputs('resultadoNeto', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.resultadoNeto)
                           }
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.resultadoNeto}
+                            onChange={(e) =>
+                              handleChangeInputs('resultadoNeto', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {resultadoNeto?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -606,48 +609,44 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.amortizaciones}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'amortizaciones',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.amortizaciones)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.amortizaciones}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'amortizaciones',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {amortizaciones?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -667,48 +666,44 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.interesesPagados}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'interesesPagados',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.interesesPagados)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.interesesPagados}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'interesesPagados',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {interesesPagados?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -728,45 +723,41 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.variacion}
-                              onChange={(e) =>
-                                handleChangeInputs('variacion', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.variacion)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.variacion}
+                                onChange={(e) =>
+                                  handleChangeInputs('variacion', e.target.value)
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {variacion?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -792,46 +783,42 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.FEOperativas}
-                          onChange={(e) =>
-                            handleChangeInputs('FEOperativas', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.FEOperativas)
                           }
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.FEOperativas}
+                            onChange={(e) =>
+                              handleChangeInputs('FEOperativas', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {FEOperativas?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -857,48 +844,44 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.inversiones}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'inversiones',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.inversiones)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.inversiones}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'inversiones',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {inversiones?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -924,46 +907,42 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.inversiones}
-                          onChange={(e) =>
-                            handleChangeInputs('inversiones', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.inversiones)
                           }
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.inversiones}
+                            onChange={(e) =>
+                              handleChangeInputs('inversiones', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {inversiones?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -988,48 +967,44 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.financiacion}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'financiacion',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.financiacion)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.financiacion}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'financiacion',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {financiacion?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1048,48 +1023,44 @@ function TableCashflowIndirecto(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.pagoPrestamos}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'pagoPrestamos',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.pagoPrestamos)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.pagoPrestamos}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'pagoPrestamos',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {pagoPrestamos?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1115,43 +1086,39 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.FEfinanciacion}
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.FEfinanciacion)
+                          }
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.FEfinanciacion}
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {FEfinanciacion?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1172,43 +1139,39 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.variacionCajaYBco}
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.variacionCajaYBco)
+                          }
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.variacionCajaYBco}
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {variacionCajaYBco?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1229,43 +1192,39 @@ function TableCashflowIndirecto(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.cajaYBancosAlCierre}
-                          name="initial"
-                          disabled
-                          prefix={currency || '$'}
-                        />
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.cajaYBancosAlCierre)
+                          }
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.cajaYBancosAlCierre}
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {cajaYBancosAlCierre?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={currency + formatNumberPrestamos(año)}
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] font-bold text-base"
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}

@@ -212,10 +212,27 @@ function BarraDeProgresoMargenBruto({
                         indexP,
                         indexY,
                         indexMes,
-                      );
+                      );               
                     }
                   }
-                } else {
+                  if (periodoSelected.month === 24) {
+          
+                    getTotalsByParam(
+                      indexD,
+                      indexChannel,
+                      indexP,
+                      indexY,
+                      indexMes,
+                    );
+                    total += getMargenResult(
+                      indexD,
+                      indexChannel,
+                      indexP,
+                      indexY,
+                      indexMes
+                    );           
+                  }
+                } else { 
                   getTotalsByParam(
                     indexD,
                     indexChannel,
@@ -233,6 +250,7 @@ function BarraDeProgresoMargenBruto({
                 }
               });
             }
+
             if (!periodoSelected.month && selectYear.year) {
               for (let i = 0; i <= 11; i++) {
                 getTotalsByParam(indexD, indexChannel, indexP, indexY, i);
@@ -246,7 +264,7 @@ function BarraDeProgresoMargenBruto({
               }
             }
 
-            if (!selectYear.year) {
+            if (selectYear?.year !== 0 && !selectYear.year) {
               for (let j = 0; j <= 9; j++) {
                 for (let i = 0; i <= 11; i++) {
                   getTotalsByParam(indexD, indexChannel, indexP, indexY, i);
@@ -345,8 +363,8 @@ function BarraDeProgresoMargenBruto({
                 ((country.total * 100) / totalProdServ).toFixed(0) > 100
                   ? 100
                   : ((country.total * 100) / totalProdServ).toFixed(0) < 0
-                  ? 0
-                  : ((country.total * 100) / totalProdServ).toFixed(0)
+                    ? 0
+                    : ((country.total * 100) / totalProdServ).toFixed(0)
               }
               color="lime-300"
             />
@@ -362,8 +380,8 @@ function BarraDeProgresoMargenBruto({
                 ((country.total * 100) / totalProdServ).toFixed(0) > 100
                   ? 100
                   : ((country.total * 100) / totalProdServ).toFixed(0) < 0
-                  ? 0
-                  : ((country.total * 100) / totalProdServ).toFixed(0)
+                    ? 0
+                    : ((country.total * 100) / totalProdServ).toFixed(0)
               }
               color="orange-300"
             />

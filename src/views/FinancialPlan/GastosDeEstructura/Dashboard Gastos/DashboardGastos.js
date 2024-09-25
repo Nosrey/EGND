@@ -6,6 +6,7 @@ import ProgresoCircular from 'components/shared/dashboard/ProgresoCircular';
 import Total from 'components/shared/dashboard/Total';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import { MenuItem, Select } from 'components/ui';
+import { Cuentas } from 'constants/cuentas.constant';
 import {
   año,
   firstSem,
@@ -16,7 +17,7 @@ import {
   trimn,
   year,
 } from 'constants/dashboard.constant';
-import { MONTHS } from 'constants/forms.constants';
+import { AÑOS, MONTHS } from 'constants/forms.constants';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from 'services/Requests';
@@ -28,6 +29,7 @@ function DashboardGastos() {
   const currentState = useSelector((state) => state.auth.user);
   const [total, setTotal] = useState(0);
   const [totalMarkenting, setTotalMarkenting] = useState(0);
+  const [totalComercial, setTotalComercial] = useState(0);
   const [totalVentas, setTotalVentas] = useState(0);
   const [totalsView, setTotalsView] = useState();
   const [infoForm, setInfoForm] = useState();
@@ -228,6 +230,7 @@ function DashboardGastos() {
     let cuentas = [];
     let totalPerCuenta = [];
     let nameCuentas = [];
+    let totComercial = 0;
     Object.values(infoForm).map((head, indexHead) => {
       if (head.visible) {
         head.cuentas.map((cuenta, indexC) => {
@@ -245,6 +248,7 @@ function DashboardGastos() {
                       if (indexM === 0) {
                         tot += año.volMeses[mes];
                         if (indexHead === 3) totMarketing += año.volMeses[mes];
+                        if (indexHead === 2) totComercial += año.volMeses[mes];
                         setTypeView(oneMonth);
                         if (tots[indexM] || tots[indexM] === 0) {
                           tots[indexM] += año.volMeses[mes];
@@ -276,6 +280,7 @@ function DashboardGastos() {
                     if (periodoSelected.month === 4) {
                       if (indexM < 3) {
                         if (indexHead === 3) totMarketing += año.volMeses[mes];
+                        if (indexHead === 2) totComercial += año.volMeses[mes];
                         tot += año.volMeses[mes];
                         setTypeView(trimn);
                         if (tots[indexM] || tots[indexM] === 0) {
@@ -308,6 +313,7 @@ function DashboardGastos() {
                     if (periodoSelected.month === 6) {
                       if (indexM < 6) {
                         if (indexHead === 3) totMarketing += año.volMeses[mes];
+                        if (indexHead === 2) totComercial += año.volMeses[mes];
                         tot += año.volMeses[mes];
                         setTypeView(firstSem);
                         if (tots[indexM] || tots[indexM] === 0) {
@@ -342,6 +348,7 @@ function DashboardGastos() {
                       if (indexM > 5) {
                         tot += año.volMeses[mes];
                         if (indexHead === 3) totMarketing += año.volMeses[mes];
+                        if (indexHead === 2) totComercial += año.volMeses[mes];
 
                         if (tots[indexM - 6] || tots[indexM - 6] === 0) {
                           tots[indexM - 6] += año.volMeses[mes];
@@ -373,6 +380,7 @@ function DashboardGastos() {
                     if (periodoSelected.month === 24) {
                       tot += año.volMeses[mes];
                       if (indexHead === 3) totMarketing += año.volMeses[mes];
+                      if (indexHead === 2) totComercial += año.volMeses[mes];
                       setTypeView(month);
                       if (tots[indexM] || tots[indexM] === 0) {
                         tots[indexM] += año.volMeses[mes];
@@ -403,6 +411,7 @@ function DashboardGastos() {
                   } else {
                     tot += año.volMeses[mes];
                     if (indexHead === 3) totMarketing += año.volMeses[mes];
+                    if (indexHead === 2) totComercial += año.volMeses[mes];
                     setTypeView(month);
                     if (tots[indexM] || tots[indexM] === 0) {
                       tots[indexM] += año.volMeses[mes];
@@ -426,6 +435,7 @@ function DashboardGastos() {
               } else if (!yearSelected.year) {
                 tot += año.volMeses[mes];
                 if (indexHead === 3) totMarketing += año.volMeses[mes];
+                if (indexHead === 2) totComercial += año.volMeses[mes];
                 setTypeView(year);
                 if (tots[indexY] || tots[indexY] === 0) {
                   tots[indexY] += año.volMeses[mes];
@@ -450,6 +460,8 @@ function DashboardGastos() {
         });
       }
     });
+
+    setTotalComercial(totComercial);
     setTotalMarkenting(totMarketing);
     setTotalPorCuenta(totalPerCuenta);
     setNameDataView(nameCuentas);
@@ -524,6 +536,7 @@ function DashboardGastos() {
             setInfoForm(data?.gastosPorCCData[0].centroDeCostos[0]);
           }
         }
+
         setShowLoader(false);
       })
       .catch((error) => console.error(error));
@@ -617,14 +630,25 @@ function DashboardGastos() {
                 </div>
                 <div className="mt-[30px] mb-[30px] cursor-default">
                   <Total title="Gastos Totales" data={total} />
-                </div>
-                <div className="grid grid-cols-3 gap-[20px] mt-[20px]">
-                  <CardNumerica
-                    type="default"
-                    title="Nuevos clientes"
-                    cantidad={newClients}
-                  />
-                </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-[20px] mt-[20px]">
+
+                    <>
+                      <CardNumerica
+                        type="default"
+                        title="Nuevos clientes"
+                        cantidad={newClients}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Costo de Adquisición por Cliente"
+                        hasCurrency
+                        cantidad={              
+                        (Number.isNaN(Number(totalMarkenting + totalComercial)) || Number.isNaN(Number(newClients)) || newClients === 0) ? 0 : ((totalMarkenting + totalComercial) / newClients).toFixed(2)
+                        }
+                      />
+                    </>
+                  </div>
 
                 <div className=" mt-[40px]">
                   <h5>Distribución de Gasto por mes</h5>
@@ -651,11 +675,14 @@ function DashboardGastos() {
                           }
                         />
                       )}
-                      <ProgresoCircular
+                      {/* <ProgresoCircular
                         ancho={100}
                         title="Costo de Adquisición por Cliente"
-                        data={12}
-                      />
+                        data={(
+                          (totalMarkenting + totalComercial) /
+                          newClients
+                        ).toFixed(2)}
+                      /> */}
                     </div>
                   </div>
                 </div>
