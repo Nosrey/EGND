@@ -630,14 +630,25 @@ function DashboardGastos() {
                 </div>
                 <div className="mt-[30px] mb-[30px] cursor-default">
                   <Total title="Gastos Totales" data={total} />
-                </div>
-                <div className="grid grid-cols-3 gap-[20px] mt-[20px]">
-                  <CardNumerica
-                    type="default"
-                    title="Nuevos clientes"
-                    cantidad={newClients}
-                  />
-                </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-[20px] mt-[20px]">
+
+                    <>
+                      <CardNumerica
+                        type="default"
+                        title="Nuevos clientes"
+                        cantidad={newClients}
+                      />
+                      <CardNumerica
+                        type="default"
+                        title="Costo de Adquisición por Cliente"
+                        hasCurrency
+                        cantidad={              
+                        (Number.isNaN(Number(totalMarkenting + totalComercial)) || Number.isNaN(Number(newClients)) || newClients === 0) ? 0 : ((totalMarkenting + totalComercial) / newClients).toFixed(2)
+                        }
+                      />
+                    </>
+                  </div>
 
                 <div className=" mt-[40px]">
                   <h5>Distribución de Gasto por mes</h5>
@@ -664,14 +675,14 @@ function DashboardGastos() {
                           }
                         />
                       )}
-                      <ProgresoCircular
+                      {/* <ProgresoCircular
                         ancho={100}
                         title="Costo de Adquisición por Cliente"
                         data={(
                           (totalMarkenting + totalComercial) /
                           newClients
                         ).toFixed(2)}
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>

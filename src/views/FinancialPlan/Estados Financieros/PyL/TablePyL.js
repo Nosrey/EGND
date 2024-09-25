@@ -11,7 +11,6 @@ import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
 import { calcularRemuneraciones } from 'utils/calcs';
 import { set } from 'lodash';
 
-const impGanancias = 20;
 function TablePyL(props) {
   const dispatch = useDispatch();
   const [showLoader, setShowLoader] = useState(true);
@@ -41,12 +40,13 @@ function TablePyL(props) {
   const [EBITPorcentaje, setEBITPorcentaje] = useState([]);
   const [intereses, setIntereses] = useState([]);
   const [BAT, setBAT] = useState([]);
-  const [IIGG, setIIGG] = useState([]);
+  const [IIGG, setIIGG] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [rdoNeto, setRdoNeto] = useState([]);
   const [RNPorcentaje, setRNPorcentaje] = useState([]);
   // abreviamos Remuneraciones Y Cargas Sociales
   const [remYcargas, setRemYcargas] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const currentState = useSelector((state) => state.auth.user);
+  const [impGanancias, setImpGanancias] = useState(0);
 
   // ***************** INPUTS ANIO 0 ******************
   const [inputsValues, setinputsValues] = useState({
@@ -209,7 +209,7 @@ function TablePyL(props) {
     }
 
 
-    if (value?.startsWith('0')) {
+    if (value?.startsWith('00')) {
       value = value.slice(1);
     }
 
@@ -380,7 +380,7 @@ function TablePyL(props) {
       setIIGG(resultado);
       dispatch(addIIGG(resultado));
     }
-  }, [BAT]);
+  }, [BAT, impGanancias]);
 
 
   useEffect(() => {
@@ -560,10 +560,17 @@ function TablePyL(props) {
 
   useEffect(() => {
     if (gatillo === true) {
-      setTimeout(() => {
-        handleChangeInputs(null, null);
-      }, 5000);
-      console.log('entre con gatillo');
+      getUser(currentState.id)
+        .then((data) => {
+          let impuestosTemp = data?.assumpFinancierasData[0]?.impGanancias;
+          setImpGanancias(impuestosTemp)
+          setTimeout(() => {
+            handleChangeInputs(null, null, null, impuestosTemp);
+          }, 5000);
+          console.log('entre con gatillo');
+        }
+        )
+        .catch((error) => console.error(error));
     }
   }, [gatillo]);
 
@@ -619,16 +626,23 @@ function TablePyL(props) {
                             <p className="cursor-default"> Año 0</p>
                           </div>
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.vtasProd}
-                              onChange={(e) =>
-                                handleChangeInputs('vtasProd', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.vtasProd)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.vtasProd}
+                                onChange={(e) =>
+                                  handleChangeInputs('vtasProd', e.target.value)
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {vtasProd.map((año, indexYear) => (
@@ -640,32 +654,21 @@ function TablePyL(props) {
                               </p>
                             </div>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px] "
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -686,47 +689,43 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              name="initial"
-                              value={inputsValues.vtasServ}
-                              onChange={(e) =>
-                                handleChangeInputs('vtasServ', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.vtasServ)
                               }
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.vtasServ}
+                                onChange={(e) =>
+                                  handleChangeInputs('vtasServ', e.target.value)
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {vtasServ.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -767,46 +766,44 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.vtasTot}
-                          onChange={(e) =>
-                            handleChangeInputs('vtasTot', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.vtasTot)
                           }
-                          disabled
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.vtasTot}
+                            onChange={(e) =>
+                              handleChangeInputs('vtasTot', e.target.value)
+                            }
+                            name="initial"
+                            prefix={currency || '$'}
+                            disabled
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {vtasTot.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -828,50 +825,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoProd}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoProd',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoProd)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoProd}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoProd',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoProd.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
-                                  prefix={currency || '$'}
                                   disabled
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -892,50 +885,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoServ}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoServ',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoServ)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoServ}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoServ',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoServ.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -956,51 +945,47 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoProduccionTotal}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoProduccionTotal',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoProduccionTotal)
                               }
-                              disabled
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoProduccionTotal}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoProduccionTotal',
+                                    e.target.value,
+                                  )
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoProduccionTotal.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {Math.round(año).toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px] font-bold bg-blue-100"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1020,50 +1005,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoImpuesto}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoImpuesto',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoImpuesto)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoImpuesto}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoImpuesto',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoImpuesto.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1084,50 +1065,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoComision}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoComision',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoComision)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoComision}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoComision',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoComision.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1148,50 +1125,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoCargos}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoCargos',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoCargos)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoCargos}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoCargos',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoCargos.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1211,51 +1184,47 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.costoComerciales}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'costoComerciales',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.costoComerciales)
                               }
-                              disabled
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.costoComerciales}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'costoComerciales',
+                                    e.target.value,
+                                  )
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {costoComerciales.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {Math.round(año).toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px] font-bold bg-blue-100"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1281,46 +1250,44 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.costoTotales}
-                          onChange={(e) =>
-                            handleChangeInputs('costoTotales', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.costoTotales)
                           }
-                          disabled
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.costoTotales}
+                            onChange={(e) =>
+                              handleChangeInputs('costoTotales', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {costoTotales.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1340,45 +1307,43 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.MBPesos}
-                          onChange={(e) =>
-                            handleChangeInputs('MBPesos', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.MBPesos)
                           }
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.MBPesos}
+                            onChange={(e) =>
+                              handleChangeInputs('MBPesos', e.target.value)
+                            }
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {MBPesos.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold bg-blue-100"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold bg-blue-100"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1398,45 +1363,43 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.MBPorcentaje}
-                          onChange={(e) =>
-                            handleChangeInputs('MBPorcentaje', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.MBPorcentaje)
                           }
-                          name="initial"
-                          prefix="%"
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.MBPorcentaje}
+                            onChange={(e) =>
+                              handleChangeInputs('MBPorcentaje', e.target.value)
+                            }
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {MBPorcentaje.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {año.toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={`%${formatNumberPrestamos(año)}`}
-                            >
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix="%"
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px]"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix="%"
+                              prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1459,51 +1422,47 @@ function TablePyL(props) {
                           </FormItem>
                           <div className="flex flex-col">
                             <FormItem className="mb-0">
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={inputsValues.gastoEnCtas[indexCta]}
-                                onChange={(e) =>
-                                  handleChangeInputs(
-                                    'gastoEnCtas',
-                                    e.target.value,
-                                    indexCta,
-                                  )
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(inputsValues.gastoEnCtas[indexCta])
                                 }
-                                name="initial"
-                                prefix={currency || '$'}
-                              />
+                              >
+                                <Input
+                                  className="w-[130px]"
+                                  type="text"
+                                  value={inputsValues.gastoEnCtas[indexCta]}
+                                  onChange={(e) =>
+                                    handleChangeInputs(
+                                      'gastoEnCtas',
+                                      e.target.value,
+                                      indexCta,
+                                    )
+                                  }
+                                  name="initial"
+                                  prefix={currency || '$'}
+                                />
+                              </Tooltip>
                             </FormItem>
                           </div>
                           {(indexCta === 0 ? remYcargas : gastoEnCtas[indexCta])?.map((anio, indexanio) => (
                             <div className="flex flex-col" key={indexanio}>
                               <FormItem className="mb-0">
-                                {anio.toString().length > 5 ? (
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(anio)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px]"
-                                      type="text"
-                                      value={formatNumberPrestamos(anio)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency || '$'}
-                                    />
-                                  </Tooltip>
-                                ) : (
+                                <Tooltip
+                                  placement="top-end"
+                                  title={
+                                    currency + formatNumberPrestamos(anio)
+                                  }
+                                >
                                   <Input
-                                    className="w-[130px]"
+                                    className="w-[130px] "
                                     type="text"
                                     value={formatNumberPrestamos(anio)}
                                     name="year"
                                     disabled
                                     prefix={currency || '$'}
                                   />
-                                )}
+                                </Tooltip>
                               </FormItem>
                             </div>
                           ))}
@@ -1530,49 +1489,48 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.gastoEnCtasTotal}
-                          disabled
-                          onChange={(e) =>
-                            handleChangeInputs(
-                              'gastoEnCtasTotal',
-                              e.target.value,
-                            )
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.gastoEnCtasTotal)
                           }
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.gastoEnCtasTotal}
+                            disabled
+                            onChange={(e) =>
+                              handleChangeInputs(
+                                'gastoEnCtasTotal',
+                                e.target.value,
+                              )
+                            }
+
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {gastoEnCtasTotal.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold text-base"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold "
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1594,46 +1552,44 @@ function TablePyL(props) {
                     <div className="flex flex-col">
 
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.EBITDA}
-                          onChange={(e) =>
-                            handleChangeInputs('EBITDA', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.EBITDA)
                           }
-                          name="initial"
-                          prefix={currency || '$'}
-                          disabled
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.EBITDA}
+                            onChange={(e) =>
+                              handleChangeInputs('EBITDA', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {EBITDA.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold bg-blue-100"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold bg-blue-100"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1654,49 +1610,47 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.EBITDAPorcentaje}
-                          onChange={(e) =>
-                            handleChangeInputs(
-                              'EBITDAPorcentaje',
-                              e.target.value,
-                            )
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.EBITDAPorcentaje)
                           }
-                          name="initial"
-                          prefix="%"
-                          disabled
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.EBITDAPorcentaje}
+                            onChange={(e) =>
+                              handleChangeInputs(
+                                'EBITDAPorcentaje',
+                                e.target.value,
+                              )
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {EBITDAPorcentaje.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {año.toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={`%${formatNumberPrestamos(año)}`}
-                            >
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix="%"
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px]"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix="%"
+                              prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -1719,50 +1673,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.amortizaciones}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'amortizaciones',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.amortizaciones)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.amortizaciones}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'amortizaciones',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {amortizaciones.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1783,48 +1733,44 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.EBIT}
-                              onChange={(e) =>
-                                handleChangeInputs('EBIT', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.EBIT)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                              disabled
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.EBIT}
+                                onChange={(e) =>
+                                  handleChangeInputs('EBIT', e.target.value)
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {EBIT.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {Math.round(año).toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px] font-bold bg-blue-100"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1845,49 +1791,47 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.EBITPorcentaje}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'EBITPorcentaje',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.EBITPorcentaje)
                               }
-                              name="initial"
-                              prefix="%"
-                              disabled
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.EBITPorcentaje}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'EBITPorcentaje',
+                                    e.target.value,
+                                  )
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {EBITPorcentaje.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={`%${formatNumberPrestamos(año)}`}
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix="%"
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix="%"
+                                  prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1908,50 +1852,46 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.intereses}
-                              onChange={(e) =>
-                                handleChangeInputs(
-                                  'intereses',
-                                  e.target.value,
-                                )
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.intereses)
                               }
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.intereses}
+                                onChange={(e) =>
+                                  handleChangeInputs(
+                                    'intereses',
+                                    e.target.value,
+                                  )
+                                }
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {intereses.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -1972,48 +1912,44 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.BAT}
-                              onChange={(e) =>
-                                handleChangeInputs('BAT', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.BAT)
                               }
-                              disabled
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.BAT}
+                                onChange={(e) =>
+                                  handleChangeInputs('BAT', e.target.value)
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {BAT.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {Math.round(año).toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px] font-bold bg-blue-100"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px] font-bold bg-blue-100"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -2034,48 +1970,44 @@ function TablePyL(props) {
                         </FormItem>
                         <div className="flex flex-col">
                           <FormItem className="mb-0">
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.IIGG}
-                              onChange={(e) =>
-                                handleChangeInputs('IIGG', e.target.value)
+                            <Tooltip
+                              placement="top-end"
+                              title={
+                                currency + formatNumberPrestamos(inputsValues.IIGG)
                               }
-                              disabled
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
+                            >
+                              <Input
+                                className="w-[130px]"
+                                type="text"
+                                value={inputsValues.IIGG}
+                                onChange={(e) =>
+                                  handleChangeInputs('IIGG', e.target.value)
+                                }
+                                disabled
+                                name="initial"
+                                prefix={currency || '$'}
+                              />
+                            </Tooltip>
                           </FormItem>
                         </div>
                         {IIGG.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
-                              {año.toString().length > 5 ? (
-                                <Tooltip
-                                  placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(año)
-                                  }
-                                >
-                                  <Input
-                                    className="w-[130px]"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency || '$'}
-                                  />
-                                </Tooltip>
-                              ) : (
+                              <Tooltip
+                                placement="top-end"
+                                title={
+                                  currency + formatNumberPrestamos(año)
+                                }
+                              >
                                 <Input
-                                  className="w-[130px]"
+                                  className="w-[130px] "
                                   type="text"
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
                                   prefix={currency || '$'}
                                 />
-                              )}
+                              </Tooltip>
                             </FormItem>
                           </div>
                         ))}
@@ -2103,46 +2035,44 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.rdoNeto}
-                          onChange={(e) =>
-                            handleChangeInputs('rdoNeto', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.rdoNeto)
                           }
-                          disabled
-                          name="initial"
-                          prefix={currency || '$'}
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.rdoNeto}
+                            onChange={(e) =>
+                              handleChangeInputs('rdoNeto', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {rdoNeto.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {Math.round(año).toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={currency + formatNumberPrestamos(año)}
-                            >
-                              <Input
-                                className="w-[130px] font-bold bg-blue-100"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix={currency || '$'}
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px] font-bold bg-blue-100"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
                               prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}
@@ -2163,46 +2093,44 @@ function TablePyL(props) {
                     </FormItem>
                     <div className="flex flex-col">
                       <FormItem className="mb-0">
-                        <Input
-                          className="w-[130px]"
-                          type="text"
-                          value={inputsValues.RNPorcentaje}
-                          onChange={(e) =>
-                            handleChangeInputs('RNPorcentaje', e.target.value)
+                        <Tooltip
+                          placement="top-end"
+                          title={
+                            currency + formatNumberPrestamos(inputsValues.RNPorcentaje)
                           }
-                          disabled
-                          name="initial"
-                          prefix="%"
-                        />
+                        >
+                          <Input
+                            className="w-[130px]"
+                            type="text"
+                            value={inputsValues.RNPorcentaje}
+                            onChange={(e) =>
+                              handleChangeInputs('RNPorcentaje', e.target.value)
+                            }
+                            disabled
+                            name="initial"
+                            prefix={currency || '$'}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                     {RNPorcentaje.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
-                          {año.toString().length > 5 ? (
-                            <Tooltip
-                              placement="top-end"
-                              title={`%${formatNumberPrestamos(año)}`}
-                            >
-                              <Input
-                                className="w-[130px]"
-                                type="text"
-                                value={formatNumberPrestamos(año)}
-                                name="year"
-                                disabled
-                                prefix="%"
-                              />
-                            </Tooltip>
-                          ) : (
+                          <Tooltip
+                            placement="top-end"
+                            title={
+                              currency + formatNumberPrestamos(año)
+                            }
+                          >
                             <Input
-                              className="w-[130px]"
+                              className="w-[130px] "
                               type="text"
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix="%"
+                              prefix={currency || '$'}
                             />
-                          )}
+                          </Tooltip>
                         </FormItem>
                       </div>
                     ))}

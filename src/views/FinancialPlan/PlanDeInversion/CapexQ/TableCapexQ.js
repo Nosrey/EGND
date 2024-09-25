@@ -18,6 +18,26 @@ import { FiMinus, FiPlus } from 'react-icons/fi';
 import { MdDelete } from 'react-icons/md';
 import { useSelector } from 'react-redux';
 import { v4 as uuid } from 'uuid';
+import info from '../../../../assets/image/info.png';
+
+const longTitle = `
+  <table style="font-size: 12px; border-collapse: collapse; width: 100%;">
+    <tr style="font-size: 13px; font-weight: bold; background-color: #343f4f;">
+      <td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Rubros</td>
+      <td style="text-align: center; vertical-align: middle; padding: 4px;">Tiempo en años</td>
+    </tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Rodados</td><td style="text-align: center; vertical-align: middle; padding: 4px;">5</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Maquinarias</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Fabrica, Edificios, Oficinas</td><td style="text-align: center; vertical-align: middle; padding: 4px;">50</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Horas Desarrollo</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Informaticos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Electronicos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Terreno</td><td style="text-align: center; vertical-align: middle; padding: 4px;">0</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Producto Tecnologico</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Utiles y Muebles</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Herramientas</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
+  </table>
+`;
 
 function TableCapexQ(props) {
   const [visibleItems, setVisibleItems] = useState([0]);
@@ -118,6 +138,19 @@ function TableCapexQ(props) {
                   <div className="flex flex-col">
                     {index === 0 && (
                       <div className="titleRow min-w-[62px]">
+                        {/* coloco un icono de info con una i en un circulo aca */}
+                        
+                        <Tooltip title={<span dangerouslySetInnerHTML={{ __html: longTitle }} />} placement="bottom" arrow>
+                        <img
+                          src={info}
+                          alt="info"
+                          className="infoIcon"                          
+                          // 15 px de tamaño
+                          width="20"
+                          style={{ marginRight: '10px' }}                        
+                        />
+                        </Tooltip>
+
                         <p>Bien</p>
                       </div>
                     )}
