@@ -21,20 +21,20 @@ import { v4 as uuid } from 'uuid';
 import info from '../../../../assets/image/info.png';
 
 const longTitle = `
-  <table style="font-size: 12px; border-collapse: collapse; width: 100%;">
+<table style="font-size: 12px; border-collapse: collapse; width: 100%;">
     <tr style="font-size: 13px; font-weight: bold; background-color: #343f4f;">
-      <td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Rubros</td>
+      <td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Rúbros</td>
       <td style="text-align: center; vertical-align: middle; padding: 4px;">Tiempo en años</td>
     </tr>
     <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Rodados</td><td style="text-align: center; vertical-align: middle; padding: 4px;">5</td></tr>
     <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Maquinarias</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
-    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Fabrica, Edificios, Oficinas</td><td style="text-align: center; vertical-align: middle; padding: 4px;">50</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Fábrica, Edificios, Oficinas</td><td style="text-align: center; vertical-align: middle; padding: 4px;">50</td></tr>
     <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Horas Desarrollo</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
-    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Informaticos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
-    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Electronicos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Informáticos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Equipos Electrónicos</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
     <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Terreno</td><td style="text-align: center; vertical-align: middle; padding: 4px;">0</td></tr>
-    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Producto Tecnologico</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
-    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Utiles y Muebles</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Producto Tecnológico</td><td style="text-align: center; vertical-align: middle; padding: 4px;">3</td></tr>
+    <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Útiles y Muebles</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
     <tr><td style="text-align: center; vertical-align: middle; border-right: 1px solid black; padding: 4px;">Herramientas</td><td style="text-align: center; vertical-align: middle; padding: 4px;">10</td></tr>
   </table>
 `;
@@ -139,16 +139,16 @@ function TableCapexQ(props) {
                     {index === 0 && (
                       <div className="titleRow min-w-[62px]">
                         {/* coloco un icono de info con una i en un circulo aca */}
-                        
+
                         <Tooltip title={<span dangerouslySetInnerHTML={{ __html: longTitle }} />} placement="bottom" arrow>
-                        <img
-                          src={info}
-                          alt="info"
-                          className="infoIcon"                          
-                          // 15 px de tamaño
-                          width="20"
-                          style={{ marginRight: '10px' }}                        
-                        />
+                          <img
+                            src={info}
+                            alt="info"
+                            className="infoIcon"
+                            // 15 px de tamaño
+                            width="20"
+                            style={{ marginRight: '10px' }}
+                          />
                         </Tooltip>
 
                         <p>Bien</p>
@@ -168,11 +168,10 @@ function TableCapexQ(props) {
                         />
                       )}
                       <FormItem
-                        className={`${
-                          index === 0
+                        className={`${index === 0
                             ? 'mt-[40px] w-[200px] '
                             : 'mt-[20px] w-[200px]'
-                        }`}
+                          }`}
                       >
                         <Select
                           name="bien"
@@ -195,11 +194,10 @@ function TableCapexQ(props) {
                     )}
 
                     <FormItem
-                      className={`${
-                        index === 0
+                      className={`${index === 0
                           ? 'mt-[40px] w-[300px]'
                           : 'mt-[20px] w-[300px]'
-                      }`}
+                        }`}
                     >
                       <Input
                         name="descripcion"
@@ -217,11 +215,10 @@ function TableCapexQ(props) {
                     )}
 
                     <FormItem
-                      className={`${
-                        index === 0
+                      className={`${index === 0
                           ? 'mt-[40px] w-[100px]'
                           : 'mt-[20px] w-[100px]'
-                      }`}
+                        }`}
                     >
                       <Input name="unidad" disabled value={cta.unidad} />
                     </FormItem>
