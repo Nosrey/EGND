@@ -10,6 +10,7 @@ import { FiMinus, FiPlus } from 'react-icons/fi';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getUser } from 'services/Requests';
+import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 
 function ResumenDeGasto() {
   const [infoForm, setInfoForm] = useState();
@@ -319,13 +320,15 @@ function ResumenDeGasto() {
                                                   >
                                                     <Tooltip
                                                       placement="top-end"
-                                                      title={`${currency}${sumMes(
-                                                        head,
-                                                        indexYear,
-                                                        Object.keys(
-                                                          año.volMeses,
-                                                        )[indexMes],
-                                                        index,
+                                                      title={`${currency}${formatNumberPrestamos(
+                                                        sumMes(
+                                                          head,
+                                                          indexYear,
+                                                          Object.keys(
+                                                            año.volMeses,
+                                                          )[indexMes],
+                                                          index,
+                                                        ),
                                                       )}`}
                                                     >
                                                       <Input
@@ -350,10 +353,12 @@ function ResumenDeGasto() {
                                             <FormItem className="mb-0">
                                               <Tooltip
                                                 placement="top-end"
-                                                title={`${currency}${sumAnio(
-                                                  head,
-                                                  indexYear,
-                                                  index,
+                                                title={`${currency}${formatNumberPrestamos(
+                                                  sumAnio(
+                                                    head,
+                                                    indexYear,
+                                                    index,
+                                                  ),
                                                 )}`}
                                               >
                                                 <Input
@@ -429,16 +434,18 @@ function ResumenDeGasto() {
                                             (valor, index) => (
                                               <p className="w-[90px] text-center cursor-default">
                                                 {currency}
-                                                {valor}
+                                                {formatNumberPrestamos(valor)}
                                               </p>
                                             ),
                                           )}
                                         <p className="w-[90px] text-center font-bold cursor-default">
                                           {currency}
-                                          {sumVerticales[indexYear]?.reduce(
-                                            (acumulador, numero) =>
-                                              acumulador + numero,
-                                            0,
+                                          {formatNumberPrestamos(
+                                            sumVerticales[indexYear]?.reduce(
+                                              (acumulador, numero) =>
+                                                acumulador + numero,
+                                              0,
+                                            ),
                                           )}
                                         </p>
                                       </div>
