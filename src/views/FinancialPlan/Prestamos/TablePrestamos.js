@@ -25,6 +25,7 @@ import {
   calcInteresTotal,
   calcPagoMensual,
   calcTasaMensual,
+  getStringFromPriceNumber,
 } from 'utils/calcs';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { v4 as uuid } from 'uuid';
@@ -375,7 +376,7 @@ function TablePrestamos(props) {
                         placement="top-end"
                         title={
                           currency +
-                          formatNumberPrestamos(
+                          getStringFromPriceNumber(
                             calcPagoMensual(
                               cta.monto,
                               cta.tasaAnual,
@@ -388,7 +389,7 @@ function TablePrestamos(props) {
                           name="unidad"
                           disabled
                           prefix={currency}
-                          value={formatNumberPrestamos(
+                          value={getStringFromPriceNumber(
                             calcPagoMensual(
                               cta.monto,
                               cta.tasaAnual,

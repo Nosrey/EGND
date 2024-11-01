@@ -79,7 +79,7 @@ function TablePyL(props) {
   });
 
   function convertirAEntero(value) {
-    const numValue = parseFloat(value)
+    const numValue = parseFloat(value);
     if (Number.isNaN(numValue)) {
       return 0;
     }
@@ -91,41 +91,37 @@ function TablePyL(props) {
 
     if (key === 'gastoEnCtas') {
       copy.gastoEnCtas[indexCta] = value;
-    }
-    else if (key !== null) {
+    } else if (key !== null) {
       copy[key] = value;
     }
-    console.log('copy: ', copy);
 
     // setearemos para que total ventas siempre equivalga a la suma de ventas de productos y servicios en cada ejecucion de la funcion
     copy.vtasTot = (
       convertirAEntero(copy.vtasProd) + convertirAEntero(copy.vtasServ)
     ).toString();
 
-    // seteamos .EBITDA en base a CMG BRUTA menos la suma de todos los gastoEnCtas al recorrerlos 
+    // seteamos .EBITDA en base a CMG BRUTA menos la suma de todos los gastoEnCtas al recorrerlos
     let sumGastos = 0;
     for (let i = 0; i < gastoEnCtas.length; i++) {
       sumGastos += convertirAEntero(copy.gastoEnCtas[i]);
     }
 
-    copy.EBITDA = (
-      convertirAEntero(copy.MBPesos) - sumGastos
-    ).toString();
+    copy.EBITDA = (convertirAEntero(copy.MBPesos) - sumGastos).toString();
 
     // igual para costoProduccionTotal
-    copy.costoProduccionTotal = (
-      convertirAEntero(copy.costoProd) + convertirAEntero(copy.costoServ)
-    )
+    copy.costoProduccionTotal =
+      convertirAEntero(copy.costoProd) + convertirAEntero(copy.costoServ);
 
     // igual para costoComerciales
-    copy.costoComerciales = (
-      convertirAEntero(copy.costoImpuesto) + convertirAEntero(copy.costoComision) + convertirAEntero(copy.costoCargos)
-    )
+    copy.costoComerciales =
+      convertirAEntero(copy.costoImpuesto) +
+      convertirAEntero(copy.costoComision) +
+      convertirAEntero(copy.costoCargos);
 
     // igual para costoTotales
-    copy.costoTotales = (
-      convertirAEntero(copy.costoProduccionTotal) + convertirAEntero(copy.costoComerciales)
-    )
+    copy.costoTotales =
+      convertirAEntero(copy.costoProduccionTotal) +
+      convertirAEntero(copy.costoComerciales);
 
     // igual para gastoEnCtasTotal pero sumaré desde remuneraciones hasta marketing
     let sum = 0;
@@ -146,10 +142,7 @@ function TablePyL(props) {
     ).toString();
 
     // ahora configuramos para setear el .IIGG usando impGanancias
-    copy.IIGG = (
-      convertirAEntero(copy.BAT) * impGanancias / 100
-    ).toString();
-
+    copy.IIGG = ((convertirAEntero(copy.BAT) * impGanancias) / 100).toString();
 
     // ahora configuramos para setear .rdoNeto
     copy.rdoNeto = (
@@ -169,45 +162,39 @@ function TablePyL(props) {
     // ).toString();
 
     if (convertirAEntero(copy.vtasTot) === 0) {
-      copy.RNPorcentaje = (
+      copy.RNPorcentaje =
         // (convertirAEntero(copy.rdoNeto) / 1) * 100
-        0
-      )
-      copy.EBITDAPorcentaje = (
-        0
-      )
-      copy.MBPorcentaje = (
-        0
-      )
+        0;
+      copy.EBITDAPorcentaje = 0;
+      copy.MBPorcentaje = 0;
       // ebit porcentaje
-      copy.EBITPorcentaje = (
-        0
-      )
+      copy.EBITPorcentaje = 0;
       // RN porcentaje
+      copy.RNPorcentaje = 0;
+    } else {
       copy.RNPorcentaje = (
-        0
-      )
-    }
-    else {
-      copy.RNPorcentaje = (
-        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) * 100
+        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) *
+        100
       ).toString();
       copy.EBITDAPorcentaje = (
-        (convertirAEntero(copy.EBITDA) / convertirAEntero(copy.vtasTot)) * 100
+        (convertirAEntero(copy.EBITDA) / convertirAEntero(copy.vtasTot)) *
+        100
       ).toString();
       copy.MBPorcentaje = (
-        (convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot)) * 100
+        (convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot)) *
+        100
       ).toString();
       // ebit porcentaje
       copy.EBITPorcentaje = (
-        (convertirAEntero(copy.EBIT) / convertirAEntero(copy.vtasTot)) * 100
+        (convertirAEntero(copy.EBIT) / convertirAEntero(copy.vtasTot)) *
+        100
       ).toString();
       // RN porcentaje
       copy.RNPorcentaje = (
-        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) * 100
+        (convertirAEntero(copy.rdoNeto) / convertirAEntero(copy.vtasTot)) *
+        100
       ).toString();
     }
-
 
     if (value?.startsWith('00')) {
       value = value.slice(1);
@@ -336,7 +323,7 @@ function TablePyL(props) {
     }
     if (amortizaciones) {
       if (props?.setAmortizacionesExterior) {
-        props?.setAmortizacionesExterior(amortizaciones)
+        props?.setAmortizacionesExterior(amortizaciones);
       }
     }
   }, [EBITDA, amortizaciones]);
@@ -345,7 +332,7 @@ function TablePyL(props) {
     if (EBIT) {
       let resultado = [];
       for (let i = 0; i < EBIT.length; i++) {
-        resultado.push(EBIT[i] / vtasTot[i]);
+        resultado.push((EBIT[i] / vtasTot[i]) * 100);
       }
       setEBITPorcentaje(resultado);
     }
@@ -363,7 +350,7 @@ function TablePyL(props) {
     }
     if (intereses) {
       if (props?.setInteresesExterior) {
-        props?.setInteresesExterior(intereses)
+        props?.setInteresesExterior(intereses);
       }
     }
   }, [EBIT, intereses]);
@@ -381,7 +368,6 @@ function TablePyL(props) {
       dispatch(addIIGG(resultado));
     }
   }, [BAT, impGanancias]);
-
 
   useEffect(() => {
     if (BAT && IIGG) {
@@ -526,22 +512,28 @@ function TablePyL(props) {
               gastoEnCtas.push('0');
             }
           }
-          console.log('gastoEnCtas: ', gastoEnCtas);
 
           let inputsEditados = {
             ...data[0],
             vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
-            costoTotales: Number(data[0].costoProduccionTotal) + Number(data[0].costoComerciales),
-            gastoEnCtasTotal: data[0].gastoEnCtas.reduce((acc, curr) => Number(acc) + Number(curr), 0),
+            costoTotales:
+              Number(data[0].costoProduccionTotal) +
+              Number(data[0].costoComerciales),
+            gastoEnCtasTotal: data[0].gastoEnCtas.reduce(
+              (acc, curr) => Number(acc) + Number(curr),
+              0,
+            ),
             gastoEnCtas,
-            rdoNeto: Number((Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) - (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG)),
-          }
+            rdoNeto: Number(
+              (Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) -
+                (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG),
+            ),
+          };
 
           setinputsValues(inputsEditados);
           // set gatillo en true en 5 segundos
 
           setGatillo(true);
-
         }
       })
 
@@ -549,9 +541,9 @@ function TablePyL(props) {
 
     getUser(currentState.id)
       .then((data) => {
-        console.log('data?.puestosPData[0].puestosp[0]: ', data?.puestosPData[0].puestosp[0]);
-        let remuneraciones = calcularRemuneraciones(data?.puestosPData[0].puestosp[0]);
-        console.log('remuneraciones: ', remuneraciones);
+        let remuneraciones = calcularRemuneraciones(
+          data?.puestosPData[0].puestosp[0],
+        );
         setRemYcargas(remuneraciones);
       })
       .catch((error) => console.error(error));
@@ -563,13 +555,11 @@ function TablePyL(props) {
       getUser(currentState.id)
         .then((data) => {
           let impuestosTemp = data?.assumpFinancierasData[0]?.impGanancias;
-          setImpGanancias(impuestosTemp)
+          setImpGanancias(impuestosTemp);
           setTimeout(() => {
             handleChangeInputs(null, null, null, impuestosTemp);
           }, 5000);
-          console.log('entre con gatillo');
-        }
-        )
+        })
         .catch((error) => console.error(error));
     }
   }, [gatillo]);
@@ -578,9 +568,7 @@ function TablePyL(props) {
     <>
       {/* <MiContexto.Provider value={rdoNeto}> */}
       {showLoader ? (
-        <div
-          style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}
-        >
+        <div style={{ marginLeft: 'auto', marginRight: 'auto', width: '100%' }}>
           <MySpinner />
         </div>
       ) : (
@@ -629,7 +617,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.vtasProd)
+                                currency +
+                                formatNumberPrestamos(inputsValues.vtasProd)
                               }
                             >
                               <Input
@@ -656,9 +645,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -692,7 +679,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.vtasServ)
+                                currency +
+                                formatNumberPrestamos(inputsValues.vtasServ)
                               }
                             >
                               <Input
@@ -713,9 +701,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -739,10 +725,7 @@ function TablePyL(props) {
                       </div>
                       {vtasProd.map((año, indexYear) => (
                         <div key={indexYear} className="titleRow w-[130px]">
-                          <p className="cursor-default">
-                            {' '}
-                            Año {indexYear + 1}
-                          </p>
+                          <p className="cursor-default"> Año {indexYear + 1}</p>
                         </div>
                       ))}
                     </div>
@@ -769,7 +752,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.vtasTot)
+                            currency +
+                            formatNumberPrestamos(inputsValues.vtasTot)
                           }
                         >
                           <Input
@@ -791,9 +775,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -828,7 +810,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoProd)
+                                currency +
+                                formatNumberPrestamos(inputsValues.costoProd)
                               }
                             >
                               <Input
@@ -852,9 +835,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -888,7 +869,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoServ)
+                                currency +
+                                formatNumberPrestamos(inputsValues.costoServ)
                               }
                             >
                               <Input
@@ -912,9 +894,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -948,7 +928,10 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoProduccionTotal)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.costoProduccionTotal,
+                                )
                               }
                             >
                               <Input
@@ -973,9 +956,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1008,7 +989,10 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoImpuesto)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.costoImpuesto,
+                                )
                               }
                             >
                               <Input
@@ -1032,9 +1016,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1068,7 +1050,10 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoComision)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.costoComision,
+                                )
                               }
                             >
                               <Input
@@ -1092,9 +1077,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1128,7 +1111,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoCargos)
+                                currency +
+                                formatNumberPrestamos(inputsValues.costoCargos)
                               }
                             >
                               <Input
@@ -1152,9 +1136,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1187,7 +1169,10 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.costoComerciales)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.costoComerciales,
+                                )
                               }
                             >
                               <Input
@@ -1212,9 +1197,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1253,7 +1236,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.costoTotales)
+                            currency +
+                            formatNumberPrestamos(inputsValues.costoTotales)
                           }
                         >
                           <Input
@@ -1275,9 +1259,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -1310,7 +1292,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.MBPesos)
+                            currency +
+                            formatNumberPrestamos(inputsValues.MBPesos)
                           }
                         >
                           <Input
@@ -1322,6 +1305,7 @@ function TablePyL(props) {
                             }
                             name="initial"
                             prefix={currency || '$'}
+                            disabled
                           />
                         </Tooltip>
                       </FormItem>
@@ -1331,9 +1315,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -1365,9 +1347,9 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={
-                            currency + formatNumberPrestamos(inputsValues.MBPorcentaje)
-                          }
+                          title={`%${formatNumberPrestamos(
+                            inputsValues.MBPorcentaje,
+                          )}`}
                         >
                           <Input
                             className="w-[130px]"
@@ -1377,7 +1359,8 @@ function TablePyL(props) {
                               handleChangeInputs('MBPorcentaje', e.target.value)
                             }
                             name="initial"
-                            prefix={currency || '$'}
+                            prefix="%"
+                            disabled
                           />
                         </Tooltip>
                       </FormItem>
@@ -1387,9 +1370,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={`%${formatNumberPrestamos(año)}`}
                           >
                             <Input
                               className="w-[130px] "
@@ -1397,7 +1378,7 @@ function TablePyL(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency || '$'}
+                              prefix="%"
                             />
                           </Tooltip>
                         </FormItem>
@@ -1425,7 +1406,10 @@ function TablePyL(props) {
                               <Tooltip
                                 placement="top-end"
                                 title={
-                                  currency + formatNumberPrestamos(inputsValues.gastoEnCtas[indexCta])
+                                  currency +
+                                  formatNumberPrestamos(
+                                    inputsValues.gastoEnCtas[indexCta],
+                                  )
                                 }
                               >
                                 <Input
@@ -1445,14 +1429,15 @@ function TablePyL(props) {
                               </Tooltip>
                             </FormItem>
                           </div>
-                          {(indexCta === 0 ? remYcargas : gastoEnCtas[indexCta])?.map((anio, indexanio) => (
+                          {(indexCta === 0
+                            ? remYcargas
+                            : gastoEnCtas[indexCta]
+                          )?.map((anio, indexanio) => (
                             <div className="flex flex-col" key={indexanio}>
                               <FormItem className="mb-0">
                                 <Tooltip
                                   placement="top-end"
-                                  title={
-                                    currency + formatNumberPrestamos(anio)
-                                  }
+                                  title={currency + formatNumberPrestamos(anio)}
                                 >
                                   <Input
                                     className="w-[130px] "
@@ -1492,7 +1477,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.gastoEnCtasTotal)
+                            currency +
+                            formatNumberPrestamos(inputsValues.gastoEnCtasTotal)
                           }
                         >
                           <Input
@@ -1506,7 +1492,6 @@ function TablePyL(props) {
                                 e.target.value,
                               )
                             }
-
                             name="initial"
                             prefix={currency || '$'}
                           />
@@ -1518,9 +1503,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -1550,12 +1533,12 @@ function TablePyL(props) {
                       />
                     </FormItem>
                     <div className="flex flex-col">
-
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.EBITDA)
+                            currency +
+                            formatNumberPrestamos(inputsValues.EBITDA)
                           }
                         >
                           <Input
@@ -1577,9 +1560,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -1612,9 +1593,9 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={
-                            currency + formatNumberPrestamos(inputsValues.EBITDAPorcentaje)
-                          }
+                          title={`%${formatNumberPrestamos(
+                            inputsValues.EBITDAPorcentaje,
+                          )}`}
                         >
                           <Input
                             className="w-[130px]"
@@ -1628,7 +1609,7 @@ function TablePyL(props) {
                             }
                             disabled
                             name="initial"
-                            prefix={currency || '$'}
+                            prefix="%"
                           />
                         </Tooltip>
                       </FormItem>
@@ -1638,9 +1619,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={`%${formatNumberPrestamos(año)}`}
                           >
                             <Input
                               className="w-[130px] "
@@ -1648,7 +1627,7 @@ function TablePyL(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency || '$'}
+                              prefix="%"
                             />
                           </Tooltip>
                         </FormItem>
@@ -1676,7 +1655,10 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.amortizaciones)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.amortizaciones,
+                                )
                               }
                             >
                               <Input
@@ -1700,9 +1682,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1736,7 +1716,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.EBIT)
+                                currency +
+                                formatNumberPrestamos(inputsValues.EBIT)
                               }
                             >
                               <Input
@@ -1758,9 +1739,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1793,9 +1772,9 @@ function TablePyL(props) {
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
-                              title={
-                                currency + formatNumberPrestamos(inputsValues.EBITPorcentaje)
-                              }
+                              title={`%${formatNumberPrestamos(
+                                inputsValues.EBITPorcentaje,
+                              )}`}
                             >
                               <Input
                                 className="w-[130px]"
@@ -1809,7 +1788,7 @@ function TablePyL(props) {
                                 }
                                 disabled
                                 name="initial"
-                                prefix={currency || '$'}
+                                prefix="%"
                               />
                             </Tooltip>
                           </FormItem>
@@ -1819,9 +1798,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={`%${formatNumberPrestamos(año)}`}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1829,7 +1806,7 @@ function TablePyL(props) {
                                   value={formatNumberPrestamos(año)}
                                   name="year"
                                   disabled
-                                  prefix={currency || '$'}
+                                  prefix="%"
                                 />
                               </Tooltip>
                             </FormItem>
@@ -1855,7 +1832,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.intereses)
+                                currency +
+                                formatNumberPrestamos(inputsValues.intereses)
                               }
                             >
                               <Input
@@ -1879,9 +1857,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1915,7 +1891,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.BAT)
+                                currency +
+                                formatNumberPrestamos(inputsValues.BAT)
                               }
                             >
                               <Input
@@ -1937,9 +1914,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -1973,7 +1948,8 @@ function TablePyL(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.IIGG)
+                                currency +
+                                formatNumberPrestamos(inputsValues.IIGG)
                               }
                             >
                               <Input
@@ -1995,9 +1971,7 @@ function TablePyL(props) {
                             <FormItem className="mb-0">
                               <Tooltip
                                 placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
+                                title={currency + formatNumberPrestamos(año)}
                               >
                                 <Input
                                   className="w-[130px] "
@@ -2038,7 +2012,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.rdoNeto)
+                            currency +
+                            formatNumberPrestamos(inputsValues.rdoNeto)
                           }
                         >
                           <Input
@@ -2060,9 +2035,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -2096,7 +2069,8 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.RNPorcentaje)
+                            currency +
+                            formatNumberPrestamos(inputsValues.RNPorcentaje)
                           }
                         >
                           <Input
@@ -2118,9 +2092,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={
-                              currency + formatNumberPrestamos(año)
-                            }
+                            title={currency + formatNumberPrestamos(año)}
                           >
                             <Input
                               className="w-[130px] "
@@ -2150,7 +2122,6 @@ function TablePyL(props) {
           }
         </>
       )}
-
     </>
   );
 }
