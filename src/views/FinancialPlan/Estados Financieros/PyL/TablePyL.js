@@ -149,6 +149,11 @@ function TablePyL(props) {
       convertirAEntero(copy.BAT) - convertirAEntero(copy.IIGG)
     ).toString();
 
+    // calculamos CMG bruta
+    copy.MBPesos = (
+      convertirAEntero(copy.vtasTot) - convertirAEntero(copy.costoTotales)
+    ).toString();
+
     // seteamos RNPorcentaje}
 
     // ebitda porcentaje es igual a ebitda dividido por ventas totales
