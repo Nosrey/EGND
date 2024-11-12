@@ -1353,13 +1353,15 @@ function TablePyL(props) {
                         <Tooltip
                           placement="top-end"
                           title={`%${formatNumberPrestamos(
-                            inputsValues.MBPorcentaje,
+                            parseFloat(inputsValues.MBPorcentaje)?.toFixed(2),
                           )}`}
                         >
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.MBPorcentaje}
+                            value={`${formatNumberPrestamos(
+                            parseFloat(inputsValues.MBPorcentaje)?.toFixed(2),
+                          )}`}
                             onChange={(e) =>
                               handleChangeInputs('MBPorcentaje', e.target.value)
                             }

@@ -333,7 +333,7 @@ export const calcAmortizaciones = (PxQCapex) => {
             mesesRestantesPrimerAnio * valorMensual;
           myArrayAmort[a] += pcioAmortizadoPrimerAnio;          
 
-          for (let x = 1; x < (anioAmort ); x++) {
+          for (let x = 1; x < anioAmort; x++) {
             const pcioAmortizado = 12 * valorMensual;
             const anioCurrent = a + x;
 
@@ -344,11 +344,10 @@ export const calcAmortizaciones = (PxQCapex) => {
           }
 
           if (anioAmort > 1) {
-            const mesesRestantesUltimoAnio =
-              indexM === 0 ? indexM : indexM;
+            const mesesRestantesUltimoAnio = indexM;
             const pcioAmortizadoUltimoAnio =
               mesesRestantesUltimoAnio * valorMensual;
-            const anioUltimo = a + anioAmort;       
+            const anioUltimo = a + anioAmort;
 
             if (anioUltimo <= 9) {
               // dentro del plazo planteado
