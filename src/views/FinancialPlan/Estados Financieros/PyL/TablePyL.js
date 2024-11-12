@@ -188,7 +188,6 @@ function TablePyL(props) {
       copy.MBPorcentaje = (
         (convertirAEntero(copy.MBPesos) * 100) / convertirAEntero(copy.vtasTot)
       ).toString();
-      console.log('mbporcentaje', copy.MBPorcentaje);
       // ebit porcentaje
       copy.EBITPorcentaje = (
         (convertirAEntero(copy.EBIT) / convertirAEntero(copy.vtasTot)) *
