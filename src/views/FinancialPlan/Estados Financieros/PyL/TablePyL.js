@@ -186,9 +186,9 @@ function TablePyL(props) {
         100
       ).toString();
       copy.MBPorcentaje = (
-        (convertirAEntero(copy.MBPesos) / convertirAEntero(copy.vtasTot)) *
-        100
+        (convertirAEntero(copy.MBPesos) * 100) / convertirAEntero(copy.vtasTot)
       ).toString();
+      console.log('mbporcentaje', copy.MBPorcentaje);
       // ebit porcentaje
       copy.EBITPorcentaje = (
         (convertirAEntero(copy.EBIT) / convertirAEntero(copy.vtasTot)) *
@@ -1352,16 +1352,12 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={`%${formatNumberPrestamos(
-                            parseFloat(inputsValues.MBPorcentaje)?.toFixed(2),
-                          )}`}
+                          title={`%${parseFloat(inputsValues.MBPorcentaje).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`}
                         >
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={`${formatNumberPrestamos(
-                            parseFloat(inputsValues.MBPorcentaje)?.toFixed(2),
-                          )}`}
+                            value={  parseFloat(inputsValues.MBPorcentaje)?.toFixed(2)}
                             onChange={(e) =>
                               handleChangeInputs('MBPorcentaje', e.target.value)
                             }
