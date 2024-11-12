@@ -6,7 +6,7 @@ import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPyL, getPyLInfo, getUser } from 'services/Requests';
 import { addResult } from 'store/netoResult/netoResultSlice';
-import { formatNumberPrestamos } from 'utils/formatTotalsValues';
+import formatNumber, { formatNumberPrestamos } from 'utils/formatTotalsValues';
 import { addIIGG } from 'store/tableBalanceResult/tableBalanceResultSlice';
 import { calcularRemuneraciones } from 'utils/calcs';
 import { set } from 'lodash';
@@ -186,7 +186,8 @@ function TablePyL(props) {
         100
       ).toString();
       copy.MBPorcentaje = (
-        (convertirAEntero(copy.MBPesos) * 100) / convertirAEntero(copy.vtasTot)
+        (convertirAEntero(copy.MBPesos) * 100) /
+        convertirAEntero(copy.vtasTot)
       ).toString();
       // ebit porcentaje
       copy.EBITPorcentaje = (
@@ -763,7 +764,7 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.vtasTot}
+                            value={formatNumberPrestamos(inputsValues.vtasTot)}
                             onChange={(e) =>
                               handleChangeInputs('vtasTot', e.target.value)
                             }
@@ -941,7 +942,9 @@ function TablePyL(props) {
                               <Input
                                 className="w-[130px]"
                                 type="text"
-                                value={inputsValues.costoProduccionTotal}
+                                value={formatNumberPrestamos(
+                                  inputsValues.costoProduccionTotal,
+                                )}
                                 onChange={(e) =>
                                   handleChangeInputs(
                                     'costoProduccionTotal',
@@ -1182,7 +1185,9 @@ function TablePyL(props) {
                               <Input
                                 className="w-[130px]"
                                 type="text"
-                                value={inputsValues.costoComerciales}
+                                value={formatNumberPrestamos(
+                                  inputsValues.costoComerciales,
+                                )}
                                 onChange={(e) =>
                                   handleChangeInputs(
                                     'costoComerciales',
@@ -1247,7 +1252,9 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.costoTotales}
+                            value={formatNumberPrestamos(
+                              inputsValues.costoTotales,
+                            )}
                             onChange={(e) =>
                               handleChangeInputs('costoTotales', e.target.value)
                             }
@@ -1303,7 +1310,7 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.MBPesos}
+                            value={formatNumberPrestamos(inputsValues.MBPesos)}
                             onChange={(e) =>
                               handleChangeInputs('MBPesos', e.target.value)
                             }
@@ -1351,12 +1358,16 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={`%${parseFloat(inputsValues.MBPorcentaje).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`}
+                          title={`%${formatNumberPrestamos(
+                            inputsValues.MBPorcentaje,
+                          )}`}
                         >
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={  parseFloat(inputsValues.MBPorcentaje)?.toFixed(2)}
+                            value={formatNumberPrestamos(
+                              inputsValues.MBPorcentaje,
+                            )}
                             onChange={(e) =>
                               handleChangeInputs('MBPorcentaje', e.target.value)
                             }
@@ -1486,7 +1497,9 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.gastoEnCtasTotal}
+                            value={formatNumberPrestamos(
+                              inputsValues.gastoEnCtasTotal,
+                            )}
                             disabled
                             onChange={(e) =>
                               handleChangeInputs(
@@ -1546,7 +1559,7 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.EBITDA}
+                            value={formatNumberPrestamos(inputsValues.EBITDA)}
                             onChange={(e) =>
                               handleChangeInputs('EBITDA', e.target.value)
                             }
@@ -1602,7 +1615,9 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.EBITDAPorcentaje}
+                            value={formatNumberPrestamos(
+                              inputsValues.EBITDAPorcentaje,
+                            )}
                             onChange={(e) =>
                               handleChangeInputs(
                                 'EBITDAPorcentaje',
@@ -1781,7 +1796,9 @@ function TablePyL(props) {
                               <Input
                                 className="w-[130px]"
                                 type="text"
-                                value={inputsValues.EBITPorcentaje}
+                                value={formatNumberPrestamos(
+                                  inputsValues.EBITPorcentaje,
+                                )}
                                 onChange={(e) =>
                                   handleChangeInputs(
                                     'EBITPorcentaje',
@@ -1900,7 +1917,7 @@ function TablePyL(props) {
                               <Input
                                 className="w-[130px]"
                                 type="text"
-                                value={inputsValues.BAT}
+                                value={formatNumberPrestamos(inputsValues.BAT)}
                                 onChange={(e) =>
                                   handleChangeInputs('BAT', e.target.value)
                                 }
@@ -1957,7 +1974,7 @@ function TablePyL(props) {
                               <Input
                                 className="w-[130px]"
                                 type="text"
-                                value={inputsValues.IIGG}
+                                value={formatNumberPrestamos(inputsValues.IIGG)}
                                 onChange={(e) =>
                                   handleChangeInputs('IIGG', e.target.value)
                                 }
@@ -2021,7 +2038,7 @@ function TablePyL(props) {
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.rdoNeto}
+                            value={formatNumberPrestamos(inputsValues.rdoNeto)}
                             onChange={(e) =>
                               handleChangeInputs('rdoNeto', e.target.value)
                             }
@@ -2070,21 +2087,22 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={
-                            currency +
-                            formatNumberPrestamos(inputsValues.RNPorcentaje)
-                          }
+                          title={`% ${formatNumberPrestamos(
+                            inputsValues.RNPorcentaje,
+                          )}`}
                         >
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={inputsValues.RNPorcentaje}
+                            value={formatNumberPrestamos(
+                              inputsValues.RNPorcentaje,
+                            )}
                             onChange={(e) =>
                               handleChangeInputs('RNPorcentaje', e.target.value)
                             }
                             disabled
                             name="initial"
-                            prefix={currency || '$'}
+                            prefix="%"
                           />
                         </Tooltip>
                       </FormItem>
@@ -2094,7 +2112,7 @@ function TablePyL(props) {
                         <FormItem className="mb-0">
                           <Tooltip
                             placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
+                            title={`%${formatNumberPrestamos(año)}`}
                           >
                             <Input
                               className="w-[130px] "
@@ -2102,7 +2120,7 @@ function TablePyL(props) {
                               value={formatNumberPrestamos(año)}
                               name="year"
                               disabled
-                              prefix={currency || '$'}
+                              prefix="%"
                             />
                           </Tooltip>
                         </FormItem>
