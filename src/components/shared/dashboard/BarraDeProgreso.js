@@ -72,8 +72,6 @@ function BarraDeProgreso({ data, totalVentas, selectYear, periodoSelected }) {
     return 0;
   });
 
-  console.log('data', paises);
-
   return (
     <div>
       {paises.map((country) => (

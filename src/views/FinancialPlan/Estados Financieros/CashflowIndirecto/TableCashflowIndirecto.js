@@ -66,11 +66,8 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
-    console.log('copy: ', copy);
-    console.log('valor: ', valorFOp.toString());
 
     let valorFFinanciacion = 0;
-    // parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
     // si el valor de pagoPrestamos es positivo, lo paso a negativo y sumo a financiacion
     if (parseInt(copy.pagoPrestamos) >= 0) {
       valorFFinanciacion =
@@ -212,9 +209,9 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           resultadoNeto[i] +
-          amortizaciones[i] +
-          interesesPagados[i] +
-          variacion[i],
+            amortizaciones[i] +
+            interesesPagados[i] +
+            variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -354,46 +351,6 @@ function TableCashflowIndirecto(props) {
   }, []);
 
   useEffect(() => {
-    // console.log('props?.variacionCajaYBco', variacionCajaYBco)
-    // console.log('props?.cajaYBancosAlCierre', cajaYBancosAlCierre)
-    // let variacionCajaYBcoFinal = variacionCajaYBco
-    // let cajaYBancosAlCierreFinal = cajaYBancosAlCierre
-
-    // if (variacionCajaYBcoFinal !== undefined && variacionCajaYBcoFinal.length) {
-    //   if (variacionCajaYBcoFinal.length < 10) {
-    //     variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    //   } else {
-    //     for (let i = 0; i < 10; i++) {
-    //       if (Number.isNaN(variacionCajaYBcoFinal[i]) || variacionCajaYBcoFinal[i] === Infinity || variacionCajaYBcoFinal[i] === -Infinity) {
-    //         variacionCajaYBcoFinal[i] = 0;
-    //       } else {
-    //         variacionCajaYBcoFinal[i] = variacionCajaYBco?.[i].toFixed(2)
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    // }
-
-    // if (cajaYBancosAlCierreFinal !== undefined && cajaYBancosAlCierreFinal.length) {
-    //   if (cajaYBancosAlCierreFinal.length < 10) {
-    //     cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    //   } else {
-    //     for (let i = 0; i < 10; i++) {
-    //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
-    //         cajaYBancosAlCierreFinal[i] = 0;
-    //       } else {
-    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    // }
-
-    // console.log('variacionCajaYBcoFinal', variacionCajaYBcoFinal)
-    // console.log('cajaYBancosAlCierreFinal', cajaYBancosAlCierreFinal)
-
     props?.setGraph04Data([
       {
         name: 'Variación de caja y bancos',
@@ -409,10 +366,7 @@ function TableCashflowIndirecto(props) {
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
 
   useEffect(() => {
-    // if (primeraEdicionCajaInicio) {
-    // setPrimeraEdicionCajaInicio(false);
     setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
-    // }
   }, [inputsValues.cajaYBancosAlCierre]);
 
   return (
@@ -457,7 +411,7 @@ function TableCashflowIndirecto(props) {
                         value="Caja y bancos - inicio de periodo"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <div className="titleRow w-[130px]">
                         <p className="cursor-default"> Año 0</p>
                       </div>
@@ -480,7 +434,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {[
                       cajaYBancosInicioManual,
                       ...cajaYBancosAlCierre.slice(0, 9),
@@ -501,8 +455,8 @@ function TableCashflowIndirecto(props) {
                                 value={
                                   indexYear !== 0
                                     ? formatNumberPrestamos(
-                                      cajaYBancosAlCierre[indexYear - 1],
-                                    )
+                                        cajaYBancosAlCierre[indexYear - 1],
+                                      )
                                     : cajaYBancosInicioManual
                                 }
                                 name="year"
@@ -546,7 +500,7 @@ function TableCashflowIndirecto(props) {
                         value="Resultado Neto"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
@@ -567,7 +521,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {resultadoNeto?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
@@ -607,12 +561,15 @@ function TableCashflowIndirecto(props) {
                             value="Amortizaciones"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.amortizaciones)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.amortizaciones,
+                                )
                               }
                             >
                               <Input
@@ -630,7 +587,7 @@ function TableCashflowIndirecto(props) {
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {amortizaciones?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -664,12 +621,15 @@ function TableCashflowIndirecto(props) {
                             value="Intereses Pagados"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.interesesPagados)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.interesesPagados,
+                                )
                               }
                             >
                               <Input
@@ -687,7 +647,7 @@ function TableCashflowIndirecto(props) {
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {interesesPagados?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -721,12 +681,13 @@ function TableCashflowIndirecto(props) {
                             value="Variación Capital de trabajo"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.variacion)
+                                currency +
+                                formatNumberPrestamos(inputsValues.variacion)
                               }
                             >
                               <Input
@@ -734,14 +695,17 @@ function TableCashflowIndirecto(props) {
                                 type="text"
                                 value={inputsValues.variacion}
                                 onChange={(e) =>
-                                  handleChangeInputs('variacion', e.target.value)
+                                  handleChangeInputs(
+                                    'variacion',
+                                    e.target.value,
+                                  )
                                 }
                                 name="initial"
                                 prefix={currency || '$'}
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {variacion?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -781,12 +745,13 @@ function TableCashflowIndirecto(props) {
                         value="FF generado en act. operativas"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.FEOperativas)
+                            currency +
+                            formatNumberPrestamos(inputsValues.FEOperativas)
                           }
                         >
                           <Input
@@ -802,7 +767,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {FEOperativas?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
@@ -842,12 +807,13 @@ function TableCashflowIndirecto(props) {
                             value="Inversiones"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.inversiones)
+                                currency +
+                                formatNumberPrestamos(inputsValues.inversiones)
                               }
                             >
                               <Input
@@ -865,7 +831,7 @@ function TableCashflowIndirecto(props) {
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {inversiones?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -905,12 +871,13 @@ function TableCashflowIndirecto(props) {
                         value="FF generado en act. de inversión"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.inversiones)
+                            currency +
+                            formatNumberPrestamos(inputsValues.inversiones)
                           }
                         >
                           <Input
@@ -926,7 +893,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {inversiones?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
@@ -965,12 +932,13 @@ function TableCashflowIndirecto(props) {
                             value="Financiación de terceros"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.financiacion)
+                                currency +
+                                formatNumberPrestamos(inputsValues.financiacion)
                               }
                             >
                               <Input
@@ -988,7 +956,7 @@ function TableCashflowIndirecto(props) {
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {financiacion?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -1021,12 +989,15 @@ function TableCashflowIndirecto(props) {
                             value="Pago préstamos"
                           />
                         </FormItem>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                           <FormItem className="mb-0">
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.pagoPrestamos)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.pagoPrestamos,
+                                )
                               }
                             >
                               <Input
@@ -1044,7 +1015,7 @@ function TableCashflowIndirecto(props) {
                               />
                             </Tooltip>
                           </FormItem>
-                        </div>
+                        </div> */}
                         {pagoPrestamos?.map((año, indexYear) => (
                           <div className="flex flex-col" key={indexYear}>
                             <FormItem className="mb-0">
@@ -1084,12 +1055,13 @@ function TableCashflowIndirecto(props) {
                         value="FF generado en act. de financiación"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.FEfinanciacion)
+                            currency +
+                            formatNumberPrestamos(inputsValues.FEfinanciacion)
                           }
                         >
                           <Input
@@ -1102,7 +1074,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {FEfinanciacion?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
@@ -1137,12 +1109,15 @@ function TableCashflowIndirecto(props) {
                         value="Variación de caja y bancos"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.variacionCajaYBco)
+                            currency +
+                            formatNumberPrestamos(
+                              inputsValues.variacionCajaYBco,
+                            )
                           }
                         >
                           <Input
@@ -1155,7 +1130,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {variacionCajaYBco?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">
@@ -1190,12 +1165,15 @@ function TableCashflowIndirecto(props) {
                         value="Caja y bancos al cierre"
                       />
                     </FormItem>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.cajaYBancosAlCierre)
+                            currency +
+                            formatNumberPrestamos(
+                              inputsValues.cajaYBancosAlCierre,
+                            )
                           }
                         >
                           <Input
@@ -1208,7 +1186,7 @@ function TableCashflowIndirecto(props) {
                           />
                         </Tooltip>
                       </FormItem>
-                    </div>
+                    </div> */}
                     {cajaYBancosAlCierre?.map((año, indexYear) => (
                       <div className="flex flex-col" key={indexYear}>
                         <FormItem className="mb-0">

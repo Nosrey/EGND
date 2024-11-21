@@ -13,9 +13,7 @@ import { getUser } from 'services/Requests';
 import TableWorkingCapital from './TableWorkingCapital';
 // import CashflowIndirecto from '../CashflowIndirecto/CashflowIndirecto';
 
-function WorkingCapital({
-  setVariacionExterior
-}) {
+function WorkingCapital({ setVariacionExterior }) {
   const [showLoader, setShowLoader] = useState(false);
   const currentState = useSelector((state) => state.auth.user);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -41,9 +39,7 @@ function WorkingCapital({
           No se pudieron guardar los datos.
         </Alert>
       )}
-      <div className="oculto">
-        {/* <CashflowIndirecto /> */}
-      </div>
+      <div className="oculto">{/* <CashflowIndirecto /> */}</div>
       {showLoader ? (
         <MySpinner />
       ) : (
