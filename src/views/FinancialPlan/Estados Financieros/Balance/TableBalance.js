@@ -19,16 +19,21 @@ import {
 } from 'utils/calcs';
 import { addVariacion } from 'store/tableVariacionesCapital/tableVariacionesCapitalSlice';
 
-
 function TableBalance(props) {
   const dispatch = useDispatch();
   const [cebo, setCebo] = useState(0);
   const [showLoader, setShowLoader] = useState(true);
   const [creditosPorVentas, setCreditosPorVentas] = useState([]);
   const [creditosFiscales, setCreditosFiscales] = useState([]);
-  const [bienesDeCambio, setBienesDeCambio] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [bienesDeUso, setBienesDeUso] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [cajaYBancos, setCajaYBancos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [bienesDeCambio, setBienesDeCambio] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
+  const [bienesDeUso, setBienesDeUso] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
+  const [cajaYBancos, setCajaYBancos] = useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  ]);
   const [totActivo, setTotActivo] = useState([]);
 
   const [deudasComerciales, setDeudasComerciales] = useState([]);
@@ -57,11 +62,7 @@ function TableBalance(props) {
   const [timeoutId, setTimeoutId] = useState(null);
 
   const currentState = useSelector((state) => state.auth.user);
-  let ResultadosDelEjercicioData = useSelector(
-    (state) => state.netoResult[0],
-  );
-
-
+  let ResultadosDelEjercicioData = useSelector((state) => state.netoResult[0]);
 
   if (ResultadosDelEjercicioData === undefined) {
     ResultadosDelEjercicioData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -99,12 +100,14 @@ function TableBalance(props) {
       value = value.slice(1);
     }
     copy[key] = value;
+    const parseOrZero = (value) =>
+      Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
     const valorTotActivo =
-      parseInt(copy.BienesDeCambio) +
-      parseInt(copy.BienesDeUso) +
-      parseInt(copy.creditosFiscales) +
-      parseInt(copy.creditosPorVentas) -
-      parseInt(copy.cajaYBancos);
+      parseOrZero(copy.BienesDeCambio) +
+      parseOrZero(copy.BienesDeUso) +
+      parseOrZero(copy.creditosFiscales) +
+      parseOrZero(copy.creditosPorVentas) +
+      parseOrZero(copy.cajaYBancos);
     copy.totActivo = Number.isNaN(valorTotActivo)
       ? '0'
       : valorTotActivo.toString();
@@ -168,7 +171,6 @@ function TableBalance(props) {
   }
 
   useEffect(() => {
-
     let cajaYBancosCopy = Array.from({ length: 10 }, () => 0);
     props?.cajaYBancos?.forEach((element, index) => {
       if (!Number.isNaN(element)) {
@@ -191,8 +193,12 @@ function TableBalance(props) {
       setTimeout(() => {
         const fetchData = async () => {
           try {
-            let cajaYBancosAlCierreFinal = (cajaYBancosAlCierre?.length === 0) ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : cajaYBancosAlCierre;
-            let IIGGFinal = (IIGG?.length === 0) ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
+            let cajaYBancosAlCierreFinal =
+              cajaYBancosAlCierre?.length === 0
+                ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                : cajaYBancosAlCierre;
+            let IIGGFinal =
+              IIGG?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
 
             const data = await getUser(currentState.id);
             let dataCopy = JSON.parse(JSON.stringify(data));
@@ -229,8 +235,15 @@ function TableBalance(props) {
               setCebo,
             );
 
-            let prestamosFinal = prestamos
-            if (prestamosFinal.length === 1 && prestamosFinal[0].monto === 0 && prestamosFinal[0].plazo === 0 && prestamosFinal[0].tasaAnual === 0 && prestamosFinal[0].mesInicio === '') prestamosFinal = []
+            let prestamosFinal = prestamos;
+            if (
+              prestamosFinal.length === 1 &&
+              prestamosFinal[0].monto === 0 &&
+              prestamosFinal[0].plazo === 0 &&
+              prestamosFinal[0].tasaAnual === 0 &&
+              prestamosFinal[0].mesInicio === ''
+            )
+              prestamosFinal = [];
             await calcularPrestamos(
               prestamosFinal,
               setDeudasFinancieras,
@@ -257,15 +270,15 @@ function TableBalance(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           deudasComerciales[i] +
-          deudasFiscales[i] +
-          deudasFinancieras[i] +
-          otrasDeudas[i],
+            deudasFiscales[i] +
+            deudasFinancieras[i] +
+            otrasDeudas[i],
         );
       }
 
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -287,7 +300,7 @@ function TableBalance(props) {
       setinputsValues(copy);
     }
     if (deudasComerciales) {
-      dispatch(addVariacion(deudasComerciales))
+      dispatch(addVariacion(deudasComerciales));
     }
   }, [
     deudasComerciales,
@@ -381,15 +394,15 @@ function TableBalance(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           bienesDeUso[i] +
-          creditosPorVentas[i] +
-          creditosFiscales[i] +
-          bienesDeCambio[i] +
-          cajaYBancos[i],
+            creditosPorVentas[i] +
+            creditosFiscales[i] +
+            bienesDeCambio[i] +
+            cajaYBancos[i],
         );
       }
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -426,7 +439,7 @@ function TableBalance(props) {
 
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
             if (Number.isNaN(resultado[i])) {
@@ -450,8 +463,10 @@ function TableBalance(props) {
   // igual peron con tot activo / tot pasivo para setear props.graph06Data
   useEffect(() => {
     if (totActivo && totPasivo) {
-      let totActivoFinal = totActivo?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : totActivo;
-      let totPasivoFinal = totPasivo?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : totPasivo;
+      let totActivoFinal =
+        totActivo?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : totActivo;
+      let totPasivoFinal =
+        totPasivo?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : totPasivo;
 
       let resultado = [];
       for (let i = 0; i < 10; i++) {
@@ -465,10 +480,14 @@ function TableBalance(props) {
 
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
-            if (Number.isNaN(resultado[i]) || resultado[i] === Infinity || resultado[i] === -Infinity) {
+            if (
+              Number.isNaN(resultado[i]) ||
+              resultado[i] === Infinity ||
+              resultado[i] === -Infinity
+            ) {
               resultado[i] = 0;
             }
           }
@@ -499,7 +518,7 @@ function TableBalance(props) {
             (cajaYBancos[i - 1] +
               creditosPorVentas[i - 1] +
               bienesDeCambio[i - 1]) /
-            totPasivo[i - 1],
+              totPasivo[i - 1],
           )
         ) {
           resultado.push(0);
@@ -508,17 +527,21 @@ function TableBalance(props) {
             (cajaYBancos[i - 1] +
               creditosPorVentas[i - 1] +
               bienesDeCambio[i - 1]) /
-            totPasivo[i - 1],
+              totPasivo[i - 1],
           );
         }
       }
 
       if (resultado !== undefined) {
         if (resultado.length < 10) {
-          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         } else {
           for (let i = 0; i < 10; i++) {
-            if (Number.isNaN(resultado[i]) || resultado[i] === Infinity || resultado[i] === -Infinity) {
+            if (
+              Number.isNaN(resultado[i]) ||
+              resultado[i] === Infinity ||
+              resultado[i] === -Infinity
+            ) {
               resultado[i] = 0;
             }
           }
@@ -628,7 +651,8 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.cajaYBancos)
+                                currency +
+                                formatNumberPrestamos(inputsValues.cajaYBancos)
                               }
                             >
                               <Input
@@ -650,34 +674,34 @@ function TableBalance(props) {
                         {Number.isNaN(cajaYBancos[0])
                           ? []
                           : cajaYBancos.map((año, indexYear) => {
-                            return (
-                              <div className="flex flex-col" key={indexYear}>
-                                <div className="titleRow w-[130px]">
-                                  <p className="cursor-default">
-                                    {' '}
-                                    Año {indexYear + 1}
-                                  </p>
+                              return (
+                                <div className="flex flex-col" key={indexYear}>
+                                  <div className="titleRow w-[130px]">
+                                    <p className="cursor-default">
+                                      {' '}
+                                      Año {indexYear + 1}
+                                    </p>
+                                  </div>
+                                  <FormItem className="mb-0">
+                                    <Tooltip
+                                      placement="top-end"
+                                      title={
+                                        currency + formatNumberPrestamos(año)
+                                      }
+                                    >
+                                      <Input
+                                        className="w-[130px] "
+                                        type="text"
+                                        value={formatNumberPrestamos(año)}
+                                        name="year"
+                                        disabled
+                                        prefix={currency}
+                                      />
+                                    </Tooltip>
+                                  </FormItem>
                                 </div>
-                                <FormItem className="mb-0">
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] "
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency}
-                                    />
-                                  </Tooltip>
-                                </FormItem>
-                              </div>
-                            );
-                          })}
+                              );
+                            })}
                       </div>
                       {/** *********** ****************  ************ */}
 
@@ -697,7 +721,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.creditosPorVentas)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.creditosPorVentas,
+                                )
                               }
                             >
                               <Input
@@ -754,7 +781,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.creditosFiscales)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.creditosFiscales,
+                                )
                               }
                             >
                               <Input
@@ -776,28 +806,28 @@ function TableBalance(props) {
                         {Number.isNaN(creditosFiscales[0])
                           ? []
                           : creditosFiscales.map((año, indexYear) => {
-                            return (
-                              <div className="flex flex-col" key={indexYear}>
-                                <FormItem className="mb-0">
-                                  <Tooltip
-                                    placement="top-end"
-                                    title={
-                                      currency + formatNumberPrestamos(año)
-                                    }
-                                  >
-                                    <Input
-                                      className="w-[130px] "
-                                      type="text"
-                                      value={formatNumberPrestamos(año)}
-                                      name="year"
-                                      disabled
-                                      prefix={currency}
-                                    />
-                                  </Tooltip>
-                                </FormItem>
-                              </div>
-                            );
-                          })}
+                              return (
+                                <div className="flex flex-col" key={indexYear}>
+                                  <FormItem className="mb-0">
+                                    <Tooltip
+                                      placement="top-end"
+                                      title={
+                                        currency + formatNumberPrestamos(año)
+                                      }
+                                    >
+                                      <Input
+                                        className="w-[130px] "
+                                        type="text"
+                                        value={formatNumberPrestamos(año)}
+                                        name="year"
+                                        disabled
+                                        prefix={currency}
+                                      />
+                                    </Tooltip>
+                                  </FormItem>
+                                </div>
+                              );
+                            })}
                       </div>
                       {/** *********** ****************  ************ */}
 
@@ -817,7 +847,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.BienesDeCambio)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.BienesDeCambio,
+                                )
                               }
                             >
                               <Input
@@ -870,7 +903,8 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.BienesDeUso)
+                                currency +
+                                formatNumberPrestamos(inputsValues.BienesDeUso)
                               }
                             >
                               <Input
@@ -933,7 +967,8 @@ function TableBalance(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.totActivo)
+                            currency +
+                            formatNumberPrestamos(inputsValues.totActivo)
                           }
                         >
                           <Input
@@ -954,28 +989,26 @@ function TableBalance(props) {
                     {Number.isNaN(totActivo[0])
                       ? []
                       : totActivo.map((año, indexYear) => {
-                        return (
-                          <div className="flex flex-col" key={indexYear}>
-                            <FormItem className="mb-0">
-                              <Tooltip
-                                placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(año)
-                                }
-                              >
-                                <Input
-                                  className="w-[130px] font-bold text-base"
-                                  type="text"
-                                  value={formatNumberPrestamos(año)}
-                                  name="year"
-                                  disabled
-                                  prefix={currency}
-                                />
-                              </Tooltip>
-                            </FormItem>
-                          </div>
-                        );
-                      })}
+                          return (
+                            <div className="flex flex-col" key={indexYear}>
+                              <FormItem className="mb-0">
+                                <Tooltip
+                                  placement="top-end"
+                                  title={currency + formatNumberPrestamos(año)}
+                                >
+                                  <Input
+                                    className="w-[130px] font-bold text-base"
+                                    type="text"
+                                    value={formatNumberPrestamos(año)}
+                                    name="year"
+                                    disabled
+                                    prefix={currency}
+                                  />
+                                </Tooltip>
+                              </FormItem>
+                            </div>
+                          );
+                        })}
                   </div>
                   {/** *********** ****************  ************ */}
 
@@ -998,7 +1031,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.deudasComerciales)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.deudasComerciales,
+                                )
                               }
                             >
                               <Input
@@ -1055,7 +1091,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.deudasFiscales)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.deudasFiscales,
+                                )
                               }
                             >
                               <Input
@@ -1112,7 +1151,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.deudasFinancieras)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.deudasFinancieras,
+                                )
                               }
                             >
                               <Input
@@ -1169,7 +1211,8 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.otrasDeudas)
+                                currency +
+                                formatNumberPrestamos(inputsValues.otrasDeudas)
                               }
                             >
                               <Input
@@ -1232,7 +1275,8 @@ function TableBalance(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.totPasivo)
+                            currency +
+                            formatNumberPrestamos(inputsValues.totPasivo)
                           }
                         >
                           <Input
@@ -1292,7 +1336,8 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.equity)
+                                currency +
+                                formatNumberPrestamos(inputsValues.equity)
                               }
                             >
                               <Input
@@ -1346,7 +1391,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.ResultadosNoAsignados)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.ResultadosNoAsignados,
+                                )
                               }
                             >
                               <Input
@@ -1403,7 +1451,10 @@ function TableBalance(props) {
                             <Tooltip
                               placement="top-end"
                               title={
-                                currency + formatNumberPrestamos(inputsValues.resultadosDelEjercicio)
+                                currency +
+                                formatNumberPrestamos(
+                                  inputsValues.resultadosDelEjercicio,
+                                )
                               }
                             >
                               <Input
@@ -1469,7 +1520,8 @@ function TableBalance(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.totPatNeto)
+                            currency +
+                            formatNumberPrestamos(inputsValues.totPatNeto)
                           }
                         >
                           <Input
@@ -1531,7 +1583,8 @@ function TableBalance(props) {
                         <Tooltip
                           placement="top-end"
                           title={
-                            currency + formatNumberPrestamos(inputsValues.totPnYPasivo)
+                            currency +
+                            formatNumberPrestamos(inputsValues.totPnYPasivo)
                           }
                         >
                           <Input

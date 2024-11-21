@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { getUser } from 'services/Requests';
 import { setUser } from 'store/auth/userSlice';
@@ -15,7 +14,6 @@ import './locales';
 import mockServer from './mock';
 import store, { persistor } from './store';
 
-
 const environment = process.env.NODE_ENV;
 
 /**
@@ -27,27 +25,6 @@ if (environment !== 'production' && appConfig.enableMock) {
 }
 
 function App() {
-  // const currentState = useSelector((state) => state.auth.user);
-
-  // useEffect(() => {
-  //   getUser(currentState.id)
-  //     .then((data) => {
-  //       const currencyInfo = data?.businessInfo[0]?.currency;
-
-  //       if (currencyInfo) {
-  //         console.log('cargo moneda', currencyInfo)
-  //         const newState = {
-  //           ...currentState,
-  //           currency: currencyInfo,
-  //         };
-  //         dispatch(setUser(newState));
-  //       } else {
-  //         console.log('no cargo moneda')
-  //       }
-  //     })
-  //     .catch((error) => console.error(error));
-  // }, []);
-
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

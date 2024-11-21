@@ -66,11 +66,8 @@ function TableCashflowIndirecto(props) {
       parseInt(copy.interesesPagados) +
       parseInt(copy.variacion);
     copy.FEOperativas = Number.isNaN(valorFOp) ? '0' : valorFOp.toString();
-    console.log('copy: ', copy);
-    console.log('valor: ', valorFOp.toString());
 
     let valorFFinanciacion = 0;
-    // parseInt(copy.financiacion) - parseInt(copy.pagoPrestamos);
     // si el valor de pagoPrestamos es positivo, lo paso a negativo y sumo a financiacion
     if (parseInt(copy.pagoPrestamos) >= 0) {
       valorFFinanciacion =
@@ -354,46 +351,6 @@ function TableCashflowIndirecto(props) {
   }, []);
 
   useEffect(() => {
-    // console.log('props?.variacionCajaYBco', variacionCajaYBco)
-    // console.log('props?.cajaYBancosAlCierre', cajaYBancosAlCierre)
-    // let variacionCajaYBcoFinal = variacionCajaYBco
-    // let cajaYBancosAlCierreFinal = cajaYBancosAlCierre
-
-    // if (variacionCajaYBcoFinal !== undefined && variacionCajaYBcoFinal.length) {
-    //   if (variacionCajaYBcoFinal.length < 10) {
-    //     variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    //   } else {
-    //     for (let i = 0; i < 10; i++) {
-    //       if (Number.isNaN(variacionCajaYBcoFinal[i]) || variacionCajaYBcoFinal[i] === Infinity || variacionCajaYBcoFinal[i] === -Infinity) {
-    //         variacionCajaYBcoFinal[i] = 0;
-    //       } else {
-    //         variacionCajaYBcoFinal[i] = variacionCajaYBco?.[i].toFixed(2)
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   variacionCajaYBcoFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    // }
-
-    // if (cajaYBancosAlCierreFinal !== undefined && cajaYBancosAlCierreFinal.length) {
-    //   if (cajaYBancosAlCierreFinal.length < 10) {
-    //     cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    //   } else {
-    //     for (let i = 0; i < 10; i++) {
-    //       if (Number.isNaN(cajaYBancosAlCierreFinal[i]) || cajaYBancosAlCierreFinal[i] === Infinity || cajaYBancosAlCierreFinal[i] === -Infinity) {
-    //         cajaYBancosAlCierreFinal[i] = 0;
-    //       } else {
-    //         cajaYBancosAlCierreFinal[i] = cajaYBancosAlCierre?.[i].toFixed(2)
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   cajaYBancosAlCierreFinal = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    // }
-
-    // console.log('variacionCajaYBcoFinal', variacionCajaYBcoFinal)
-    // console.log('cajaYBancosAlCierreFinal', cajaYBancosAlCierreFinal)
-
     props?.setGraph04Data([
       {
         name: 'Variación de caja y bancos',
@@ -409,10 +366,7 @@ function TableCashflowIndirecto(props) {
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
 
   useEffect(() => {
-    // if (primeraEdicionCajaInicio) {
-    // setPrimeraEdicionCajaInicio(false);
     setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
-    // }
   }, [inputsValues.cajaYBancosAlCierre]);
 
   return (

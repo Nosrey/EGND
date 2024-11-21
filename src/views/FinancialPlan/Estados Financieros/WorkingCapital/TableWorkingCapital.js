@@ -37,7 +37,9 @@ function TableWorkingCapital(props) {
   const currentState = useSelector((state) => state.auth.user);
   const [timeoutId, setTimeoutId] = useState(null);
   const IIGG = useSelector((state) => state.tableBalanceResult);
-
+  const [deudasComercialesAnio0, setDeudasComercialesAnio0] = useState(0);
+  const [bienesDeCambioAnio0, setBienesDeCambioAnio0] = useState(0);
+  const [creditosPorVentasAnio0, setCreditosPorVentasAnio0] = useState(0);
   const [cebo, setCebo] = useState(0);
 
   // ***************** INPUTS ANIO 0 ******************
@@ -97,14 +99,17 @@ function TableWorkingCapital(props) {
     getUser(currentState.id)
       .then((data) => {
         calcularCreditosPorVentas(data, creditosVentas, setCreditosVentas);
+
+        setBienesDeCambioAnio0(parseInt(data.balanceData[0].bienesDeCambio));
+        setDeudasComercialesAnio0(
+          parseInt(data.balanceData[0].deudasComerciales),
+        );
+        setCreditosPorVentasAnio0(
+          parseInt(data.balanceData[0].creditosPorVentas),
+        );
       })
       .catch((error) => console.error(error));
   }, []);
-
-  // useEffect(() => {
-  //   setCreditosVentas(props.creditosVentas);
-  //   setBienesDeCambio(props.bienesDeCambio);
-  // }, [props]);
 
   useEffect(() => {
     if (creditosVentas && bienesDeCambio && deudasComerciales) {
@@ -112,9 +117,9 @@ function TableWorkingCapital(props) {
       for (let i = 0; i < 11; i++) {
         if (i === 0) {
           resultado.push(
-            Number(inputsValues.creditosVentas) +
-              Number(inputsValues.bienesDeCambio) -
-              Number(inputsValues.deudasComerciales),
+            Number(creditosPorVentasAnio0) +
+              Number(bienesDeCambioAnio0) -
+              Number(deudasComercialesAnio0),
           );
         } else {
           resultado.push(
@@ -129,18 +134,15 @@ function TableWorkingCapital(props) {
   }, [creditosVentas, bienesDeCambio, deudasComerciales]);
 
   useEffect(() => {
-    if (inputsValues) {
-      const copy = { ...inputsValues };
-      const valor =
-        parseInt(copy.creditosVentas) +
-        parseInt(copy.bienesDeCambio) -
-        parseInt(copy.deudasComerciales);
+    const valor =
+      parseInt(creditosPorVentasAnio0) +
+      parseInt(bienesDeCambioAnio0) -
+      parseInt(deudasComercialesAnio0);
 
-      const copyArray = [...posicionAlCierre];
-      copyArray[0] = valor;
-      setPosicionAlCierre(copyArray);
-    }
-  }, [inputsValues]);
+    const copyArray = [...posicionAlCierre];
+    copyArray[0] = valor;
+    setPosicionAlCierre(copyArray);
+  }, [creditosPorVentasAnio0, bienesDeCambioAnio0, deudasComercialesAnio0]);
 
   useEffect(() => {
     if (Array.isArray(IIGG)) {
@@ -261,23 +263,22 @@ function TableWorkingCapital(props) {
                       <p className="cursor-default"> Año 0</p>
                     </div>
                     <FormItem className="mb-0">
-                    <Tooltip
-                                placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(inputsValues.creditosVentas)
-                                }
-                                >
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.creditosVentas}
-                              onChange={(e) =>
-                                handleChangeInputs('creditosVentas', e.target.value)
-                              }                              
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
-                            </Tooltip>
+                      <Tooltip
+                        placement="top-end"
+                        title={
+                          currency +
+                          formatNumberPrestamos(creditosPorVentasAnio0)
+                        }
+                      >
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          disabled
+                          value={creditosPorVentasAnio0}
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </Tooltip>
                     </FormItem>
                   </div>
                   {creditosVentas.map((año, indexYear) => (
@@ -286,19 +287,19 @@ function TableWorkingCapital(props) {
                         <p className="cursor-default"> Año {indexYear + 1}</p>
                       </div>
                       <FormItem className="mb-0">
-                      <Tooltip
-                            placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
-                          >
-                            <Input
-                              className="w-[130px] "
-                              type="text"
-                              value={formatNumberPrestamos(año)}
-                              name="year"
-                              disabled
-                              prefix={currency}
-                            />
-                          </Tooltip>
+                        <Tooltip
+                          placement="top-end"
+                          title={currency + formatNumberPrestamos(año)}
+                        >
+                          <Input
+                            className="w-[130px] "
+                            type="text"
+                            value={formatNumberPrestamos(año)}
+                            name="year"
+                            disabled
+                            prefix={currency}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                   ))}
@@ -317,39 +318,40 @@ function TableWorkingCapital(props) {
                   </FormItem>
                   <div className="flex flex-col">
                     <FormItem className="mb-0">
-                    <Tooltip
-                                placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(inputsValues.bienesDeCambio)
-                                }
-                                >
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.bienesDeCambio}
-                              onChange={(e) => handleBienesDeCambio(e.target.value)}                            
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
-                            </Tooltip>
+                      <Tooltip
+                        placement="top-end"
+                        title={
+                          currency + formatNumberPrestamos(bienesDeCambioAnio0)
+                        }
+                      >
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          disabled
+                          value={bienesDeCambioAnio0}
+                          onChange={(e) => handleBienesDeCambio(e.target.value)}
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </Tooltip>
                     </FormItem>
                   </div>
                   {bienesDeCambio.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                      <Tooltip
-                            placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
-                          >
-                            <Input
-                              className="w-[130px] "
-                              type="text"
-                              value={formatNumberPrestamos(año)}
-                              name="year"
-                              disabled
-                              prefix={currency}
-                            />
-                          </Tooltip>
+                        <Tooltip
+                          placement="top-end"
+                          title={currency + formatNumberPrestamos(año)}
+                        >
+                          <Input
+                            className="w-[130px] "
+                            type="text"
+                            value={formatNumberPrestamos(año)}
+                            name="year"
+                            disabled
+                            prefix={currency}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                   ))}
@@ -369,44 +371,40 @@ function TableWorkingCapital(props) {
                   </FormItem>
                   <div className="flex flex-col">
                     <FormItem className="mb-0">
-                    <Tooltip
-                                placement="top-end"
-                                title={
-                                  currency + formatNumberPrestamos(inputsValues.deudasComerciales)
-                                }
-                                >
-                            <Input
-                              className="w-[130px]"
-                              type="text"
-                              value={inputsValues.deudasComerciales}
-                        onChange={(e) =>
-                          handleChangeInputs(
-                            'deudasComerciales',
-                            e.target.value,
-                          )
-                        }                            
-                              name="initial"
-                              prefix={currency || '$'}
-                            />
-                            </Tooltip>
+                      <Tooltip
+                        placement="top-end"
+                        title={
+                          currency +
+                          formatNumberPrestamos(deudasComercialesAnio0)
+                        }
+                      >
+                        <Input
+                          className="w-[130px]"
+                          type="text"
+                          disabled
+                          value={formatNumberPrestamos(deudasComercialesAnio0)}
+                          name="initial"
+                          prefix={currency || '$'}
+                        />
+                      </Tooltip>
                     </FormItem>
                   </div>
                   {deudasComerciales.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                      <Tooltip
-                            placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
-                          >
-                            <Input
-                              className="w-[130px] "
-                              type="text"
-                              value={formatNumberPrestamos(año)}
-                              name="year"
-                              disabled
-                              prefix={currency}
-                            />
-                          </Tooltip>
+                        <Tooltip
+                          placement="top-end"
+                          title={currency + formatNumberPrestamos(año)}
+                        >
+                          <Input
+                            className="w-[130px] "
+                            type="text"
+                            value={formatNumberPrestamos(año)}
+                            name="year"
+                            disabled
+                            prefix={currency}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                   ))}
@@ -428,19 +426,19 @@ function TableWorkingCapital(props) {
                   {posicionAlCierre.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                      <Tooltip
-                            placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
-                          >
-                            <Input
-                              className="w-[130px] font-bold text-base"
-                              type="text"
-                              value={formatNumberPrestamos(año)}
-                              name="year"
-                              disabled
-                              prefix={currency}
-                            />
-                          </Tooltip>
+                        <Tooltip
+                          placement="top-end"
+                          title={currency + formatNumberPrestamos(año)}
+                        >
+                          <Input
+                            className="w-[130px] font-bold text-base"
+                            type="text"
+                            value={formatNumberPrestamos(año)}
+                            name="year"
+                            disabled
+                            prefix={currency}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                   ))}
@@ -471,19 +469,19 @@ function TableWorkingCapital(props) {
                   {variacion.map((año, indexYear) => (
                     <div className="flex flex-col" key={indexYear}>
                       <FormItem className="mb-0">
-                      <Tooltip
-                            placement="top-end"
-                            title={currency + formatNumberPrestamos(año)}
-                          >
-                            <Input
-                              className="w-[130px] "
-                              type="text"
-                              value={formatNumberPrestamos(año)}
-                              name="year"
-                              disabled
-                              prefix={currency}
-                            />
-                          </Tooltip>
+                        <Tooltip
+                          placement="top-end"
+                          title={currency + formatNumberPrestamos(año)}
+                        >
+                          <Input
+                            className="w-[130px] "
+                            type="text"
+                            value={formatNumberPrestamos(año)}
+                            name="year"
+                            disabled
+                            prefix={currency}
+                          />
+                        </Tooltip>
                       </FormItem>
                     </div>
                   ))}

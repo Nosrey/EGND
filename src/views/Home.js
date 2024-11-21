@@ -14,24 +14,10 @@ function Home() {
     getUser(currentState.id)
       .then((data) => {
         setCurrencyInfo(data?.businessInfo[0]?.currency);
-        console.log('cargo imagend el cliente', data?.imagePath);
         setlogoClientInfo(data?.imagePath); // logo cliente
       })
       .catch((error) => console.error(error));
   }, []);
-
-  // useEffect(() => {
-  //   if (currencyInfo) {
-      
-  //     const newState = {
-  //       ...currentState,
-  //       currency: currencyInfo,
-  //     };
-  //     dispatch(setUser(newState));
-  //   } else {
-      
-  //   }
-  // }, [currencyInfo]);
 
   useEffect(() => {
     if (logoClientInfo) {
