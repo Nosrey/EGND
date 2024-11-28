@@ -988,7 +988,7 @@ function TablePyL(props) {
                             disabled
                             type="text"
                             className="capitalize"
-                            value="Impuestos sobre ventas"
+                            value="Comisiones"
                           />
                         </FormItem>
                         <div className="flex flex-col">

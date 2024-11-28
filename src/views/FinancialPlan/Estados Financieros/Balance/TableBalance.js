@@ -640,7 +640,7 @@ function TableBalance(props) {
                             disabled
                             type="text"
                             className="capitalize"
-                            value="Caja y bancos - inicio de periodo"
+                            value="Caja y Bancos"
                           />
                         </FormItem>
                         <div className="flex flex-col">
