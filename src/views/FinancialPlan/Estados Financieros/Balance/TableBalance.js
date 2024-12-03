@@ -97,11 +97,13 @@ function TableBalance(props) {
 
   const handleChangeInputs = (key, value) => {
     let copy = { ...inputsValues };
+    value = value.toString();
     if (value.startsWith('0') && value.length > 1) {
       value = value.slice(1);
     }
-    
+    delete copy.resultadosDelEjercicio
     if (key !== 'resultadosDelEjercicio') copy[key] = value;
+    copy.resultadosDelEjercicio = (inputsValues2?.rdoNeto ? inputsValues2?.rdoNeto : 0);
 
     const parseOrZero = (value) =>
       Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
@@ -184,8 +186,6 @@ function TableBalance(props) {
           };
 
           setinputsValues2(inputsEditados);
-
-          handleChangeInputs('resultadosDelEjercicio', inputsEditados.rdoNeto);
         }
       })
 
@@ -198,10 +198,7 @@ function TableBalance(props) {
   }, []);
 
   useEffect(() => {
-    setinputsValues({
-      ...inputsValues,
-      resultadosDelEjercicio: inputsValues2?.rdoNeto,
-    })
+    handleChangeInputs('resultadosDelEjercicio', 0);
   }, [inputsValues2]);
   // **********************************************
   // **********************************************
@@ -347,6 +344,8 @@ function TableBalance(props) {
         Number(copy.deudasFiscales) +
         Number(copy.deudasFinancieras) +
         Number(copy.otrasDeudas);
+
+      copy.resultadosDelEjercicio = (inputsValues2?.rdoNeto ? inputsValues2?.rdoNeto : 0);
       setinputsValues(copy);
     }
     if (deudasComerciales) {
@@ -387,6 +386,7 @@ function TableBalance(props) {
     }
     let copy = { ...inputsValues };
     copy.totPnYPasivo = Number(copy.totPatNeto) + Number(copy.totPasivo);
+    copy.resultadosDelEjercicio = (inputsValues2?.rdoNeto ? inputsValues2?.rdoNeto : 0);
     setinputsValues(copy);
   }, [
     totalPatrimonioNeto,
@@ -403,10 +403,13 @@ function TableBalance(props) {
       inputsValues.resultadosDelEjercicio
     ) {
       let copy = { ...inputsValues };
+
       copy.totPatNeto =
         Number(copy.equity) +
         Number(copy.ResultadosNoAsignados) +
         Number(copy.resultadosDelEjercicio);
+
+      copy.resultadosDelEjercicio = (inputsValues2?.rdoNeto ? inputsValues2?.rdoNeto : 0);
       setinputsValues(copy);
     }
   }, [
