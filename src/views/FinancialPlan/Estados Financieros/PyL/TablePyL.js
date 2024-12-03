@@ -2087,16 +2087,12 @@ function TablePyL(props) {
                       <FormItem className="mb-0">
                         <Tooltip
                           placement="top-end"
-                          title={`% ${formatNumberPrestamos(
-                            inputsValues.RNPorcentaje,
-                          )}`}
+                          title={`% ${inputsValues.RNPorcentaje}`}
                         >
                           <Input
                             className="w-[130px]"
                             type="text"
-                            value={formatNumberPrestamos(
-                              inputsValues.RNPorcentaje,
-                            )}
+                            value={inputsValues.RNPorcentaje}
                             onChange={(e) =>
                               handleChangeInputs('RNPorcentaje', e.target.value)
                             }
