@@ -100,94 +100,46 @@ function TableCosto(props) {
   };
 
   const calcTotales = () => {
-    if (infoProducts.length !== 0 && infoProducts[0].sum !== 0) {
-      props.precioData.map((p, indexInicial) =>
-        p.stats.map((s, indexStats) =>
-          s.productos.map((o, indexP) =>
-            o.años.map((a, indexYear) =>
+    if (infoProducts.length !== 0 && infoProducts[0]?.sum !== 0) {
+      props.precioData.forEach((p, indexInicial) => {
+        p.stats.forEach((s, indexStats) => {
+          s.productos.forEach((o, indexP) => {
+            o.años.forEach((a, indexYear) => {
               MONTHS.forEach((m, indexMonth) => {
-                if (!totals[p.countryName][o.name][indexYear]) {
-                  totals[p.countryName][o.name].push([
-                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                  ]);
-                  totals[p.countryName][o.name][indexYear][indexMonth] +=
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].comision,
-                    ) +
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].impuesto,
-                    ) +
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].cargos,
-                    ) +
-                    Math.round(
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m] *
-                        props.costoData[indexInicial].stats[indexStats]
-                          .productos[indexP].años[indexYear].volMeses[m],
-                    );
-                } else {
-                  totals[p.countryName][o.name][indexYear][indexMonth] +=
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].comision,
-                    ) +
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].impuesto,
-                    ) +
-                    resolveResul(
-                      a.volMeses[m],
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m],
-
-                      props.costoData[indexInicial].stats[indexStats].productos[
-                        indexP
-                      ].cargos,
-                    ) +
-                    Math.round(
-                      props.volumenData[indexInicial].stats[indexStats]
-                        .productos[indexP].años[indexYear].volMeses[m] *
-                        props.costoData[indexInicial].stats[indexStats]
-                          .productos[indexP].años[indexYear].volMeses[m],
-                    );
+                // Inicializamos estructuras si no existen
+                if (!totals[p.countryName]) {
+                  totals[p.countryName] = {};
                 }
-              }),
-            ),
-          ),
-        ),
-      );
+                if (!totals[p.countryName][o.name]) {
+                  totals[p.countryName][o.name] = [];
+                }
+                if (!totals[p.countryName][o.name][indexYear]) {
+                  totals[p.countryName][o.name][indexYear] = Array(12).fill(0);
+                }
+  
+                // Validamos que los datos de `a.volMeses` y `props` existan
+                const volMesesActual = a.volMeses?.[m] ?? 0;
+                const volumenDataActual =
+                  props.volumenData?.[indexInicial]?.stats?.[indexStats]?.productos?.[indexP]?.años?.[indexYear]?.volMeses?.[m] ?? 0;
+                const costoDataActual =
+                  props.costoData?.[indexInicial]?.stats?.[indexStats]?.productos?.[indexP];
+  
+                if (costoDataActual) {
+                  totals[p.countryName][o.name][indexYear][indexMonth] +=
+                    resolveResul(volMesesActual, volumenDataActual, costoDataActual.comision ?? 0) +
+                    resolveResul(volMesesActual, volumenDataActual, costoDataActual.impuesto ?? 0) +
+                    resolveResul(volMesesActual, volumenDataActual, costoDataActual.cargos ?? 0) +
+                    Math.round(volumenDataActual * volumenDataActual);
+                }
+              });
+            });
+          });
+        });
+      });
       setViewTotals({ ...totals });
     }
   };
+  
 
   useEffect(() => {
     if (infoForm && props.country && infoProducts) {

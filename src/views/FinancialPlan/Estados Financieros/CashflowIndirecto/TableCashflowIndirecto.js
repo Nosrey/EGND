@@ -7,6 +7,7 @@ import {
   createCashflowIndirecto,
   getCashflowIndirectoInfo,
   getPyLInfo,
+  getBalance
 } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
@@ -38,6 +39,7 @@ function TableCashflowIndirecto(props) {
   const currentState = useSelector((state) => state.auth.user);
 
   // ***************** INPUTS ANIO 0 ******************
+  const [inputsValues2, setinputsValues2] = useState({});
   const [inputsValues, setinputsValues] = useState({
     cajaYBancos: '0',
     cajaYBancosAnioUno: '0',
@@ -103,7 +105,7 @@ function TableCashflowIndirecto(props) {
     const copy = { ...inputsValues };
     copy.cajaYBancosAnioUno = valueTemp;
     setinputsValues(copy);
-    setCajaYBancosInicioManual(parseInt(valueTemp));
+    // setCajaYBancosInicioManual(parseInt(valueTemp));
   };
 
   // ***************** ACORDION ******************
@@ -209,9 +211,9 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           resultadoNeto[i] +
-            amortizaciones[i] +
-            interesesPagados[i] +
-            variacion[i],
+          amortizaciones[i] +
+          interesesPagados[i] +
+          variacion[i],
         );
       }
       setFEOperativas(resultado);
@@ -253,6 +255,15 @@ function TableCashflowIndirecto(props) {
     }
   }, [FEOperativas, FEfinanciacion, inversiones]);
   // ---------------------------------
+
+  useEffect(() => {
+    getBalance(localStorage.getItem('userId'), setinputsValues2);
+  }, []);
+
+  useEffect(() => {
+    console.log('inputsValues2', inputsValues2);  
+    setCajaYBancosInicioManual(inputsValues2?.cajaYBancos);
+  }, [inputsValues2]);
 
   useEffect(() => {
     if (variacionCajaYBco) {
@@ -365,9 +376,9 @@ function TableCashflowIndirecto(props) {
     ]);
   }, [cajaYBancosAlCierre, variacionCajaYBco]);
 
-  useEffect(() => {
-    setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
-  }, [inputsValues.cajaYBancosAlCierre]);
+  // useEffect(() => {
+  //   setCajaYBancosInicioManual(inputsValues?.cajaYBancosAlCierre);
+  // }, [inputsValues.cajaYBancosAlCierre]);
 
   return (
     <>
@@ -455,12 +466,12 @@ function TableCashflowIndirecto(props) {
                                 value={
                                   indexYear !== 0
                                     ? formatNumberPrestamos(
-                                        cajaYBancosAlCierre[indexYear - 1],
-                                      )
+                                      cajaYBancosAlCierre[indexYear - 1],
+                                    )
                                     : cajaYBancosInicioManual
                                 }
                                 name="year"
-                                disabled={indexYear !== 0}
+                                disabled
                                 prefix={currency || '$'}
                                 onChange={(e) =>
                                   handleChangeCyB(e.target.value)

@@ -561,9 +561,9 @@ function TablePyL(props) {
         .then((data) => {
           let impuestosTemp = data?.assumpFinancierasData[0]?.impGanancias;
           setImpGanancias(impuestosTemp);
-          setTimeout(() => {
-            handleChangeInputs(null, null, null, impuestosTemp);
-          }, 5000);
+          // setTimeout(() => {
+          //   // handleChangeInputs(null, null, null, impuestosTemp);
+          // }, 8000);
         })
         .catch((error) => console.error(error));
     }
@@ -988,7 +988,7 @@ function TablePyL(props) {
                             disabled
                             type="text"
                             className="capitalize"
-                            value="Impuestos sobre ventas"
+                            value="Comisiones"
                           />
                         </FormItem>
                         <div className="flex flex-col">

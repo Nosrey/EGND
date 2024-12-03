@@ -106,7 +106,7 @@ function TableCosto(props) {
     let currentMonth = 1;
 
     for (let i = yearIndex >= 0 ? yearIndex : 0; i < newAños.length; i++) {
-      const newMeses = { ...newAños[i].volMeses };
+      const newMeses = { ...newAños[i]?.volMeses };
       for (const mes in newMeses) {
         if (currentMonth >= producto.inicioMes) {
           newMeses[mes] = Math.round(precioActual);
@@ -141,10 +141,10 @@ function TableCosto(props) {
     indexYear,
   ) => {
     let inputNumero;
-    if (typeof newValue === "string") {
+    if (typeof newValue === 'string') {
       inputNumero = Number(newValue.replace(/\D/g, ''));
     } else {
-      inputNumero = newValue
+      inputNumero = newValue;
     }
     const newData = { ...infoForm };
     const channelIndex = newData[pais].findIndex(
@@ -155,7 +155,7 @@ function TableCosto(props) {
     );
 
     const producto = {
-      ...newData[pais][channelIndex].productos[productoIndex],
+      ...newData[pais][channelIndex]?.productos[productoIndex],
     };
     switch (key) {
       case 'precioInicial':
@@ -225,8 +225,12 @@ function TableCosto(props) {
                               value={producto.name}
                             />
                             <p className="mt-20 cursor-default">Comisiones</p>
-                            <p className="mt-8 cursor-default">Impuestos Comerciales</p>
-                            <p className="mt-8 cursor-default">Cargos por pasarela cobro</p>
+                            <p className="mt-8 cursor-default">
+                              Impuestos Comerciales
+                            </p>
+                            <p className="mt-8 cursor-default">
+                              Cargos por pasarela cobro
+                            </p>
                           </FormItem>
                           <div className="flex flex-col w-[240px] mt-[81px]">
                             <div className="flex w-[240px]  gap-x-2">
@@ -364,7 +368,7 @@ function TableCosto(props) {
                           {producto.años.map((año, indexYear) => (
                             <div className="flex flex-col" key={indexYear}>
                               <div className="titleRow min-w-[62px]">
-                                <p className='cursor-default'> Año {año.año}</p>
+                                <p className="cursor-default"> Año {año.año}</p>
                                 <div
                                   className="iconYear"
                                   onClick={() => hideYear(indexYear)}

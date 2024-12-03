@@ -112,26 +112,17 @@ function TableVolumen(props) {
 
   useEffect(() => {
     if (props?.productos) {
-      console.log('productos', props.productos) 
       initialConfig([...props.productos]);
     }
   }, [infoForm, props?.country]);
 
   useEffect(() => {
     if (props?.productos) {
-      // setInfoProducts(() => [...props.productos]);
-      console.log('productos', props.productos) 
-      console.log('si entré')
       initialConfig([...props.productos]);
-    } else {
-      console.log('no entré')
     }
+
     if (props?.data) setInfoForm(props?.data);
   }, [props]);
-
-  useEffect(() => {
-    console.log('infoProducts', infoProducts);  
-  }, [infoProducts]);
 
   const hideYear = (index) => {
     setVisibleItems((prevItems) => {

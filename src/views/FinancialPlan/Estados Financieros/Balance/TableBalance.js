@@ -4,7 +4,7 @@ import { Button, FormContainer, FormItem, Input, Tooltip } from 'components/ui';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { formatNumberPrestamos } from 'utils/formatTotalsValues';
-import { getUser, getBalance, createBalance } from 'services/Requests';
+import { getUser, getBalance, createBalance, getPyLInfo } from 'services/Requests';
 import { CiCircleMinus, CiCirclePlus } from 'react-icons/ci';
 import MySpinner from 'components/shared/loaders/MySpinner';
 import {
@@ -75,6 +75,7 @@ function TableBalance(props) {
   const prestamos = useSelector((state) => state.tableBalancePrestamos);
 
   // ***************** INPUTS ANIO 0 ******************
+  const [inputsValues2, setinputsValues2] = useState({});
   const [inputsValues, setinputsValues] = useState({
     cajaYBancos: '0',
     creditosPorVentas: '0',
@@ -95,11 +96,13 @@ function TableBalance(props) {
   });
 
   const handleChangeInputs = (key, value) => {
-    const copy = { ...inputsValues };
+    let copy = { ...inputsValues };
     if (value.startsWith('0') && value.length > 1) {
       value = value.slice(1);
     }
-    copy[key] = value;
+    
+    if (key !== 'resultadosDelEjercicio') copy[key] = value;
+
     const parseOrZero = (value) =>
       Number.isNaN(parseInt(value)) ? 0 : parseInt(value);
     const valorTotActivo =
@@ -111,6 +114,7 @@ function TableBalance(props) {
     copy.totActivo = Number.isNaN(valorTotActivo)
       ? '0'
       : valorTotActivo.toString();
+
     setinputsValues(copy);
   };
 
@@ -149,10 +153,56 @@ function TableBalance(props) {
     }
   }, [hiddenItems]);
 
+
+  useEffect(() => {
+    getPyLInfo(currentState.id)
+      .then((data) => {
+        if (data.length !== 0) {
+          // reviso si existe, si es un array y lo asigno, si no es array asigno un  []
+          let gastoEnCtas = data[0]?.gastoEnCtas || [];
+          if (gastoEnCtas?.length <= 11) {
+            while (gastoEnCtas?.length <= 11) {
+              gastoEnCtas.push('0');
+            }
+          }
+
+          let inputsEditados = {
+            ...data[0],
+            vtasTot: Number(data[0].vtasProd) + Number(data[0].vtasServ),
+            costoTotales:
+              Number(data[0].costoProduccionTotal) +
+              Number(data[0].costoComerciales),
+            gastoEnCtasTotal: data[0].gastoEnCtas.reduce(
+              (acc, curr) => Number(acc) + Number(curr),
+              0,
+            ),
+            gastoEnCtas,
+            rdoNeto: Number(
+              (Number.isNaN(Number(data[0].BAT)) ? 0 : data[0].BAT) -
+              (Number.isNaN(Number(data[0].IIGG)) ? 0 : data[0].IIGG),
+            ),
+          };
+
+          setinputsValues2(inputsEditados);
+
+          handleChangeInputs('resultadosDelEjercicio', inputsEditados.rdoNeto);
+        }
+      })
+
+      .catch((error) => console.error(error));
+  }, []);
+
   // un useEffect que se ejecute al inicio
   useEffect(() => {
     getBalance(localStorage.getItem('userId'), setinputsValues);
   }, []);
+
+  useEffect(() => {
+    setinputsValues({
+      ...inputsValues,
+      resultadosDelEjercicio: inputsValues2?.rdoNeto,
+    })
+  }, [inputsValues2]);
   // **********************************************
   // **********************************************
 
@@ -270,9 +320,9 @@ function TableBalance(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           deudasComerciales[i] +
-            deudasFiscales[i] +
-            deudasFinancieras[i] +
-            otrasDeudas[i],
+          deudasFiscales[i] +
+          deudasFinancieras[i] +
+          otrasDeudas[i],
         );
       }
 
@@ -394,10 +444,10 @@ function TableBalance(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(
           bienesDeUso[i] +
-            creditosPorVentas[i] +
-            creditosFiscales[i] +
-            bienesDeCambio[i] +
-            cajaYBancos[i],
+          creditosPorVentas[i] +
+          creditosFiscales[i] +
+          bienesDeCambio[i] +
+          cajaYBancos[i],
         );
       }
       if (resultado !== undefined) {
@@ -518,7 +568,7 @@ function TableBalance(props) {
             (cajaYBancos[i - 1] +
               creditosPorVentas[i - 1] +
               bienesDeCambio[i - 1]) /
-              totPasivo[i - 1],
+            totPasivo[i - 1],
           )
         ) {
           resultado.push(0);
@@ -527,7 +577,7 @@ function TableBalance(props) {
             (cajaYBancos[i - 1] +
               creditosPorVentas[i - 1] +
               bienesDeCambio[i - 1]) /
-              totPasivo[i - 1],
+            totPasivo[i - 1],
           );
         }
       }
@@ -640,7 +690,7 @@ function TableBalance(props) {
                             disabled
                             type="text"
                             className="capitalize"
-                            value="Caja y bancos - inicio de periodo"
+                            value="Caja y Bancos"
                           />
                         </FormItem>
                         <div className="flex flex-col">
@@ -674,34 +724,34 @@ function TableBalance(props) {
                         {Number.isNaN(cajaYBancos[0])
                           ? []
                           : cajaYBancos.map((año, indexYear) => {
-                              return (
-                                <div className="flex flex-col" key={indexYear}>
-                                  <div className="titleRow w-[130px]">
-                                    <p className="cursor-default">
-                                      {' '}
-                                      Año {indexYear + 1}
-                                    </p>
-                                  </div>
-                                  <FormItem className="mb-0">
-                                    <Tooltip
-                                      placement="top-end"
-                                      title={
-                                        currency + formatNumberPrestamos(año)
-                                      }
-                                    >
-                                      <Input
-                                        className="w-[130px] "
-                                        type="text"
-                                        value={formatNumberPrestamos(año)}
-                                        name="year"
-                                        disabled
-                                        prefix={currency}
-                                      />
-                                    </Tooltip>
-                                  </FormItem>
+                            return (
+                              <div className="flex flex-col" key={indexYear}>
+                                <div className="titleRow w-[130px]">
+                                  <p className="cursor-default">
+                                    {' '}
+                                    Año {indexYear + 1}
+                                  </p>
                                 </div>
-                              );
-                            })}
+                                <FormItem className="mb-0">
+                                  <Tooltip
+                                    placement="top-end"
+                                    title={
+                                      currency + formatNumberPrestamos(año)
+                                    }
+                                  >
+                                    <Input
+                                      className="w-[130px] "
+                                      type="text"
+                                      value={formatNumberPrestamos(año)}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                    />
+                                  </Tooltip>
+                                </FormItem>
+                              </div>
+                            );
+                          })}
                       </div>
                       {/** *********** ****************  ************ */}
 
@@ -806,28 +856,28 @@ function TableBalance(props) {
                         {Number.isNaN(creditosFiscales[0])
                           ? []
                           : creditosFiscales.map((año, indexYear) => {
-                              return (
-                                <div className="flex flex-col" key={indexYear}>
-                                  <FormItem className="mb-0">
-                                    <Tooltip
-                                      placement="top-end"
-                                      title={
-                                        currency + formatNumberPrestamos(año)
-                                      }
-                                    >
-                                      <Input
-                                        className="w-[130px] "
-                                        type="text"
-                                        value={formatNumberPrestamos(año)}
-                                        name="year"
-                                        disabled
-                                        prefix={currency}
-                                      />
-                                    </Tooltip>
-                                  </FormItem>
-                                </div>
-                              );
-                            })}
+                            return (
+                              <div className="flex flex-col" key={indexYear}>
+                                <FormItem className="mb-0">
+                                  <Tooltip
+                                    placement="top-end"
+                                    title={
+                                      currency + formatNumberPrestamos(año)
+                                    }
+                                  >
+                                    <Input
+                                      className="w-[130px] "
+                                      type="text"
+                                      value={formatNumberPrestamos(año)}
+                                      name="year"
+                                      disabled
+                                      prefix={currency}
+                                    />
+                                  </Tooltip>
+                                </FormItem>
+                              </div>
+                            );
+                          })}
                       </div>
                       {/** *********** ****************  ************ */}
 
@@ -989,26 +1039,26 @@ function TableBalance(props) {
                     {Number.isNaN(totActivo[0])
                       ? []
                       : totActivo.map((año, indexYear) => {
-                          return (
-                            <div className="flex flex-col" key={indexYear}>
-                              <FormItem className="mb-0">
-                                <Tooltip
-                                  placement="top-end"
-                                  title={currency + formatNumberPrestamos(año)}
-                                >
-                                  <Input
-                                    className="w-[130px] font-bold text-base"
-                                    type="text"
-                                    value={formatNumberPrestamos(año)}
-                                    name="year"
-                                    disabled
-                                    prefix={currency}
-                                  />
-                                </Tooltip>
-                              </FormItem>
-                            </div>
-                          );
-                        })}
+                        return (
+                          <div className="flex flex-col" key={indexYear}>
+                            <FormItem className="mb-0">
+                              <Tooltip
+                                placement="top-end"
+                                title={currency + formatNumberPrestamos(año)}
+                              >
+                                <Input
+                                  className="w-[130px] font-bold text-base"
+                                  type="text"
+                                  value={formatNumberPrestamos(año)}
+                                  name="year"
+                                  disabled
+                                  prefix={currency}
+                                />
+                              </Tooltip>
+                            </FormItem>
+                          </div>
+                        );
+                      })}
                   </div>
                   {/** *********** ****************  ************ */}
 
@@ -1458,6 +1508,7 @@ function TableBalance(props) {
                               }
                             >
                               <Input
+                                disabled
                                 className="w-[130px]"
                                 type="text"
                                 value={inputsValues.resultadosDelEjercicio}
