@@ -32,68 +32,69 @@ function Cac() {
   const [infoVolToCalculateClient, setInfoVolToCalculateClient] = useState();
   const [dataAssump, setDataAssump] = useState();
   const [gastosPorCCData, setGastosPorCCData] = useState();
-  const [valoresCAC, setValoresCAC] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
-  const [valoresLTV, setValoresLTV] = useState([]);
-  const [valoresLTVCAC, setValoresLTVCAC] = useState([]);
+  const [valoresCAC, setValoresCAC] = useState(null);
+  const [valoresLTV, setValoresLTV] = useState(null);
+  const [valoresLTVCAC, setValoresLTVCAC] = useState(null);
 
   const [infoForm, setInfoForm] = useState();
   const [volumenData, setVolumenData] = useState();
   const [assumptionData, setAssumptionData] = useState();
   const [churnDataXProd, setChurnDataXProd] = useState();
   const [costoData, setCostoData] = useState();
+  
+  const calcNewClients = (data, indexY, indexMes, indexChannel, indexProd) => {
+    const volumen = dataAssump?.canales?.[indexChannel]?.items?.[indexProd]?.volumen || 1;
 
-  const calcNewClients = (data, indexY, indexMes, indexChannel, indexProd) =>
-    Number(
-      formatNumber(
-        data.años[indexY].volMeses[MONTHS[indexMes]] /
-          dataAssump.canales[indexChannel].items[indexProd].volumen -
-          (data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
-            dataAssump.canales[indexChannel].items[indexProd].volumen -
-            ((data.años[indexY].volMeses[MONTHS[indexMes - 1]] /
-              dataAssump.canales[indexChannel].items[indexProd].volumen) *
-              dataAssump.churns[indexChannel].items[indexProd]
-                .porcentajeChurn) /
-              100),
-      ),
-    );
+    const currentMonthVol = data.años[indexY].volMeses[MONTHS[indexMes]] || 0;
+    const prevMonthVol = indexMes > 0 ? (data.años[indexY].volMeses[MONTHS[indexMes - 1]] || 0) : 0;
+    const churnPercentage = dataAssump?.churns?.[indexChannel]?.items?.[indexProd]?.porcentajeChurn || 0;
+
+    let result = (currentMonthVol / volumen);
+    if (indexMes > 0) {
+      const prevClientes = (prevMonthVol / volumen);
+      const clientesPerdidos = prevClientes * (churnPercentage / 100);
+      const clientesRetenidos = prevClientes - clientesPerdidos;
+      result -= clientesRetenidos;
+    }
+
+    result = Math.max(0.1, Number(formatNumber(result)));
+    return result;
+  };
 
   const calculateClients = () => {
     let nuevoClientes = [];
-    let newC = 0;
-
+    
     for (let guia = 0; guia < 10; guia++) {
-      Object.values(infoVolToCalculateClient).map((d, indexPais) => {
-        d.map((i, indexChannel) => {
-          i.productos.map((p, indexProd) => {
-            p.años.map((a, indexY) => {
+      let newC = 0;
+      let contadorProductos = 0;
+      
+      Object.values(infoVolToCalculateClient).forEach((d, indexPais) => {
+        d.forEach((i, indexChannel) => {
+          i.productos.forEach((p, indexProd) => {
+            p.años.forEach((a, indexY) => {
               if (indexY === guia) {
-                MONTHS.map((o, indexMes) => {
-                  newC +=
-                    indexMes === 0
-                      ? 0
-                      : calcNewClients(
-                          p,
-                          indexY,
-                          indexMes,
-                          indexChannel,
-                          indexProd,
-                        );
+                contadorProductos++;
+                MONTHS.forEach((o, indexMes) => {
+                  const clientesNuevos = calcNewClients(
+                    p,
+                    indexY,
+                    indexMes,
+                    indexChannel,
+                    indexProd,
+                  );
+                  newC += clientesNuevos;
                 });
-                if (
-                  indexProd === i.productos.length - 1 &&
-                  indexPais ===
-                    Object.values(infoVolToCalculateClient).length - 1
-                ) {
-                  const valor = isNaN(newC) ? 0 : newC;
-                  nuevoClientes.push(valor);
-                  newC = 0;
-                }
               }
             });
           });
         });
       });
+      
+      // Asegurar que haya al menos un valor mínimo de clientes nuevos por año
+      const valorFinal = (contadorProductos > 0 && newC <= 0) ? contadorProductos : Math.max(1, isNaN(newC) ? 1 : newC);
+      nuevoClientes.push(valorFinal);
     }
+    
     return nuevoClientes;
   };
 
@@ -150,11 +151,29 @@ function Cac() {
   };
 
   const calculateCAC = () => {
+    if (!gastosPorCCData || !infoVolToCalculateClient) return Array(10).fill(0); // Validación adicional
     const costos = costosMktyComercial(gastosPorCCData);
     const nuevosClientes = calculateClients();
-    const newData = costos.map((elemento, indice) =>
-      Math.round(elemento / nuevosClientes[indice]),
+    
+    // Mostrar valores por año para verificación
+    console.log('--- Resumen de valores para cálculo de CAC por año ---');
+    for (let i = 0; i < 10; i++) {
+      console.log(`Año ${i+1}:
+      - Costos Comercial/Marketing: ${costos[i]}
+      - Nuevos clientes: ${nuevosClientes[i]}
+      - CAC esperado: ${costos[i] / Math.max(1, nuevosClientes[i])}`);
+    }
+    
+    // Verificar si hay algún problema con los nuevos clientes
+    const clientesCorregidos = nuevosClientes.map(valor => 
+      valor <= 0 || isNaN(valor) ? 1 : valor // Prevenir división por cero o valores muy pequeños
     );
+    
+    // Usar valores corregidos para el cálculo
+    const newData = costos.map((elemento, indice) => {
+      const cac = Math.round(elemento / clientesCorregidos[indice]);
+      return cac;
+    });
 
     return newData;
   };
@@ -164,24 +183,27 @@ function Cac() {
 
   const calculateCicloCliente = () => {
     const arrayCiclos = [];
+    if (!churnDataXProd) return arrayCiclos; // <- Validación añadida
+
     for (let i = 0; i < 10; i++) {
       let acum = 0;
-      const paises = Object.keys(churnDataXProd);
+      const paises = Object.keys(churnDataXProd || {});
       // Iterar sobre las claves (paises)
-      paises.forEach((pais, indexPais) => {
+      paises.forEach((pais) => {
         // Iterar sobre los elementos del array de cada pais
-        churnDataXProd[pais].forEach((canal, indexCanal) => {
-          canal.productos.forEach((prod, indexProd) => {
-            const sumatoriaPorcentajesChurnEseAnio = prod.churnPorcetajes[
-              i
-            ].reduce((total, valor) => total + valor, 0);
-            acum += isNaN(sumatoriaPorcentajesChurnEseAnio)
-              ? 0
-              : sumatoriaPorcentajesChurnEseAnio;
+        churnDataXProd[pais]?.forEach((canal) => {
+          canal.productos?.forEach((prod) => {
+            const sumatoriaPorcentajesChurnEseAnio = prod.churnPorcetajes?.[i]?.reduce(
+              (total, valor) => total + (valor || 0),
+              0
+            );
+            acum += isNaN(sumatoriaPorcentajesChurnEseAnio) ? 0 : sumatoriaPorcentajesChurnEseAnio;
           });
         });
       });
-      arrayCiclos.push(redondearHaciaArribaConDosDecimales((1 / acum) * 100)); // esto es porque la formula de ciclo cliente es 1/churn %
+      arrayCiclos.push(
+        acum === 0 ? 0 : redondearHaciaArribaConDosDecimales((1 / acum) * 100)
+      ); // esto es porque la formula de ciclo cliente es 1/churn %
     }
     return arrayCiclos; // array de diez valores d 1/ %Churn de ese anio de todos los prod
   };
@@ -215,7 +237,8 @@ function Cac() {
   };
 
   const calculateLTV = () => {
-    const cicloCLiente = calculateCicloCliente(gastosPorCCData);
+    if (!churnDataXProd || !costoData || !infoForm) return Array(10).fill(0); // Validación adicional
+    const cicloCLiente = calculateCicloCliente();
     const avClientes = calculateAvClientes();
     const margenBruto = calculateMargenBrutoPorcentaje(
       costoData,
@@ -236,14 +259,14 @@ function Cac() {
     } else {
       console.error('Los arrays no tienen la misma longitud.');
     }
-    return resultado; // cicloCLiente * avClientes * margenBruto; //son aarrays
+    return resultado;
   };
   // ********************** fin calculos de LTV // **********************
 
   useEffect(() => {
     if (infoVolToCalculateClient && dataAssump && gastosPorCCData) {
       const result = calculateCAC();
-      if (calculateCAC().length !== 0) {
+      if (result.length !== 0) {
         setValoresCAC(result);
       }
     }
@@ -261,19 +284,21 @@ function Cac() {
 
   useEffect(() => {
     if (churnDataXProd && costoData && infoForm) {
-      setValoresLTV(calculateLTV());
+      const result = calculateLTV();
+      if (result.length !== 0) {
+        setValoresLTV(result);
+      }
     }
   }, [churnDataXProd, costoData]);
 
   useEffect(() => {
-    if (valoresCAC.length !== 0 && valoresLTV.length !== 0) {
-      // calculo LTV / CAC
+    if (valoresCAC && valoresLTV) {
       const resultado = [];
 
       if (valoresLTV.length === valoresCAC.length) {
         for (let i = 0; i < valoresLTV.length; i++) {
-          if (!isFinite(valoresLTV[i] / valoresCAC[i])) {
-            resultado[i] = 0;
+          if (!valoresCAC[i] || !isFinite(valoresLTV[i] / valoresCAC[i])) {
+            resultado[i] = 0; // Validación adicional
           } else {
             resultado[i] = valoresLTV[i] / valoresCAC[i];
           }
@@ -284,6 +309,7 @@ function Cac() {
       }
     }
   }, [valoresCAC, valoresLTV]);
+
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
@@ -302,7 +328,7 @@ function Cac() {
           ///
 
           if (data.assumptionData[0]) {
-            setDataAssump(data.assumptionData[0]);
+            setDataAssump(data.assumptionData[0] || { canales: [], churns: [] });
 
             if (data.costoData.length !== 0) {
               setCostoData(data.costoData);
@@ -364,46 +390,44 @@ function Cac() {
         <MySpinner />
       ) : (
         <>
-          {valoresCAC.length !== 0 &&
-            valoresLTV.length !== 0 &&
-            valoresLTVCAC.length !== 0 && (
-              <div>
-                <div className="border-b-2 mb-8 pb-1">
-                  <h4 className="cursor-default">CAC</h4>
-                  <span className="cursor-default">Gastos de Estructura</span>
-                </div>
-                <div className="container-countries">
-                  <p style={{ fontSize: '12px', color: 'grey' }}>
-                    * Para el cálculo de CAC es necesario tener activos y con
-                    datos los centros de costo Comercial y/o Marketing.
-                  </p>
-                  <FormContainer className="cont-countries">
-                    <ContainerScrollable
-                      contenido={
-                        <TableCac
-                          cac={valoresCAC}
-                          ltv={valoresLTV}
-                          ltvcac={valoresLTVCAC}
-                        />
-                      }
-                    />
-                  </FormContainer>
-                </div>
-
-                {valoresCAC.length > 0 && valoresLTV.length > 0 && (
-                  <div className=" mt-[40px]">
-                    <h5>CAC y LTV</h5>
-                    <GraficoDashed cac={valoresCAC} ltv={valoresLTV} />
-                  </div>
-                )}
-                {valoresLTVCAC.length > 0 && (
-                  <div className=" mt-[40px]">
-                    <h5>LTV / CAC</h5>
-                    <GraficoDashedLTVCAC ltvcac={valoresLTVCAC} />
-                  </div>
-                )}
+          {valoresCAC && valoresLTV && valoresLTVCAC && (
+            <div>
+              <div className="border-b-2 mb-8 pb-1">
+                <h4 className="cursor-default">CAC</h4>
+                <span className="cursor-default">Gastos de Estructura</span>
               </div>
-            )}
+              <div className="container-countries">
+                <p style={{ fontSize: '12px', color: 'grey' }}>
+                  * Para el cálculo de CAC es necesario tener activos y con
+                  datos los centros de costo Comercial y/o Marketing.
+                </p>
+                <FormContainer className="cont-countries">
+                  <ContainerScrollable
+                    contenido={
+                      <TableCac
+                        cac={valoresCAC}
+                        ltv={valoresLTV}
+                        ltvcac={valoresLTVCAC}
+                      />
+                    }
+                  />
+                </FormContainer>
+              </div>
+
+              {valoresCAC.length > 0 && valoresLTV.length > 0 && (
+                <div className=" mt-[40px]">
+                  <h5>CAC y LTV</h5>
+                  <GraficoDashed cac={valoresCAC} ltv={valoresLTV} />
+                </div>
+              )}
+              {valoresLTVCAC.length > 0 && (
+                <div className=" mt-[40px]">
+                  <h5>LTV / CAC</h5>
+                  <GraficoDashedLTVCAC ltvcac={valoresLTVCAC} />
+                </div>
+              )}
+            </div>
+          )}
         </>
       )}
     </>

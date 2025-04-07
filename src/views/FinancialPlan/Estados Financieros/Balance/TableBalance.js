@@ -305,6 +305,47 @@ function TableBalance(props) {
     }
   }, [updateBienesDeCambio, IIGG, inputsValues.BienesDeCambio]);
 
+  // useEffect que autosetee setTotalPatrimonioNeto al cambiar equity, resultadosNoAsignados y resultadosDelEjercicio
+  useEffect(() => {
+    if (Equity && ResultadosNoAsignados && ResultadosDelEjercicio) {
+      let resultado = [];
+      let resultadosAUsar = ResultadosDelEjercicioData || ResultadosDelEjercicio;
+      for (let i = 0; i < 10; i++) {
+        resultado.push(
+          Equity[i] + ResultadosNoAsignados[i] + resultadosAUsar[i],
+        );
+      }
+      if (resultado !== undefined) {
+        if (resultado.length < 10) {
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        } else {
+          for (let i = 0; i < 10; i++) {
+            if (Number.isNaN(resultado[i])) {
+              resultado[i] = 0;
+            }
+          }
+        }
+      } else {
+        resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      }
+      setTotalPatrimonioNeto(resultado);
+      let copy = { ...inputsValues };
+      copy.totPatNeto =
+        Number(copy.equity) +
+        Number(copy.ResultadosNoAsignados) +
+        Number(copy.resultadosDelEjercicio);
+      copy.resultadosDelEjercicio = (inputsValues2?.rdoNeto ? inputsValues2?.rdoNeto : 0);
+      setinputsValues(copy);
+    }
+  }, [
+    Equity,
+    ResultadosNoAsignados,
+    ResultadosDelEjercicio,
+    inputsValues.equity,
+    inputsValues.ResultadosNoAsignados,
+    inputsValues.resultadosDelEjercicio,
+  ]);
+
   // un useEffect que reacciona si se editan algunas de las Deudas Comerciales Deudas Fiscales Deudas Financieras y Otras Deudas y suma el total del pasivo
   useEffect(() => {
     if (
@@ -581,6 +622,56 @@ function TableBalance(props) {
               creditosPorVentas[i - 1] +
               bienesDeCambio[i - 1]) /
             totPasivo[i - 1],
+          );
+        }
+      }
+
+      if (resultado !== undefined) {
+        if (resultado.length < 10) {
+          resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        } else {
+          for (let i = 0; i < 10; i++) {
+            if (
+              Number.isNaN(resultado[i]) ||
+              resultado[i] === Infinity ||
+              resultado[i] === -Infinity
+            ) {
+              resultado[i] = 0;
+            }
+          }
+        }
+      } else {
+        resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      }
+
+      props.setGraph07Data([
+        {
+          name: 'Liquidez',
+          data: resultado.map((año) => parseFloat(año.toFixed(2))),
+        },
+      ]);
+    }
+  }, [cajaYBancos, creditosPorVentas, bienesDeCambio, totPasivo]);
+
+  useEffect(() => {
+    if (cajaYBancos && creditosPorVentas && bienesDeCambio && totPasivo) {
+      let resultado = [];
+      for (let i = 0; i < 10; i++) {
+        if (
+          Number.isNaN(
+            (cajaYBancos[i] +
+              creditosPorVentas[i] +
+              bienesDeCambio[i]) /
+            totPasivo[i]
+          )
+        ) {
+          resultado.push(0);
+        } else {
+          resultado.push(
+            (cajaYBancos[i] +
+              creditosPorVentas[i] +
+              bienesDeCambio[i]) /
+            totPasivo[i]
           );
         }
       }

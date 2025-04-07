@@ -141,6 +141,9 @@ function PyL({
   useEffect(() => {
     if (prestamosData) {
       setIntereses(calcInteresesPagadosPorAnio(prestamosData));
+    } else {
+      // Asumimos que no hay préstamos, por lo tanto, los intereses son 0
+      setIntereses([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
     }
   }, [prestamosData]);
 
@@ -220,7 +223,7 @@ function PyL({
       )}
       {showLoader ? (
         <MySpinner />
-      ) : !infoCuentas || !prestamosData || !costoData ? (
+      ) : !infoCuentas || !costoData ? (
         <div className="py-[25px] bg-[#F6F6F5] flex justify-center rounded-lg mb-[30px]  mt-[30px] ml-[30px] mr-[30px]">
           <span className="cursor-default">
             Para acceder a este formulario primero debe completar el formulario
@@ -228,11 +231,6 @@ function PyL({
             {!infoCuentas && (
               <Link className="text-indigo-700 underline" to="/gastos-por-cc">
                 Supuesto de Gasto de Estructura{', '}
-              </Link>
-            )}
-            {!prestamosData && (
-              <Link className="text-indigo-700 underline" to="/prestamos">
-                Prestamos {', '}
               </Link>
             )}
             {!costoData && (

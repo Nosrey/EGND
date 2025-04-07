@@ -28,6 +28,9 @@ function Balance({
   ]);
   const [costos, setCostos] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   
+  useEffect(() => {
+    console.log('Valor de myResult al arrancar:', myResult);
+  }, [myResult]);
 
   return (
     <>
