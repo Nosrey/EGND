@@ -39,8 +39,19 @@ function TablePrestamos(props) {
   useEffect(() => {
     if (props.data.length) {
       dispatch(addPrestamos(props.data));
+    } else {
+      dispatch(addPrestamos([{
+        idUser: localStorage.getItem('userId'),
+        id: uuid(),
+        titulo: '',
+        monto: 0,
+        plazo: 0,
+        tasaAnual: 0,
+        mesInicio: '',
+        yearInicio: '',
+      }]));
     }
-  }, [props.data]);
+  }, [props.data, dispatch]);
 
   const hableChangePrestamo = (cta, e, type = 'month') => {
     let bien;

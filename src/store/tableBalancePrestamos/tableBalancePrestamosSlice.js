@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const netoResultSlice = createSlice({
-  name: 'result',
+  name: 'tableBalancePrestamos',
   initialState: [],
   reducers: {
     addPrestamos: (state, action) => {

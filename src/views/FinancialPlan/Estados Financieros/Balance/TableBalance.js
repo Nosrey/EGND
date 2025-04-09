@@ -72,7 +72,7 @@ function TableBalance(props) {
   const cajaYBancosAlCierre = useSelector(
     (state) => state.tableBalanceCajaCierre,
   );
-  const prestamos = useSelector((state) => state.tableBalancePrestamos);
+  const prestamos = useSelector((state) => state.tableBalancePrestamos) || [];
 
   // ***************** INPUTS ANIO 0 ******************
   const [inputsValues2, setinputsValues2] = useState({});
@@ -282,15 +282,22 @@ function TableBalance(props) {
               setCebo,
             );
 
-            let prestamosFinal = prestamos;
+            // Initialize prestamosFinal with a non-empty default if prestamos is empty
+            let prestamosFinal = Array.isArray(prestamos) && prestamos.length > 0 
+              ? prestamos 
+              : [{ monto: 0, plazo: 0, tasaAnual: 0, mesInicio: '', yearInicio: '' }];
+              
+            // Check if the first element is empty object or has default values
             if (
               prestamosFinal.length === 1 &&
-              prestamosFinal[0].monto === 0 &&
-              prestamosFinal[0].plazo === 0 &&
-              prestamosFinal[0].tasaAnual === 0 &&
-              prestamosFinal[0].mesInicio === ''
-            )
+              (prestamosFinal[0].monto === 0 || prestamosFinal[0].monto === '0') &&
+              (prestamosFinal[0].plazo === 0 || prestamosFinal[0].plazo === '0') &&
+              (prestamosFinal[0].tasaAnual === 0 || prestamosFinal[0].tasaAnual === '0') &&
+              (prestamosFinal[0].mesInicio === '' || !prestamosFinal[0].mesInicio)
+            ) {
               prestamosFinal = [];
+            }
+              
             await calcularPrestamos(
               prestamosFinal,
               setDeudasFinancieras,
@@ -298,12 +305,15 @@ function TableBalance(props) {
             );
           } catch (error) {
             console.error(error);
+            // If there was an error, set default values
+            setDeudasFinancieras([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+            setShowLoader(false);
           }
         };
         fetchData();
       }, 1500);
     }
-  }, [updateBienesDeCambio, IIGG, inputsValues.BienesDeCambio]);
+  }, [updateBienesDeCambio, IIGG, inputsValues.BienesDeCambio, prestamos]);
 
   // useEffect que autosetee setTotalPatrimonioNeto al cambiar equity, resultadosNoAsignados y resultadosDelEjercicio
   useEffect(() => {

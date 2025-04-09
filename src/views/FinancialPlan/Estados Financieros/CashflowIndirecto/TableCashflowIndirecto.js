@@ -223,10 +223,16 @@ function TableCashflowIndirecto(props) {
   useEffect(() => {
     if (interesesPagados && financiacion) {
       let resultado = [];
+      console.log('Valores antes de las sumas:');
+      console.log('Intereses Pagados array:', interesesPagados);
+      console.log('Financiación array:', financiacion);
+      
       for (let i = 0; i < 10; i++) {
         resultado.push(interesesPagados[i] + financiacion[i]);
       }
-      setPagoPrestamos(arrayNegativos(resultado));
+      
+      const resultadoNegativos = arrayNegativos(resultado);
+      setPagoPrestamos(resultadoNegativos);
     }
   }, [interesesPagados, financiacion]);
 
