@@ -74,8 +74,8 @@
   },
   "scripts": {
     "start": "run-p watch:css react-scripts:start",
-    "ec2-dev": "CI=true;export CI; react-scripts start",
-    "build": "run-s build:css react-scripts:build",
+    "ec2-dev": "CI=true;export CI; NODE_OPTIONS=--max_old_space_size=4096 react-scripts start",
+    "build": "NODE_OPTIONS=--max_old_space_size=4096 run-s build:css react-scripts:build",
     "lint": "eslint --fix . --ext .js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
