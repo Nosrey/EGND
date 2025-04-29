@@ -74,6 +74,7 @@
   },
   "scripts": {
     "start": "run-p watch:css react-scripts:start",
+    "ec2-dev": "CI=true;export CI; react-scripts start",
     "build": "run-s build:css react-scripts:build",
     "lint": "eslint --fix . --ext .js",
     "test": "react-scripts test",
