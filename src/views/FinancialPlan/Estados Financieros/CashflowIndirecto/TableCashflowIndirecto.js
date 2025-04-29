@@ -183,6 +183,8 @@ function TableCashflowIndirecto(props) {
       ? props?.variacion
       : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     setVariacion(variacionFinal);
+
+    console.log('variacionFinal', variacionFinal);
   }, [props]);
 
   // // useEffect para incluir la funcion calcularDeudasComerciales
@@ -207,6 +209,8 @@ function TableCashflowIndirecto(props) {
 
   useEffect(() => {
     if (resultadoNeto && amortizaciones && interesesPagados && variacion) {
+      console.log('DATA:  resultadoNeto', resultadoNeto);
+      console.log('DATA:  variacion', variacion);
       let resultado = [];
       for (let i = 0; i < 10; i++) {
         resultado.push(
@@ -217,6 +221,7 @@ function TableCashflowIndirecto(props) {
         );
       }
       setFEOperativas(resultado);
+      console.log('DATA:  FEOperativas', FEOperativas);
     }
   }, [resultadoNeto, amortizaciones, interesesPagados, variacion]);
 
@@ -257,6 +262,7 @@ function TableCashflowIndirecto(props) {
       for (let i = 0; i < 10; i++) {
         resultado.push(FEOperativas[i] + FEfinanciacion[i] + inversiones[i]);
       }
+      console.log('variacionCajaYBco', resultado);
       setVariacionCajaYBco(resultado);
     }
   }, [FEOperativas, FEfinanciacion, inversiones]);
@@ -272,14 +278,22 @@ function TableCashflowIndirecto(props) {
   }, [inputsValues2]);
 
   useEffect(() => {
+    console.log('variacionCajaYBco', variacionCajaYBco);
     if (variacionCajaYBco) {
       let resultado = [];
       for (let i = 0; i < 10; i++) {
         if (i === 0) {
+          console.log('debug: variacionCajaYBco[0]', variacionCajaYBco[0]);
+          console.log('debug: cajaYBancosInicioManual', cajaYBancosInicioManual);
+          
           resultado.push(
             parseInt(variacionCajaYBco[0]) + parseInt(cajaYBancosInicioManual),
           );
         } else {
+          if (i === 1) {
+            console.log('debug: variacionCajaYBco[1]', variacionCajaYBco[1]);
+            console.log('debug: resultado[0]', resultado[0]);
+          }
           resultado.push(
             parseInt(variacionCajaYBco[i]) + parseInt(resultado[i - 1]),
           );
@@ -298,6 +312,7 @@ function TableCashflowIndirecto(props) {
       } else {
         resultado = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
       }
+      console.log('cajaYBancosAlCierre', resultado);
       setCajaYBancosAlCierre(resultado);
       if (!Number.isNaN(resultado[0]))
         dispatch(

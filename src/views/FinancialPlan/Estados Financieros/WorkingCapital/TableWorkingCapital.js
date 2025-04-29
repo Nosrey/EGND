@@ -114,6 +114,8 @@ function TableWorkingCapital(props) {
   useEffect(() => {
     if (creditosVentas && bienesDeCambio && deudasComerciales) {
       let resultado = [];
+
+  
       for (let i = 0; i < 11; i++) {
         if (i === 0) {
           resultado.push(
@@ -122,6 +124,7 @@ function TableWorkingCapital(props) {
               Number(deudasComercialesAnio0),
           );
         } else {
+        
           resultado.push(
             Number(creditosVentas[i - 1]) +
               Number(bienesDeCambio[i - 1]) -
@@ -129,6 +132,7 @@ function TableWorkingCapital(props) {
           );
         }
       }
+
       setPosicionAlCierre(resultado);
     }
   }, [creditosVentas, bienesDeCambio, deudasComerciales]);
@@ -187,6 +191,8 @@ function TableWorkingCapital(props) {
       for (let i = 0; i < 10; i++) {
         resultado[i] = deudasFiscales2[i] + deudasComerciales2[i];
       }
+      console.log('DATA: deudasComerciales2', deudasComerciales2);
+      console.log('DATA: deudasFiscales2', deudasFiscales2);
       setDeudasComerciales(resultado);
     }
   }, [deudasFiscales2, deudasComerciales2]);
@@ -197,7 +203,7 @@ function TableWorkingCapital(props) {
       for (let i = 1; i < posicionAlCierre.length; i++) {
         let resultado = posicionAlCierre[i] - posicionAlCierre[i - 1];
         arrayResultado.push(resultado);
-      }
+      }  
       if (props?.setVariacionExterior) {
         // invierto los valores para que queden en negativo o positivo
         let arrayInvertido = arrayResultado.map((item) => item * -1);

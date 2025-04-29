@@ -393,7 +393,7 @@ function TablePyL(props) {
           Number.isNaN(rdoNeto[i] / vtasTot[i]) ||
             !Number.isFinite(rdoNeto[i] / vtasTot[i])
             ? 0
-            : rdoNeto[i] / vtasTot[i],
+            : (rdoNeto[i] / vtasTot[i]) * 100
         );
       }
       setRNPorcentaje(resultado);
