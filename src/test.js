@@ -1,18 +1,13 @@
 const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
 function calcFinanciacionDeTerceros(prestamosData) {
-  console.log('Calculando financiación de terceros...');
   
   let dataFinanciacionDeTerceros = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   for (let i = 0; i < prestamosData.length; i++) {
     const { mesInicio, monto, plazo, yearInicio } = prestamosData[i];
     
-    console.log(`\nProcesando préstamo ${i + 1}:`);
-    console.log('Monto:', monto);
-    console.log('Plazo (meses):', plazo);
-    console.log('Mes inicio:', mesInicio);
-    console.log('Año inicio:', yearInicio);
+
 
     // Parse values
     const montoNum = parseFloat(monto);
@@ -24,15 +19,15 @@ function calcFinanciacionDeTerceros(prestamosData) {
     
     // Calculate monthly payment
     const pagoMensual = montoNum / plazoNum;
-    console.log('Pago mensual sin intereses:', pagoMensual);
+
 
     // Get month index
     const mesInicioIndex = MONTHS.indexOf(mesInicio.toLowerCase());
-    console.log('Índice mes inicio:', mesInicioIndex);
+
     
     // Next month after mesInicio (when payments start)
     const startPaymentMonth = (mesInicioIndex + 1) % 12;
-    console.log('Mes de inicio de pagos:', MONTHS[startPaymentMonth]);
+
     
     // Distribute payments
     let mesesPagados = 0;
@@ -52,7 +47,7 @@ function calcFinanciacionDeTerceros(prestamosData) {
       // Subtract payment from year
       dataFinanciacionDeTerceros[anioActual] -= pagoEsteAnio;
       
-      console.log(`Año ${anioActual + 1}: pagando ${mesesEnEsteAnio} meses = ${pagoEsteAnio}`);
+
       
       mesesPagados += mesesEnEsteAnio;
       anioActual++;
@@ -60,7 +55,6 @@ function calcFinanciacionDeTerceros(prestamosData) {
     }
   }
 
-  console.log('\nResultado final por año:', dataFinanciacionDeTerceros);
   return dataFinanciacionDeTerceros;
 }
 

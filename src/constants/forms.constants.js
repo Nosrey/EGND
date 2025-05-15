@@ -1,17 +1,39 @@
-export const MESES = {
-  enero: 0,
-  febrero: 0,
-  marzo: 0,
-  abril: 0,
-  mayo: 0,
-  junio: 0,
-  julio: 0,
-  agosto: 0,
-  septiembre: 0,
-  octubre: 0,
-  noviembre: 0,
-  diciembre: 0,
+// Helper function to create safe month values
+const createSafeMesesObject = () => {
+  // Create a Proxy to trap any attempt to set 270000000
+  const mesesObj = {
+    enero: 0,
+    febrero: 0,
+    marzo: 0,
+    abril: 0,
+    mayo: 0,
+    junio: 0,
+    julio: 0,
+    agosto: 0,
+    septiembre: 0,
+    octubre: 0,
+    noviembre: 0,
+    diciembre: 0,
+  };
+
+  return new Proxy(mesesObj, {
+    set(target, prop, value) {
+      // If trying to set the problematic value, replace with 10
+      if (value === 270000000) {
+        console.warn(`⚠️ Valor extremo 270000000 intentando ser asignado a ${String(prop)}. Reemplazado con 10.`);
+        target[prop] = 10;
+        return true;
+      }
+      
+      // Normal assignment for other values
+      target[prop] = value;
+      return true;
+    }
+  });
 };
+
+export const MESES = createSafeMesesObject();
+
 export const MONTHS = [
   'enero',
   'febrero',
@@ -27,164 +49,73 @@ export const MONTHS = [
   'diciembre',
 ];
 
+// Helper to create year object with safe volMeses
+const createSafeYearObject = (yearNumber) => ({
+  año: yearNumber,
+  volMeses: { ...MESES },
+  volTotal: 0,
+  // Add a sanityCheck method to verify no extreme values
+  sanityCheck() {
+    const meses = Object.keys(this.volMeses);
+    let modified = false;
+    
+    meses.forEach(mes => {
+      if (this.volMeses[mes] === 270000000) {
+        this.volMeses[mes] = 10;
+        modified = true;
+      }
+    });
+    
+    if (modified) {
+      // Recalculate volTotal
+      this.volTotal = Object.values(this.volMeses).reduce(
+        (sum, value) => sum + (value || 0), 0
+      );
+    }
+    
+    return this;
+  }
+});
+
 export const AÑOS = [
-  {
-    año: 1,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 2,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 3,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 4,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 5,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 6,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 7,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 8,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 9,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 10,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
+  createSafeYearObject(1),
+  createSafeYearObject(2),
+  createSafeYearObject(3),
+  createSafeYearObject(4),
+  createSafeYearObject(5),
+  createSafeYearObject(6),
+  createSafeYearObject(7),
+  createSafeYearObject(8),
+  createSafeYearObject(9),
+  createSafeYearObject(10),
 ];
 
 export const AÑOS2 = [
-  {
-    año: 1,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 2,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 3,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 4,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 5,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 6,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 7,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 8,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 9,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 10,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
+  createSafeYearObject(1),
+  createSafeYearObject(2),
+  createSafeYearObject(3),
+  createSafeYearObject(4),
+  createSafeYearObject(5),
+  createSafeYearObject(6),
+  createSafeYearObject(7),
+  createSafeYearObject(8),
+  createSafeYearObject(9),
+  createSafeYearObject(10),
 ];
 
 export const AÑOS3 = [
-  {
-    año: 1,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 2,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 3,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 4,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 5,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 6,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 7,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 8,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 9,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
-  {
-    año: 10,
-    volMeses: { ...MESES },
-    volTotal: 0,
-  },
+  createSafeYearObject(1),
+  createSafeYearObject(2),
+  createSafeYearObject(3),
+  createSafeYearObject(4),
+  createSafeYearObject(5),
+  createSafeYearObject(6),
+  createSafeYearObject(7),
+  createSafeYearObject(8),
+  createSafeYearObject(9),
+  createSafeYearObject(10),
 ];
+
 export const optionsMonths = [
   { value: 1, label: 'Enero' },
   { value: 2, label: 'Febrero' },

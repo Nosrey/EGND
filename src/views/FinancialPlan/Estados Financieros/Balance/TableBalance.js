@@ -18,6 +18,12 @@ import {
   calcularPrestamos,
 } from 'utils/calcs';
 import { addVariacion } from 'store/tableVariacionesCapital/tableVariacionesCapitalSlice';
+import { 
+  sanitizarDatosVolumen, 
+  diagnosticarRutaEspecifica,
+  detectarInconsistencia,
+  corregirInconsistencia
+} from 'utils/sanitizeVolume';
 
 function TableBalance(props) {
   const dispatch = useDispatch();
@@ -229,27 +235,120 @@ function TableBalance(props) {
     setCreditosFiscales(props.creditosFiscales);
   }, [props]);
 
+  // Verificar inconsistencias en los datos
+  const verificarInconsistencias = (datos) => {
+    if (!datos || !datos.volumenData) return { inconsistencias: 0 };
+    
+    let totalInconsistencias = 0;
+    let inconsistenciasGraves = 0;
+    
+    // Recorrer la estructura de datos
+    datos.volumenData.forEach(pais => {
+      if (!pais.stats) return;
+      
+      pais.stats.forEach(canal => {
+        if (!canal.productos) return;
+        
+        canal.productos.forEach(producto => {
+          if (!producto.años) return;
+          
+          producto.años.forEach(año => {
+            if (!año.volMeses) return;
+            
+            // Verificar inconsistencia
+            const { inconsistente, porcentajeDiferencia, hayValoresExtremos } = detectarInconsistencia(año);
+            
+            if (inconsistente) {
+              totalInconsistencias++;
+              
+              // Considerar grave si hay valores extremos o la diferencia es mayor al 50%
+              if (hayValoresExtremos || Math.abs(porcentajeDiferencia) > 50) {
+                inconsistenciasGraves++;
+              }
+            }
+          });
+        });
+      });
+    });
+    
+    return { 
+      inconsistencias: totalInconsistencias, 
+      inconsistenciasGraves,
+      tieneProblemas: totalInconsistencias > 0 
+    };
+  };
+  
+  // Función para sanear datos usando el nuevo enfoque
+  const sanearDatosBalance = (datos, debug = false) => {
+    if (!datos) return datos;
+    
+    // Diagnóstico inicial
+    const checkInicial = verificarInconsistencias(datos);
+    
+    if (debug && checkInicial.tieneProblemas) {
+      console.log(`⚠️ Balance: Se detectaron ${checkInicial.inconsistencias} inconsistencias en los datos (${checkInicial.inconsistenciasGraves} graves)`);
+    }
+    
+    // Diagnóstico específico de la ruta principal
+    if (debug) console.log("🔍 Balance: Diagnóstico de la ruta específica:");
+    const diagInicial = diagnosticarRutaEspecifica(datos, debug);
+    
+    // Sanitizar datos completos
+    let dataSanitizada = sanitizarDatosVolumen(datos);
+    
+    // Verificación final
+    const checkFinal = verificarInconsistencias(dataSanitizada);
+    
+    if (debug) {
+      if (checkFinal.tieneProblemas) {
+        console.log(`⚠️ Balance: Después de la sanitización aún quedan ${checkFinal.inconsistencias} inconsistencias (${checkFinal.inconsistenciasGraves} graves)`);
+      } else {
+        console.log('✅ Balance: Datos sanitizados correctamente, no se detectaron inconsistencias');
+      }
+    }
+    
+    return dataSanitizada;
+  };
+
   useEffect(() => {
     if (
       updateBienesDeCambio &&
       Array.isArray(IIGG) &&
-      // IIGG.length > 1 &&
       Array.isArray(cajaYBancosAlCierre)
-      // cajaYBancosAlCierre.length > 1
     ) {
       setTimeout(() => {
         const fetchData = async () => {
           try {
-            let cajaYBancosAlCierreFinal =
+            const cajaYBancosAlCierreFinal =
               cajaYBancosAlCierre?.length === 0
                 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 : cajaYBancosAlCierre;
+
+            // Sanitizar valores extremos en cajaYBancosAlCierreFinal de forma inteligente
+            if (Array.isArray(cajaYBancosAlCierreFinal)) {
+              for (let i = 0; i < cajaYBancosAlCierreFinal.length; i++) {
+                const valor = cajaYBancosAlCierreFinal[i];
+                if (valor > 10000000) { // Valor muy alto, es probable que sea incorrecto
+                  console.log(`⚠️ Valor extremo en cajaYBancosAlCierre[${i}]: ${valor} -> 0`);
+                  cajaYBancosAlCierreFinal[i] = 0;
+                }
+              }
+            }
+            
             let IIGGFinal =
               IIGG?.length === 0 ? [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] : IIGG;
-
-            const data = await getUser(currentState.id);
+                        
+            // Obtener datos del usuario
+            const dataRaw = await getUser(currentState.id);
+                
+            // Aplicar sanitización inteligente
+            const data = sanearDatosBalance(dataRaw, true);
+            
+            // Crear copias con los datos ya sanitizados
             let dataCopy = JSON.parse(JSON.stringify(data));
             let dataCopy2 = JSON.parse(JSON.stringify(data));
+            
+            // Ejecutar cálculos con datos limpios
             let ivasDF = await calcularCreditosPorVentas(
               dataCopy,
               creditosPorVentas,
@@ -304,7 +403,7 @@ function TableBalance(props) {
               setShowLoader,
             );
           } catch (error) {
-            console.error(error);
+            console.error('ERROR al procesar datos de volumen:', error);
             // If there was an error, set default values
             setDeudasFinancieras([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
             setShowLoader(false);

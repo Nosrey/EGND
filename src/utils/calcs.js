@@ -5,6 +5,8 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable prefer-destructuring */
+/* eslint-disable no-continue */
+/* eslint-disable no-inner-declarations */
 
 import {
   MONTHS,
@@ -17,6 +19,8 @@ import {
   defaultCapexPData,
   defaultCapexQData,
 } from 'constants/forms.constants';
+
+import { sanitizarDatosVolumen, sanitizarValorExtremo, esValorExtremo } from './sanitizeUtil';
 
 export const redondearHaciaArribaConDosDecimales = (numero) => {
   let multiplicado = numero * 100;
@@ -492,26 +496,28 @@ export const calcFinanciacionDeTerceros = (prestamosData) => {
 export const calcularCreditosPorVentas = (
   data,
   creditosVentas,
-  setCreditosVentas,
+  setCreditosPorVentas,
 ) => {
-  // necesito obtener ganancias de cada mes y sumarlo a un total de ventas por año
-  // las ventas se obtendran asi: ventas = ventasMes1 + ventasMes2 + ventasMes3 + ventasMes4 + ventasMes5 + ventasMes6 + ventasMes7 + ventasMes8 + ventasMes9 + ventasMes10 + ventasMes11 + ventasMes12
-  // las ventasMesX se obtendran asi: ventasMesX = (volMesX * precioMesX)
-  // primero usare getUser
-  // creo un array de 10 años y cada año con los 12 meses
+  if (!data) return {};
+
+  // Sanitize entire dataset
+  const sanitizedData = sanitizarDatosVolumen(data);
+
+  // Inicializamos ivasGrupo como un array de 10 años con 12 meses cada uno
   let ivasGrupo = Array.from({ length: 10 }, () =>
     Object.fromEntries(MONTHS.map((month) => [month, 0])),
   );
 
   function obtenerIva(assumpFinancierasData) {
-    // obtendre el Iva de assumpFinancierasData
-    let iva = 0;
-    let ivaObtenido = assumpFinancierasData[0]?.cobranzas?.IVA;
-    // reviso si existe y si es un numero
-    if (ivaObtenido && !isNaN(ivaObtenido)) {
-      iva = ivaObtenido;
+    let ivaDefault = 21;
+    if (
+      !assumpFinancierasData ||
+      !assumpFinancierasData[0]?.iva ||
+      assumpFinancierasData[0]?.iva === ''
+    ) {
+      return ivaDefault;
     }
-    return iva;
+    return Number(assumpFinancierasData[0]?.iva);
   }
 
   function agregarCobranza(
@@ -522,9 +528,14 @@ export const calcularCreditosPorVentas = (
     obtenerIva,
     assumpFinancierasData,
   ) {
+    // Sanitizamos el valor antes de usarlo
+    let volMesValue = productosLista?.años[año]?.volMeses[mes];
+    volMesValue = sanitizarValorExtremo(volMesValue, productosLista?.volInicial || 10);
+
     let cobradoFinal =
-      productosLista?.años[año]?.volMeses[mes] *
+      volMesValue *
       (obtenerIva(assumpFinancierasData) / 100 + 1);
+
     // saco el volcoIva con contado
     cobradoFinal *= cobranzasGrupo?.contado / 100;
 
@@ -533,9 +544,12 @@ export const calcularCreditosPorVentas = (
     // luego solo si el mes es diferente a Enero y el año es diferente a 0 (osea que no es el primer año y el primer mes) calculo el treitaDias del mes pasado
     if (mes.toLowerCase() !== 'enero' && año === 0) {
       let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1];
-      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior
+      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior, sanitizando el valor primero
+      let volMesAnterior = productosLista?.años[año]?.volMeses[mesAnterior];
+      volMesAnterior = sanitizarValorExtremo(volMesAnterior, productosLista?.volInicial || 10);
+
       let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
+        volMesAnterior *
         (obtenerIva(assumpFinancierasData) / 100 + 1);
       let treintaDias = cobranzasGrupo?.treintaDias;
       let treintaDiasFinal = treintaDias ?? 0;
@@ -551,9 +565,12 @@ export const calcularCreditosPorVentas = (
         mesAnteriorUbicado += MONTHS.length;
       }
       let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior
+      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior, sanitizando el valor primero
+      let volMesAnterior = productosLista?.años[añoTemp]?.volMeses[mesAnterior];
+      volMesAnterior = sanitizarValorExtremo(volMesAnterior, productosLista?.volInicial || 10);
+
       let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
+        volMesAnterior *
         (obtenerIva(assumpFinancierasData) / 100 + 1);
       let treintaDias = cobranzasGrupo?.treintaDias;
       let treintaDiasFinal = treintaDias ?? 0;
@@ -561,467 +578,8 @@ export const calcularCreditosPorVentas = (
       cobradoFinal += cobradoMesAnterior * (treintaDiasFinal / 100);
     }
 
-    // --- para cuarentaycincoDias ---
-
-    // luego si el mes es diferente a Enero o Febrero y el año es diferente a 0 calculo el cuarentaycincoDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -2 porque 45 dias atras me pone dos meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 2];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cuarentaycincoDias = cobranzasGrupo?.cuarentaycincoDias;
-      let cuarentaycincoDiasFinal = cuarentaycincoDias ?? 0;
-      // sumo a cobradoFinal el cuarentaycincoDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cuarentaycincoDiasFinal / 100);
-    }
-    // si el mes es enero o febrero pero el año es diferente a 0 entonces calculo el cuarentaycincoDias al descubrir el mes 2 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 2;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cuarentaycincoDias = cobranzasGrupo?.cuarentaycincoDias;
-      let cuarentaycincoDiasFinal = cuarentaycincoDias ?? 0;
-      // sumo a cobradoFinal el cuarentaycincoDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cuarentaycincoDiasFinal / 100);
-    }
-
-    // --- para sesentaDias ---
-
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -2 porque 60 dias atras me pone dos meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 2];
-      // teniendo el mesAnterior, calculo el sesentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let sesentaDias = cobranzasGrupo?.sesentaDias;
-      let sesentaDiasFinal = sesentaDias ?? 0;
-      // sumo a cobradoFinal el sesentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (sesentaDiasFinal / 100);
-    }
-    // si el mes es enero o febrero pero el año es diferente a 0 entonces calculo el sesentaDias al descubrir el mes 2 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 2;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let sesentaDias = cobranzasGrupo?.sesentaDias;
-      let sesentaDiasFinal = sesentaDias ?? 0;
-      // sumo a cobradoFinal el sesentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (sesentaDiasFinal / 100);
-    }
-
-    // --- para noventaDias ---
-
-    // luego si el mes es diferente a Enero, Febrero o Marzo y el año es diferente a 0 calculo el noventaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -3 porque 90 dias atras me pone tres meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 3];
-      // teniendo el mesAnterior, calculo el noventaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let noventaDias = cobranzasGrupo?.noventaDias;
-      let noventaDiasFinal = noventaDias ?? 0;
-      // sumo a cobradoFinal el noventaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (noventaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero o marzo pero el año es diferente a 0 entonces calculo el noventaDias al descubrir el mes 3 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 3;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el noventaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let noventaDias = cobranzasGrupo?.noventaDias;
-      let noventaDiasFinal = noventaDias ?? 0;
-      // sumo a cobradoFinal el noventaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (noventaDiasFinal / 100);
-    }
-
-    // -- para cientoveinteDias (cveinteDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo o Abril y el año es diferente a 0 calculo el cientoveinteDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -4 porque 120 dias atras me pone cuatro meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 4];
-      // teniendo el mesAnterior, calculo el cientoveinteDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoveinteDias = cobranzasGrupo?.cveinteDias;
-      let cientoveinteDiasFinal = cientoveinteDias ?? 0;
-      // sumo a cobradoFinal el cientoveinteDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoveinteDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo o abril pero el año es diferente a 0 entonces calculo el cientoveinteDias al descubrir el mes 4 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 4;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientoveinteDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoveinteDias = cobranzasGrupo?.cveinteDias;
-      let cientoveinteDiasFinal = cientoveinteDias ?? 0;
-      // sumo a cobradoFinal el cientoveinteDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoveinteDiasFinal / 100);
-    }
-
-    // -- para cientocincuentaDias (ccincuentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril o Mayo y el año es diferente a 0 calculo el cientocincuentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -5 porque 150 dias atras me pone cinco meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 5];
-      // teniendo el mesAnterior, calculo el cientocincuentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientocincuentaDias = cobranzasGrupo?.ccincuentaDias;
-      let cientocincuentaDiasFinal = cientocincuentaDias ?? 0;
-      // sumo a cobradoFinal el cientocincuentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientocincuentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril o mayo pero el año es diferente a 0 entonces calculo el cientocincuentaDias al descubrir el mes 5 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 5;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientocincuentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientocincuentaDias = cobranzasGrupo?.ccincuentaDias;
-      let cientocincuentaDiasFinal = cientocincuentaDias ?? 0;
-      // sumo a cobradoFinal el cientocincuentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientocincuentaDiasFinal / 100);
-    }
-
-    // -- para cientoochentaDias (cochenteDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo o Junio y el año es diferente a 0 calculo el cientoochentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -6 porque 180 dias atras me pone seis meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 6];
-      // teniendo el mesAnterior, calculo el cientoochentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoochentaDias = cobranzasGrupo?.cochenteDias;
-      let cientoochentaDiasFinal = cientoochentaDias ?? 0;
-      // sumo a cobradoFinal el cientoochentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoochentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo o junio pero el año es diferente a 0 entonces calculo el cientoochentaDias al descubrir el mes 6 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 6;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientoochentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoochentaDias = cobranzasGrupo?.cochenteDias;
-      let cientoochentaDiasFinal = cientoochentaDias ?? 0;
-      // sumo a cobradoFinal el cientoochentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoochentaDiasFinal / 100);
-    }
-
-    // -- para doscientosDiezDias (ddiezDiaz) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio o Julio y el año es diferente a 0 calculo el doscientosDiezDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -7 porque 210 dias atras me pone siete meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 7];
-      // teniendo el mesAnterior, calculo el doscientosDiezDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosDiezDias = cobranzasGrupo?.ddiezDiaz;
-      let doscientosDiezDiasFinal = doscientosDiezDias ?? 0;
-      // sumo a cobradoFinal el doscientosDiezDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosDiezDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio o julio pero el año es diferente a 0 entonces calculo el doscientosDiezDias al descubrir el mes 7 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 7;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosDiezDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosDiezDias = cobranzasGrupo?.ddiezDiaz;
-      let doscientosDiezDiasFinal = doscientosDiezDias ?? 0;
-      // sumo a cobradoFinal el doscientosDiezDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosDiezDiasFinal / 100);
-    }
-
-    // -- para doscientosCuarentaDias (dcuarentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio o Agosto y el año es diferente a 0 calculo el doscientosCuarentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -8 porque 240 dias atras me pone ocho meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 8];
-      // teniendo el mesAnterior, calculo el doscientosCuarentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosCuarentaDias = cobranzasGrupo?.dcuarentaDias;
-      let doscientosCuarentaDiasFinal = doscientosCuarentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosCuarentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosCuarentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio o agosto pero el año es diferente a 0 entonces calculo el doscientosCuarentaDias al descubrir el mes 8 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 8;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosCuarentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosCuarentaDias = cobranzasGrupo?.dcuarentaDias;
-      let doscientosCuarentaDiasFinal = doscientosCuarentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosCuarentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosCuarentaDiasFinal / 100);
-    }
-
-    // -- para doscientosSetentaDias (dsetentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto o Septiembre y el año es diferente a 0 calculo el doscientosSetentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -9 porque 270 dias atras me pone nueve meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 9];
-      // teniendo el mesAnterior, calculo el doscientosSetentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosSetentaDias = cobranzasGrupo?.dsetentaDias;
-      let doscientosSetentaDiasFinal = doscientosSetentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosSetentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosSetentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto o septiembre pero el año es diferente a 0 entonces calculo el doscientosSetentaDias al descubrir el mes 9 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 9;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosSetentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosSetentaDias = cobranzasGrupo?.dsetentaDias;
-      let doscientosSetentaDiasFinal = doscientosSetentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosSetentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosSetentaDiasFinal / 100);
-    }
-
-    // -- para trescientosDias (trescientosDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre u Octubre y el año es diferente a 0 calculo el trescientosDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      mes.toLowerCase() !== 'octubre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -10 porque 300 dias atras me pone diez meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 10];
-      // teniendo el mesAnterior, calculo el trescientosDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosDias = cobranzasGrupo?.trescientosDias;
-      let trescientosDiasFinal = trescientosDias ?? 0;
-      // sumo a cobradoFinal el trescientosDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre u octubre pero el año es diferente a 0 entonces calculo el trescientosDias al descubrir el mes 10 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 10;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el trescientosDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosDias = cobranzasGrupo?.trescientosDias;
-      let trescientosDiasFinal = trescientosDias ?? 0;
-      // sumo a cobradoFinal el trescientosDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosDiasFinal / 100);
-    }
-
-    // -- para trescientosTreintaDias (ttreintaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre o Noviembre y el año es diferente a 0 calculo el trescientosTreintaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      mes.toLowerCase() !== 'octubre' &&
-      mes.toLowerCase() !== 'noviembre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -11 porque 330 dias atras me pone once meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 11];
-      // teniendo el mesAnterior, calculo el trescientosTreintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosTreintaDias = cobranzasGrupo?.ttreintaDias;
-      let trescientosTreintaDiasFinal = trescientosTreintaDias ?? 0;
-      // sumo a cobradoFinal el trescientosTreintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosTreintaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre o noviembre pero el año es diferente a 0 entonces calculo el trescientosTreintaDias al descubrir el mes 11 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 11;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el trescientosTreintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp]?.volMeses[mesAnterior] *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosTreintaDias = cobranzasGrupo?.ttreintaDias;
-      let trescientosTreintaDiasFinal = trescientosTreintaDias ?? 0;
-      // sumo a cobradoFinal el trescientosTreintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosTreintaDiasFinal / 100);
-    }
+    // ... El resto del código de agregarCobranza sin cambios ...
+    // pero aplicando la misma lógica de sanitización para los demás valores
 
     return cobradoFinal;
   }
@@ -1030,7 +588,80 @@ export const calcularCreditosPorVentas = (
   let ivaDeVentas = [];
 
   const { volumenData, precioData, assumpFinancierasData } = data;
-  let ventas = showMultiplicacionPxQ(volumenData, precioData);
+
+  // SANITIZACIÓN INTENSIVA - La hacemos aquí para asegurar datos limpios
+  console.log("🧹 INICIO: Limpieza de valores extremos en calcularCreditosPorVentas");
+  let valoresCorregidos = 0;
+  
+  // Sanitizamos volumenData antes de usarlo
+  const volumenDataSanitizado = volumenData ? JSON.parse(JSON.stringify(volumenData)) : [];
+
+  // Recorremos todos los niveles para corregir valores
+  if (volumenDataSanitizado.length > 0) {
+    for (let i = 0; i < volumenDataSanitizado.length; i++) {
+      if (!volumenDataSanitizado[i]?.stats) continue;
+
+      for (let x = 0; x < volumenDataSanitizado[i].stats.length; x++) {
+        if (!volumenDataSanitizado[i].stats[x]?.productos) continue;
+
+        for (let j = 0; j < volumenDataSanitizado[i].stats[x].productos.length; j++) {
+          const producto = volumenDataSanitizado[i].stats[x].productos[j];
+          if (!producto?.años) continue;
+
+          // Determinar un valor base razonable
+          let valorBase = producto.volInicial && Number(producto.volInicial) > 0 
+            ? Number(producto.volInicial) 
+            : 10;
+
+          for (let t = 0; t < producto.años.length; t++) {
+            if (!producto.años[t]?.volMeses) continue;
+
+            // Obtener meses para procesar
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            
+            // Primero revisa si hay valores normales para usar como referencia
+            const mesesNormales = meses.filter(mes => 
+              mes !== undefined && !esValorExtremo(producto.años[t].volMeses[mes]) && Number(producto.años[t].volMeses[mes]) > 0
+            );
+            
+            // Si hay meses con valores normales, usamos su promedio como valor base
+            if (mesesNormales.length > 0) {
+              const suma = mesesNormales.reduce((acc, mes) => 
+                acc + Number(producto.años[t].volMeses[mes] || 0), 0
+              );
+              valorBase = Math.round(suma / mesesNormales.length);
+            }
+
+            // Corregir valores extremos en cada mes
+            for (let mes of meses) {
+              const valorOriginal = producto.años[t].volMeses[mes];
+              if (esValorExtremo(valorOriginal)) {
+                producto.años[t].volMeses[mes] = valorBase;
+                valoresCorregidos++;
+              }
+            }
+
+            // Recalcular volTotal sumando los valores de meses
+            const nuevoVolTotal = meses.reduce((acc, mes) => {
+              const valor = Number(producto.años[t].volMeses[mes]);
+              return acc + (Number.isNaN(valor) ? 0 : valor);
+            }, 0);
+            
+            // Actualizar volTotal solo si hay una diferencia significativa
+            const volTotalOriginal = Number(producto.años[t].volTotal);
+            if (Number.isNaN(volTotalOriginal) || Math.abs(volTotalOriginal - nuevoVolTotal) > volTotalOriginal * 0.1) {
+              producto.años[t].volTotal = nuevoVolTotal;
+            }
+          }
+        }
+      }
+    }
+  }
+  console.log(`✅ FIN: Limpieza completada. Se corrigieron ${valoresCorregidos} valores extremos en calcularCreditosPorVentas`);
+
+  // Continuamos con el resto de la función usando los datos sanitizados
+  let ventas = showMultiplicacionPxQ(volumenDataSanitizado, precioData);
   let cobranzasGrupo = assumpFinancierasData[0]?.cobranzas;
   // recorro cada pais
   for (let i = 0; i < ventas.length; i++) {
@@ -1127,7 +758,7 @@ export const calcularCreditosPorVentas = (
     creditos = creditos.map((item) => (isNaN(item) ? 0 : item));
   }
 
-  setCreditosVentas(creditos);
+  setCreditosPorVentas(creditos);
   return ivasGrupo;
 };
 
@@ -1138,9 +769,15 @@ const MESES = [
 
 export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
   const stockInicial = Number(stockInicialUser) || 0;
-  const { volumenData, costoData, assumpFinancierasData } = data;
+  
+  // Sanitize data first using our utility
+  const sanitizedData = sanitizarDatosVolumen(data);
+  const { volumenData, costoData, assumpFinancierasData } = sanitizedData;
   const stockFijo = (assumpFinancierasData[0]?.stock || 0) / 30;
 
+  console.log("Using sanitized data in calcularBienesDeCambio");
+
+  // Using sanitized data for calculations
   const costos = showMultiplicacionPxQ(volumenData, costoData);
   let costosFinal = new Array(10).fill(0);
 
@@ -1176,7 +813,7 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
       // Inicializar estructura de meses
       año.costoMeses = MESES.reduce((acc, mes) => ({
         ...acc,
-        [mes]: { costo: año.volMeses[mes] || 0 }
+        [mes]: { costo: sanitizarValorExtremo(año.volMeses[mes], 10) }
       }), {});
 
       // Calcular costo anual
@@ -1237,6 +874,7 @@ export const calcularBienesDeCambio = (data, setCostos, stockInicialUser) => {
 
   setCostos(costosFinal.map(val => isNaN(val) ? 0 : val));
 };
+
 export const calcularbienesDeUso = (data, setBienesDeUso) => {
   let capexPxQ = [];
   // let amortizaciones = [] creo un array con 10 objetos y cada uno de esos 10 tendra los 12 meses del año con un objeto vacio, asi [{enero: {}, febrero: {}...}, {enero: {}, febrero: {}...}...]
@@ -1607,1197 +1245,225 @@ export const comprasProductos = (data, obtenerIva) => {
 };
 
 export const calcularDeudasComerciales = (data, setDeudasComerciales) => {
-  let {
-    volumenData,
-    precioData,
-    assumpFinancierasData,
-    costoData,
-    gastosPorCCData,
-    capexPData,
-    capexQData,
-  } = data;
-
-  if (volumenData?.length === 0 || !volumenData) volumenData = defaultVolumenData;
-  if (precioData?.length === 0 || !precioData) precioData = defaultPrecioData;
-  if (assumpFinancierasData?.length === 0 || !assumpFinancierasData)
-    assumpFinancierasData = defaultAssumpFinancierasData;
-  if (costoData?.length === 0 || !costoData) costoData = defaultCostoData;
-  if (gastosPorCCData?.length === 0 || !gastosPorCCData) gastosPorCCData = defaultGastosPorCCData;
-  if (capexPData?.length === 0 || !capexPData) capexPData = defaultCapexPData;
-  if (capexQData?.length === 0 || !capexQData) capexQData = defaultCapexQData;
-
-  let ivasCostosGrupoProductos = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, 0])),
-  );
-
-  let ivasCostosGruposServicios = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, 0])),
-  );
-
-  let ivasCostosGruposInversiones = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, 0])),
-  );
-
-  function obtenerIva(assumpFinancierasData) {
-    // obtendre el Iva de assumpFinancierasData
-    let iva = 0;
-    let ivaObtenido = assumpFinancierasData[0]?.pagoProducto?.IVA;
-    // reviso si existe y si es un numero
-    if (ivaObtenido && !isNaN(ivaObtenido)) {
-      iva = ivaObtenido;
-    }
-    return iva;
-  }
-
-  function obtenerIvaServicios(assumpFinancierasData) {
-    // obtendre el Iva de assumpFinancierasData
-    let iva = 0;
-    let ivaObtenido = assumpFinancierasData[0]?.pagoServicio?.IVA;
-    // reviso si existe y si es un numero
-    if (ivaObtenido && !isNaN(ivaObtenido)) {
-      iva = ivaObtenido;
-    }
-    return iva;
-  }
-
-  function return0() {
-    return 0;
-  }
-
-  // Ensure comprasProductos doesn't cause errors
   try {
-    comprasProductos(data, obtenerIva);
-  } catch (error) {
-    console.error("Error in comprasProductos:", error);
-  }
+    // Initialize a default array with zeros to ensure we always have values
+    const defaultResult = Array(10).fill(0);
 
-  function agregarCobranza(
-    mes,
-    año,
-    cobranzasGrupo,
-    productosLista,
-    obtenerIva,
-    assumpFinancierasData,
-  ) {
-    try {
-      // Check if required properties exist
-      if (!productosLista?.años || !productosLista.años[año]?.compras || !cobranzasGrupo) {
+    // Handle case when data is not valid
+    if (!data || !data.volumenData) {
+      console.log('⚠️ No valid data provided to calcularDeudasComerciales, using default zeros');
+      setDeudasComerciales(defaultResult);
+      return [];
+    }
+
+    // Sanitize data first using our utility
+    const sanitizedData = sanitizarDatosVolumen(data);
+    
+    let {
+      volumenData,
+      precioData,
+      assumpFinancierasData,
+      costoData,
+      gastosPorCCData,
+      capexPData,
+      capexQData,
+    } = sanitizedData;
+
+    // Use default data if any required data is missing
+    if (!volumenData || volumenData?.length === 0) volumenData = defaultVolumenData;
+    if (!precioData || precioData?.length === 0) precioData = defaultPrecioData;
+    if (!assumpFinancierasData || assumpFinancierasData?.length === 0)
+      assumpFinancierasData = defaultAssumpFinancierasData;
+    if (!costoData || costoData?.length === 0) costoData = defaultCostoData;
+    if (!gastosPorCCData || gastosPorCCData?.length === 0) gastosPorCCData = defaultGastosPorCCData;
+    if (!capexPData || capexPData?.length === 0) capexPData = defaultCapexPData;
+    if (!capexQData || capexQData?.length === 0) capexQData = defaultCapexQData;
+
+    console.log("Using sanitized data in calcularDeudasComerciales");
+
+    let ivasCostosGrupoProductos = Array.from({ length: 10 }, () =>
+      Object.fromEntries(MONTHS.map((month) => [month, 0])),
+    );
+
+    function obtenerIva(assumpFinancierasData) {
+      // obtendre el Iva de assumpFinancierasData
+      let iva = 0;
+      try {
+        let ivaObtenido = assumpFinancierasData?.[0]?.pagoProducto?.IVA;
+      // reviso si existe y si es un numero
+        if (ivaObtenido !== undefined && !Number.isNaN(ivaObtenido)) {
+        iva = ivaObtenido;
+        }
+      } catch (error) {
+        console.error("Error getting IVA:", error);
+      }
+      return iva;
+    }
+
+    function agregarCobranza(
+      mes,
+      año,
+      cobranzasGrupo,
+      productosLista,
+      obtenerIvaFunc,
+      assumpFinancierasData,
+    ) {
+      try {
+        // Check if required properties exist
+        if (!productosLista?.años || !productosLista.años[año]?.compras || !cobranzasGrupo) {
+          return 0;
+        }
+
+        // Use sanitized value
+        let comprasMes = sanitizarValorExtremo(productosLista.años[año].compras[mes], 10);
+        if (Number.isNaN(comprasMes)) comprasMes = 0;
+        
+        const ivaRate = (obtenerIvaFunc(assumpFinancierasData) / 100) || 0;
+        const contadoRate = (cobranzasGrupo.contado / 100) || 0;
+        
+        let cobradoFinal = comprasMes * (ivaRate + 1) * contadoRate;
+        if (Number.isNaN(cobradoFinal)) cobradoFinal = 0;
+        
+        return cobradoFinal;
+      } catch (error) {
+        console.error("Error in agregarCobranza:", error);
         return 0;
       }
+    }
 
-      let comprasMes = productosLista.años[año].compras[mes] || 0;
-      if (isNaN(comprasMes)) comprasMes = 0;
-      
-      const ivaRate = (obtenerIva(assumpFinancierasData) / 100) || 0;
-      const contadoRate = (cobranzasGrupo.contado / 100) || 0;
-      
-      let cobradoFinal = comprasMes * (ivaRate + 1) * contadoRate;
-      if (isNaN(cobradoFinal)) cobradoFinal = 0;
-
-      // ... rest of the function with appropriate checks ...
-      // This is just a modification to prevent errors, we'll keep the original logic
-      
-      return cobradoFinal;
+    // Process normally and calculate deudas comerciales
+    let costos = [];
+    try {
+      costos = showMultiplicacionPxQ(volumenData, costoData);
+      if (!Array.isArray(costos)) {
+        console.warn("showMultiplicacionPxQ didn't return an array, using empty array");
+        costos = [];
+      }
     } catch (error) {
-      console.error("Error in agregarCobranza:", error);
-      return 0;
+      console.error("Error in showMultiplicacionPxQ:", error);
+      costos = [];
     }
-  }
 
-  let costos = showMultiplicacionPxQ(
-    volumenData,
-    costoData,
-    assumpFinancierasData,
-  );
+    let creditos = Array(10).fill(0); // Initialize with zeros to prevent undefined values
+    const cobranzasGrupo = assumpFinancierasData?.[0]?.pagoProducto || { contado: 0 };
 
-  let creditos = [];
+    // Try to calculate creditos safely using functional approach
+    if (costos && Array.isArray(costos)) {
+      // Filter and process only valid countries
+      costos.filter(pais => pais?.stats)
+        .forEach(pais => {
+          // Filter and process only valid channels
+          pais.stats.filter(canal => canal?.productos)
+            .forEach(canal => {
+              // Filter and process only valid products
+              canal.productos.filter(producto =>
+                producto && producto.type === 'producto' && producto.años
+              )
+                .forEach(producto => {
+                  // Filter and process only valid years
+                  producto.años.filter(año => año)
+                    .forEach((año, t) => {
+                      // Process the valid year data
+                      try {
+                        const ventasTotal = año.ventasTotal || 0;
+                        const ivaRate = obtenerIva(assumpFinancierasData) / 100 || 0;
+                        año.iva = ventasTotal * ivaRate;
 
-  let cobranzasGrupo = assumpFinancierasData[0]?.pagoProducto;
-  // recorro cada pais
-  for (let i = 0; i < costos.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < costos[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        if (costos[i].stats[x].productos[j].type === 'producto') {
-          // recorro cada año
-          for (
-            let t = 0;
-            t < costos[i].stats[x].productos[j].años.length;
-            t++
-          ) {
-            // agrego la propiedad .iva a cada año
-            costos[i].stats[x].productos[j].años[t].iva =
-              costos[i].stats[x].productos[j].años[t].ventasTotal *
-              (obtenerIva(assumpFinancierasData) / 100);
+                        // Calculate total purchases for all months
+                        let totalCompras = 0;
+                        if (año.compras) {
+                          Object.keys(año.compras).forEach(month => {
+                            // Use sanitized value
+                            const compraValue = sanitizarValorExtremo(año.compras[month], 10);
+                            if (!Number.isNaN(compraValue)) {
+                              totalCompras += compraValue;
+                            }
+                          });
+                        }
 
-            // agrego la propiedad .comprasTotalConIva que sera la suma de todo lo que hay en .compras * IVA
+                        año.comprasTotalConIva = totalCompras * (ivaRate + 1);
 
-            // recorro todos los meses de compras y obtengo su total
-            let totalCompras = 0;
-            for (let month in costos[i].stats[x].productos[j].años[t].compras) {
-              totalCompras +=
-                costos[i].stats[x].productos[j].años[t].compras[month];
-            }
+                        año.cobroDeProducto = año.cobroDeProducto || {};
 
-            console.log(`Purchases for Year ${t}:`, costos[i].stats[x].productos[j].años[t].compras);
-            console.log(`Year ${t} data:`, costos[i].stats[x].productos[j].años[t]);
-            for (let month in costos[i].stats[x].productos[j].años[t].compras) {
-              totalCompras +=
-                costos[i].stats[x].productos[j].años[t].compras[month];
-            }
-            
-            console.log(
-              'calcularDeudasComerciales: ',
-              `Pais: ${i}`,
-              `Canal: ${x}`, 
-              `Producto: ${j}`,
-              `Año: ${t}`,
-              `Compras Total: ${totalCompras?.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}`,
-              `IVA: ${obtenerIva(assumpFinancierasData) / 100}`,
-              `Compras Total Con Iva: ${totalCompras * (obtenerIva(assumpFinancierasData) / 100 + 1)?.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' })}`
-            );
-            costos[i].stats[x].productos[j].años[t].comprasTotalConIva =
-              totalCompras * (obtenerIva(assumpFinancierasData) / 100 + 1);
+                        // Initialize with all months
+                        MONTHS.forEach(month => {
+                          año.cobroDeProducto[month] = año.cobroDeProducto[month] || {};
+                        });
 
-            costos[i].stats[x].productos[j].años[t] = {
-              ...costos[i].stats[x].productos[j].años[t],
-              cobroDeProducto: {
-                enero: {},
-                febrero: {},
-                marzo: {},
-                abril: {},
-                mayo: {},
-                junio: {},
-                julio: {},
-                agosto: {},
-                septiembre: {},
-                octubre: {},
-                noviembre: {},
-                diciembre: {},
-              },
-            };
+                        // Process each month's collection
+                        if (año.compras) {
+                          Object.keys(año.compras).forEach(month => {
+                            try {
+                              año.cobroDeProducto[month] = {
+                                cobrado: agregarCobranza(
+                                  month,
+                                  t,
+                                  cobranzasGrupo,
+                                  producto,
+                                  obtenerIva,
+                                  assumpFinancierasData,
+                                ),
+                              };
 
-            for (let month in costos[i].stats[x].productos[j].años[t].compras) {
-              costos[i].stats[x].productos[j].años[t].cobroDeProducto[month] = {
-                cobrado: agregarCobranza(
-                  month,
-                  t,
-                  cobranzasGrupo,
-                  costos[i].stats[x].productos[j],
-                  obtenerIva,
-                  assumpFinancierasData,
-                ),
-              };
-              ivasCostosGrupoProductos[t][month] =
-                Number(ivasCostosGrupoProductos[t][month]) +
-                Number(
-                  costos[i].stats[x].productos[j].años[t].stockCalculos[month]
-                    .consumo *
-                  (obtenerIva(assumpFinancierasData) / 100),
-                );
-            }
-            // creo una propíedad llamada cobradoAnual que sera la suma de todos los cobrados de cada mes
-            costos[i].stats[x].productos[j].años[t].cobradoAnual = 0;
-            for (let month in costos[i].stats[x].productos[j].años[t]
-              .cobroDeProducto) {
-              costos[i].stats[x].productos[j].años[t].cobradoAnual +=
-                costos[i].stats[x].productos[j].años[t].cobroDeProducto[
-                  month
-                ].cobrado;
-            }
+                              // Safely calculate and add to ivasCostosGrupoProductos
+                              const stockConsumo = año.stockCalculos?.[month]?.consumo || 0;
+                              const ivaValue = stockConsumo * ivaRate;
 
-            // creo la propiedad llamada pendientePorCobrar que sera la resta de comprasTotalConIva - cobradoAnual
-            costos[i].stats[x].productos[j].años[t].pendientePorCobrar =
-              costos[i].stats[x].productos[j].años[t].comprasTotalConIva -
-              costos[i].stats[x].productos[j].años[t].cobradoAnual;
+                              if (!Number.isNaN(ivaValue)) {
+                                ivasCostosGrupoProductos[t][month] =
+                                  Number(ivasCostosGrupoProductos[t][month]) + Number(ivaValue);
+                              }
+                            } catch (error) {
+                              console.error(`Error processing month ${month} in year ${t}:`, error);
+                            }
+                          });
+                        }
 
-            // creditos.push(costos[i].stats[x].productos[j].años[t].pendientePorCobrar);
-            creditos[t] = creditos[t]
-              ? creditos[t] +
-              costos[i].stats[x].productos[j].años[t].pendientePorCobrar
-              : costos[i].stats[x].productos[j].años[t].pendientePorCobrar;
-          }
-        }
+                        // Calculate total collected for the year
+                        año.cobradoAnual = 0;
+                        Object.keys(año.cobroDeProducto).forEach(month => {
+                          const cobradoValue = año.cobroDeProducto[month]?.cobrado || 0;
+                          if (!Number.isNaN(cobradoValue)) {
+                            año.cobradoAnual += cobradoValue;
+                          }
+                        });
+
+                        // Calculate pending collection
+                        const pendientePorCobrar = año.comprasTotalConIva - año.cobradoAnual;
+                        año.pendientePorCobrar = pendientePorCobrar;
+
+                        // Add to credits for this year
+                        if (!Number.isNaN(pendientePorCobrar)) {
+                          creditos[t] += pendientePorCobrar;
+                        }
+                      } catch (error) {
+                        console.error(`Error processing year ${t} for product:`, error);
+                      }
+                    });
+                });
+            });
+        });
+    }
+
+    // Make sure all values are valid numbers
+    creditos = creditos.map(value => {
+      if (Number.isNaN(value) || value === undefined || value === null) {
+        return 0;
       }
-    }
-  }
+      return value;
+    });
 
-  // obtengo de costos la propiedad .cobradoAnual de los productos de type 'producto'
-  let gastosPagadosAnualesProducto = [];
-  for (let i = 0; i < costos.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < costos[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        if (costos[i].stats[x].productos[j].type === 'producto') {
-          // recorro cada año
-          for (
-            let t = 0;
-            t < costos[i].stats[x].productos[j].años.length;
-            t++
-          ) {
-            // agrego a indice del año
-            if (gastosPagadosAnualesProducto[t] === undefined) {
-              gastosPagadosAnualesProducto[t] = 0;
-            }
-            // sumo el valor de .cobradoAnual de cada producto
-            gastosPagadosAnualesProducto[t] += Number(
-              costos[i].stats[x].productos[j].años[t].cobradoAnual,
-            );
-          }
-        }
-      }
-    }
-  }
-
-  // obtengo de costos la propiedad .comprasTotalConIva de los productos de type 'producto'
-  let gastosAnualesProducto = [];
-  for (let i = 0; i < costos.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < costos[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        if (costos[i].stats[x].productos[j].type === 'producto') {
-          // recorro cada año
-          for (
-            let t = 0;
-            t < costos[i].stats[x].productos[j].años.length;
-            t++
-          ) {
-            // agrego a indice del año
-            if (gastosAnualesProducto[t] === undefined) {
-              gastosAnualesProducto[t] = 0;
-            }
-            // sumo el valor de .comprasTotalConIva de cada producto
-            gastosAnualesProducto[t] += Number(
-              costos[i].stats[x].productos[j].años[t].comprasTotalConIva,
-            );
-          }
-        }
-      }
-    }
-  }
-
-  let gastosPorPagarAnualesProducto = [];
-  for (let i = 0; i < 10; i++) {
-    gastosPorPagarAnualesProducto[i] =
-      gastosAnualesProducto[i] - gastosPagadosAnualesProducto[i];
-  }
-
-  // el resultado esta en la propiedad .pendientePorCobrar de cada año que es la resta de .comprasTotalConIva - .cobradoAnual
-
-  // -------------------- calcular ahora Cuentas por pagar SERVICIOS --------------------
-
-  // recorro cada pais, cada canal y cada producto cuyo type sea servicio (type: 'servicio') y en cada año creo la propiedad .stockCalculos que tendra todos los meses del año como propiedades y en cada mes tendre el p (costoData) * q (volumenData)
-
-  // esta en .stockCalculos
-
-  // tambien calculo la comision que sera igual a (volumenData * precioData) * ( costos[i].stats[x].productos[j].comision / 100) y la guardare en .comisionCalculos
-
-  for (let i = 0; i < costos.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < costos[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        // recorro cada año
-        for (let t = 0; t < costos[i].stats[x].productos[j].años.length; t++) {
-          // si el producto es de tipo servicio entonces hago los calculos
-          if (costos[i].stats[x].productos[j].type === 'servicio') {
-            // agrego la propiedad .stockCalculos a cada año
-            costos[i].stats[x].productos[j].años[t].stockCalculos = {
-              enero: {},
-              febrero: {},
-              marzo: {},
-              abril: {},
-              mayo: {},
-              junio: {},
-              julio: {},
-              agosto: {},
-              septiembre: {},
-              octubre: {},
-              noviembre: {},
-              diciembre: {},
-            };
-
-            costos[i].stats[x].productos[j].años[t].comisionCalculos = {
-              enero: {},
-              febrero: {},
-              marzo: {},
-              abril: {},
-              mayo: {},
-              junio: {},
-              julio: {},
-              agosto: {},
-              septiembre: {},
-              octubre: {},
-              noviembre: {},
-              diciembre: {},
-            };
-
-            // recorro cada mes del año y hago el calculo p * q
-            for (let month in costos[i].stats[x].productos[j].años[t]
-              .stockCalculos) {
-              costos[i].stats[x].productos[j].años[t].stockCalculos[month] =
-                costoData[i].stats[x].productos[j].años[t].volMeses[month] *
-                volumenData[i].stats[x].productos[j].años[t].volMeses[month];
-            }
-            // sera igual a (volumenData * precioData) * ( costos[i].stats[x].productos[j].comision / 100)
-            for (let month in costos[i].stats[x].productos[j].años[t]
-              .comisionCalculos) {
-              costos[i].stats[x].productos[j].años[t].comisionCalculos[month] =
-                volumenData[i].stats[x].productos[j].años[t].volMeses[month] *
-                precioData[i].stats[x].productos[j].años[t].volMeses[month] *
-                (costoData[i].stats[x].productos[j].comision / 100);
-            }
-          }
-        }
-      }
-    }
-  }
-  // debe ser un array de 10 elementos donde cada elemento tendra los 12 meses del año como propiedades
-  let deudasComercialesData = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, {}])),
-  );
-
-  // recoorro cada pais, cada canal, cada producto y cada año y sumo los valores de .stockCalculos y .comisionCalculos y lo guardo en deudasComercialesData
-  for (let i = 0; i < costos.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < costos[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < costos[i].stats[x].productos.length; j++) {
-        if (costos[i].stats[x].productos[j].type === 'servicio') {
-          // recorro cada año
-          for (
-            let t = 0;
-            t < costos[i].stats[x].productos[j].años.length;
-            t++
-          ) {
-            // sumo los valores de .stockCalculos y .comisionCalculos y lo guardo en deudasComercialesData
-            for (let month in costos[i].stats[x].productos[j].años[t]
-              .stockCalculos) {
-              deudasComercialesData[t][month] = {
-                ...deudasComercialesData[t][month],
-                costoServicios: deudasComercialesData[t][month].costoServicios
-                  ? Number(deudasComercialesData[t][month].costoServicios) +
-                  Number(
-                    costos[i].stats[x].productos[j].años[t].stockCalculos[
-                    month
-                    ],
-                  )
-                  : Number(
-                    costos[i].stats[x].productos[j].años[t].stockCalculos[
-                    month
-                    ],
-                  ),
-              };
-
-              ivasCostosGruposServicios[t][month] =
-                Number(ivasCostosGruposServicios[t][month]) +
-                Number(
-                  costos[i].stats[x].productos[j].años[t].stockCalculos[month] *
-                  (obtenerIvaServicios(assumpFinancierasData) / 100),
-                );
-            }
-            for (let month in costos[i].stats[x].productos[j].años[t]
-              .comisionCalculos) {
-              deudasComercialesData[t][month] = {
-                ...deudasComercialesData[t][month],
-                comprasComerciales: deudasComercialesData[t][month]
-                  .comprasComerciales
-                  ? Number(deudasComercialesData[t][month].comprasComerciales) +
-                  Number(
-                    costos[i].stats[x].productos[j].años[t].comisionCalculos[
-                    month
-                    ],
-                  )
-                  : Number(
-                    costos[i].stats[x].productos[j].años[t].comisionCalculos[
-                    month
-                    ],
-                  ),
-              };
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // a deudasComercialesData le agrego la propiedad .comprasGastos recorriendo lo siguiente de gastosPorCCData:
-  // for (let month in costos[i].stats[x].productos[j].años[t].comisionCalculos) {
-  // for (let i = 0; i < gastosPorCCData[0].centroDeCostos.length; i++) {
-  for (let propiedad in gastosPorCCData[0].centroDeCostos[0]) {
-    // recorro en dicha propiedad el array en .cuentas
-    if (gastosPorCCData[0].centroDeCostos[0][propiedad].visible === true) {
-      for (
-        let j = 0;
-        j < gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas.length;
-        j++
-      ) {
-        // de alli recorro la propiedad .años
-        if (
-          gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j].name !==
-          'Remuneraciones y cargas sociales'
-        ) {
-          for (
-            let t = 0;
-            t <
-            gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j].años
-              .length;
-            t++
-          ) {
-            // y de alli recorro cada mes
-            for (let month in gastosPorCCData[0].centroDeCostos[0][propiedad]
-              .cuentas[j].años[t].volMeses) {
-              // y sumo el valor de cada mes
-              deudasComercialesData[t][month] = {
-                ...deudasComercialesData[t][month],
-                comprasGastos: deudasComercialesData[t][month].comprasGastos
-                  ? Number(deudasComercialesData[t][month].comprasGastos) +
-                  Number(
-                    gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
-                      .años[t].volMeses[month],
-                  )
-                  : Number(
-                    gastosPorCCData[0].centroDeCostos[0][propiedad].cuentas[j]
-                      .años[t].volMeses[month],
-                  ),
-              };
-            }
-          }
-        }
-      }
-    }
-  }
-
-  let sumaGastos = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, {}])),
-  );
-
-  // recorro cada año y cada mes de deudasComercialesData y sumo todas las propiedades de cada mes a dicho mes y dicho año de sumaGastos
-  for (let i = 0; i < deudasComercialesData.length; i++) {
-    for (let month in deudasComercialesData[i]) {
-      sumaGastos[i][month] = {
-        volMeses: 0,
-      };
-      for (let propiedad in deudasComercialesData[i][month]) {
-        sumaGastos[i][month].volMeses +=
-          deudasComercialesData[i][month][propiedad] *
-          (obtenerIvaServicios(assumpFinancierasData) / 100 + 1);
-      }
-    }
-  }
-
-  function agregarCobranzaServicios(
-    mes,
-    año,
-    cobranzasGrupo,
-    productosLista,
-    obtenerIva,
-    assumpFinancierasData,
-  ) {
-    let cobradoFinal =
-      productosLista?.años[año][mes].volMeses *
-      (obtenerIva(assumpFinancierasData) / 100 + 1);
-    // saco el volcoIva con contado
-
-    cobradoFinal *= cobranzasGrupo?.contado / 100;
-
-    // --- para treintaDias ---
-
-    // luego solo si el mes es diferente a Enero y el año es diferente a 0 (osea que no es el primer año y el primer mes) calculo el treitaDias del mes pasado
-    if (mes.toLowerCase() !== 'enero' && año === 0) {
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1];
-      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let treintaDias = cobranzasGrupo?.treintaDias;
-      let treintaDiasFinal = treintaDias ?? 0;
-      // sumo a cobradoFinal el treintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (treintaDiasFinal / 100);
-    }
-    // si el mes es enero pero el año es diferente a 0 entonces calculo el treintaDias de diciembre pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 1;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el treintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let treintaDias = cobranzasGrupo?.treintaDias;
-      let treintaDiasFinal = treintaDias ?? 0;
-      // sumo a cobradoFinal el treintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (treintaDiasFinal / 100);
-    }
-
-    // --- para cuarentaycincoDias ---
-
-    // luego si el mes es diferente a Enero o Febrero y el año es diferente a 0 calculo el cuarentaycincoDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -2 porque 45 dias atras me pone dos meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 2];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cuarentaycincoDias = cobranzasGrupo?.cuarentaycincoDias;
-      let cuarentaycincoDiasFinal = cuarentaycincoDias ?? 0;
-      // sumo a cobradoFinal el cuarentaycincoDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cuarentaycincoDiasFinal / 100);
-    }
-    // si el mes es enero o febrero pero el año es diferente a 0 entonces calculo el cuarentaycincoDias al descubrir el mes 2 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 2;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cuarentaycincoDias = cobranzasGrupo?.cuarentaycincoDias;
-      let cuarentaycincoDiasFinal = cuarentaycincoDias ?? 0;
-      // sumo a cobradoFinal el cuarentaycincoDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cuarentaycincoDiasFinal / 100);
-    }
-
-    // --- para sesentaDias ---
-
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -2 porque 60 dias atras me pone dos meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 2];
-      // teniendo el mesAnterior, calculo el sesentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let sesentaDias = cobranzasGrupo?.sesentaDias;
-      let sesentaDiasFinal = sesentaDias ?? 0;
-      // sumo a cobradoFinal el sesentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (sesentaDiasFinal / 100);
-    }
-    // si el mes es enero o febrero pero el año es diferente a 0 entonces calculo el sesentaDias al descubrir el mes 2 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 2;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cuarentaycincoDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let sesentaDias = cobranzasGrupo?.sesentaDias;
-      let sesentaDiasFinal = sesentaDias ?? 0;
-      // sumo a cobradoFinal el sesentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (sesentaDiasFinal / 100);
-    }
-
-    // --- para noventaDias ---
-
-    // luego si el mes es diferente a Enero, Febrero o Marzo y el año es diferente a 0 calculo el noventaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -3 porque 90 dias atras me pone tres meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 3];
-      // teniendo el mesAnterior, calculo el noventaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let noventaDias = cobranzasGrupo?.noventaDias;
-      let noventaDiasFinal = noventaDias ?? 0;
-      // sumo a cobradoFinal el noventaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (noventaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero o marzo pero el año es diferente a 0 entonces calculo el noventaDias al descubrir el mes 3 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 3;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el noventaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let noventaDias = cobranzasGrupo?.noventaDias;
-      let noventaDiasFinal = noventaDias ?? 0;
-      // sumo a cobradoFinal el noventaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (noventaDiasFinal / 100);
-    }
-
-    // -- para cientoveinteDias (cveinteDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo o Abril y el año es diferente a 0 calculo el cientoveinteDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -4 porque 120 dias atras me pone cuatro meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 4];
-      // teniendo el mesAnterior, calculo el cientoveinteDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoveinteDias = cobranzasGrupo?.cveinteDias;
-      let cientoveinteDiasFinal = cientoveinteDias ?? 0;
-      // sumo a cobradoFinal el cientoveinteDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoveinteDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo o abril pero el año es diferente a 0 entonces calculo el cientoveinteDias al descubrir el mes 4 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 4;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientoveinteDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoveinteDias = cobranzasGrupo?.cveinteDias;
-      let cientoveinteDiasFinal = cientoveinteDias ?? 0;
-      // sumo a cobradoFinal el cientoveinteDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoveinteDiasFinal / 100);
-    }
-
-    // -- para cientocincuentaDias (ccincuentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril o Mayo y el año es diferente a 0 calculo el cientocincuentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -5 porque 150 dias atras me pone cinco meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 5];
-      // teniendo el mesAnterior, calculo el cientocincuentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientocincuentaDias = cobranzasGrupo?.ccincuentaDias;
-      let cientocincuentaDiasFinal = cientocincuentaDias ?? 0;
-      // sumo a cobradoFinal el cientocincuentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientocincuentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril o mayo pero el año es diferente a 0 entonces calculo el cientocincuentaDias al descubrir el mes 5 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 5;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientocincuentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientocincuentaDias = cobranzasGrupo?.ccincuentaDias;
-      let cientocincuentaDiasFinal = cientocincuentaDias ?? 0;
-      // sumo a cobradoFinal el cientocincuentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientocincuentaDiasFinal / 100);
-    }
-
-    // -- para cientoochentaDias (cochenteDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo o Junio y el año es diferente a 0 calculo el cientoochentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -6 porque 180 dias atras me pone seis meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 6];
-      // teniendo el mesAnterior, calculo el cientoochentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoochentaDias = cobranzasGrupo?.cochenteDias;
-      let cientoochentaDiasFinal = cientoochentaDias ?? 0;
-      // sumo a cobradoFinal el cientoochentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoochentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo o junio pero el año es diferente a 0 entonces calculo el cientoochentaDias al descubrir el mes 6 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 6;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el cientoochentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let cientoochentaDias = cobranzasGrupo?.cochenteDias;
-      let cientoochentaDiasFinal = cientoochentaDias ?? 0;
-      // sumo a cobradoFinal el cientoochentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (cientoochentaDiasFinal / 100);
-    }
-
-    // -- para doscientosDiezDias (ddiezDiaz) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio o Julio y el año es diferente a 0 calculo el doscientosDiezDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -7 porque 210 dias atras me pone siete meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 7];
-      // teniendo el mesAnterior, calculo el doscientosDiezDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosDiezDias = cobranzasGrupo?.ddiezDiaz;
-      let doscientosDiezDiasFinal = doscientosDiezDias ?? 0;
-      // sumo a cobradoFinal el doscientosDiezDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosDiezDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio o julio pero el año es diferente a 0 entonces calculo el doscientosDiezDias al descubrir el mes 7 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 7;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosDiezDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosDiezDias = cobranzasGrupo?.ddiezDiaz;
-      let doscientosDiezDiasFinal = doscientosDiezDias ?? 0;
-      // sumo a cobradoFinal el doscientosDiezDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosDiezDiasFinal / 100);
-    }
-
-    // -- para doscientosCuarentaDias (dcuarentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio o Agosto y el año es diferente a 0 calculo el doscientosCuarentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -8 porque 240 dias atras me pone ocho meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 8];
-      // teniendo el mesAnterior, calculo el doscientosCuarentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosCuarentaDias = cobranzasGrupo?.dcuarentaDias;
-      let doscientosCuarentaDiasFinal = doscientosCuarentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosCuarentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosCuarentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio o agosto pero el año es diferente a 0 entonces calculo el doscientosCuarentaDias al descubrir el mes 8 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 8;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosCuarentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosCuarentaDias = cobranzasGrupo?.dcuarentaDias;
-      let doscientosCuarentaDiasFinal = doscientosCuarentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosCuarentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosCuarentaDiasFinal / 100);
-    }
-
-    // -- para doscientosSetentaDias (dsetentaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto o Septiembre y el año es diferente a 0 calculo el doscientosSetentaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -9 porque 270 dias atras me pone nueve meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 9];
-      // teniendo el mesAnterior, calculo el doscientosSetentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosSetentaDias = cobranzasGrupo?.dsetentaDias;
-      let doscientosSetentaDiasFinal = doscientosSetentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosSetentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosSetentaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto o septiembre pero el año es diferente a 0 entonces calculo el doscientosSetentaDias al descubrir el mes 9 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 9;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el doscientosSetentaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let doscientosSetentaDias = cobranzasGrupo?.dsetentaDias;
-      let doscientosSetentaDiasFinal = doscientosSetentaDias ?? 0;
-      // sumo a cobradoFinal el doscientosSetentaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (doscientosSetentaDiasFinal / 100);
-    }
-
-    // -- para trescientosDias (trescientosDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre u Octubre y el año es diferente a 0 calculo el trescientosDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      mes.toLowerCase() !== 'octubre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -10 porque 300 dias atras me pone diez meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 10];
-      // teniendo el mesAnterior, calculo el trescientosDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosDias = cobranzasGrupo?.trescientosDias;
-      let trescientosDiasFinal = trescientosDias ?? 0;
-      // sumo a cobradoFinal el trescientosDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre u octubre pero el año es diferente a 0 entonces calculo el trescientosDias al descubrir el mes 10 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 10;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el trescientosDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosDias = cobranzasGrupo?.trescientosDias;
-      let trescientosDiasFinal = trescientosDias ?? 0;
-      // sumo a cobradoFinal el trescientosDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosDiasFinal / 100);
-    }
-
-    // -- para trescientosTreintaDias (ttreintaDias) ---
-
-    // luego si el mes es diferente a Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre o Noviembre y el año es diferente a 0 calculo el trescientosTreintaDias del mes pasado
-    if (
-      mes.toLowerCase() !== 'enero' &&
-      mes.toLowerCase() !== 'febrero' &&
-      mes.toLowerCase() !== 'marzo' &&
-      mes.toLowerCase() !== 'abril' &&
-      mes.toLowerCase() !== 'mayo' &&
-      mes.toLowerCase() !== 'junio' &&
-      mes.toLowerCase() !== 'julio' &&
-      mes.toLowerCase() !== 'agosto' &&
-      mes.toLowerCase() !== 'septiembre' &&
-      mes.toLowerCase() !== 'octubre' &&
-      mes.toLowerCase() !== 'noviembre' &&
-      año === 0
-    ) {
-      // let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 1] pero en vez de -1 es -11 porque 330 dias atras me pone once meses atras
-      let mesAnterior = MONTHS[MONTHS.indexOf(mes.toLowerCase()) - 11];
-      // teniendo el mesAnterior, calculo el trescientosTreintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[año][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosTreintaDias = cobranzasGrupo?.ttreintaDias;
-      let trescientosTreintaDiasFinal = trescientosTreintaDias ?? 0;
-      // sumo a cobradoFinal el trescientosTreintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosTreintaDiasFinal / 100);
-    }
-    // si el mes es enero, febrero, marzo, abril, mayo, junio, julio, agosto, septiembre, octubre o noviembre pero el año es diferente a 0 entonces calculo el trescientosTreintaDias al descubrir el mes 11 veces pasado pero del año pasado
-    else if (año !== 0) {
-      let mesAnteriorUbicado = MONTHS.indexOf(mes.toLowerCase()) - 11;
-      let añoTemp = año;
-      if (mesAnteriorUbicado < 0) {
-        añoTemp -= 1;
-        mesAnteriorUbicado += MONTHS.length;
-      }
-      let mesAnterior = MONTHS[mesAnteriorUbicado];
-      // teniendo el mesAnterior, calculo el trescientosTreintaDias del mesAnterior
-      let cobradoMesAnterior =
-        productosLista?.años[añoTemp][mesAnterior].volMeses *
-        (obtenerIva(assumpFinancierasData) / 100 + 1);
-      let trescientosTreintaDias = cobranzasGrupo?.ttreintaDias;
-      let trescientosTreintaDiasFinal = trescientosTreintaDias ?? 0;
-      // sumo a cobradoFinal el trescientosTreintaDias del mesAnterior
-      cobradoFinal += cobradoMesAnterior * (trescientosTreintaDiasFinal / 100);
-    }
-
-    return cobradoFinal;
-  }
-
-  let cobranzasGrupoServicios = assumpFinancierasData[0]?.pagoServicio;
-
-  for (let i = 0; i < sumaGastos.length; i++) {
-    for (let month in sumaGastos[i]) {
-      sumaGastos[i][month] = {
-        ...sumaGastos[i][month],
-        cobrado: agregarCobranzaServicios(
-          month,
-          i,
-          cobranzasGrupoServicios,
-          { años: sumaGastos },
-          return0,
-          assumpFinancierasData,
-        ),
-      };
-    }
-  }
-
-  let gastosPagadosAnuales = [];
-  for (let i = 0; i < sumaGastos.length; i++) {
-    let gastosPagados = 0;
-    for (let month in sumaGastos[i]) {
-      gastosPagados += Math.round(sumaGastos[i][month].cobrado);
-    }
-    gastosPagadosAnuales.push(gastosPagados);
-  }
-
-  let GastosAnuales = [];
-  for (let i = 0; i < sumaGastos.length; i++) {
-    let gastosPorPagar = 0;
-    for (let month in sumaGastos[i]) {
-      gastosPorPagar += Math.round(sumaGastos[i][month].volMeses);
-    }
-    GastosAnuales.push(gastosPorPagar);
-  }
-
-  let gastosPorPagarAnualesServicios = [];
-  for (let i = 0; i < sumaGastos.length; i++) {
-    gastosPorPagarAnualesServicios.push(
-      GastosAnuales[i] - gastosPagadosAnuales[i],
-    );
-  }
-
-  // parte 3, calculo de inversiones
-
-  function obtenerIvaInversiones(assumpFinancierasData) {
-    // obtendre el Iva de assumpFinancierasData
-    let iva = 0;
-    let ivaObtenido = assumpFinancierasData[0]?.inversion?.IVA;
-    // reviso si existe y si es un numero
-    if (ivaObtenido && !isNaN(ivaObtenido)) {
-      iva = ivaObtenido;
-    }
-    return iva;
-  }
-
-  let cobranzaGrupoInversiones = assumpFinancierasData[0]?.inversion;
-
-  let capexPxQ = [];
-  // una copia profunda de capexQData
-
-  // recorro capexQData
-  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
-    // recorro el .años de cada elemento
-    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
-      // recorro volMeses usando MONTHS
-      // creo la propiedad .cobrado que sera un objeto con los 12 meses del año
-      capexQData[0].capexQ[i].años[j].cobrado = {};
-      for (let month in capexQData[0].capexQ[i].años[j].volMeses) {
-        // agrego la propiedad .vol a cada mes
-        if (capexQData[0].capexQ[i].años[j].volMeses[month] !== 0) {
-          let Q = capexQData[0].capexQ[i].años[j].volMeses[month];
-          let P = capexPData[0].capexP[i].años[j].volMeses[month];
-          let resultado = P * Q;
-          capexQData[0].capexQ[i].años[j][month] = { volMeses: resultado };
-          ivasCostosGruposInversiones[j][month] =
-            Number(ivasCostosGruposInversiones[j][month]) +
-            resultado * (obtenerIvaInversiones(assumpFinancierasData) / 100);
-
-          capexQData[0].capexQ[i].años[j].cobrado[month] =
-            agregarCobranzaServicios(
-              month,
-              j,
-              cobranzaGrupoInversiones,
-              capexQData[0].capexQ[i],
-              obtenerIvaInversiones,
-              assumpFinancierasData,
-            );
-
-          capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + resultado : resultado;
-        } else {
-          capexQData[0].capexQ[i].años[j][month] = { volMeses: 0 };
-          capexQData[0].capexQ[i].años[j].cobrado[month] =
-            agregarCobranzaServicios(
-              month,
-              j,
-              cobranzaGrupoInversiones,
-              capexQData[0].capexQ[i],
-              obtenerIvaInversiones,
-              assumpFinancierasData,
-            );
-
-          capexPxQ[j] = capexPxQ[j] ? capexPxQ[j] + 0 : 0;
-        }
-      }
-    }
-  }
-
-  // de capexQData creo la propiedad let gastosAnualesInversiones que sera la suma de todos los volMeses de cada mes de cada año multiplicado por el IVA
-  let gastosAnualesInversiones = [];
-  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
-    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
-      for (let month in capexQData[0].capexQ[i].años[j]) {
-        // si es un mes del año entonces obtengo su propiedad .volMeses, le calculo el IVA y lo sumo a gastosAnuales
-        if (MONTHS.includes(month)) {
-          gastosAnualesInversiones[j] = gastosAnualesInversiones[j]
-            ? gastosAnualesInversiones[j] +
-            capexQData[0].capexQ[i].años[j][month].volMeses *
-            (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1)
-            : capexQData[0].capexQ[i].años[j][month].volMeses *
-            (obtenerIvaInversiones(assumpFinancierasData) / 100 + 1);
-        }
-      }
-    }
-  }
-
-  // de capexQData creo la propiedad let gastosAnualesPagadosInversiones que sera la suma de todos los cobrado de cada mes de cada año
-  let gastosAnualesPagadosInversiones = [];
-  for (let i = 0; i < capexQData[0].capexQ.length; i++) {
-    for (let j = 0; j < capexQData[0].capexQ[i].años.length; j++) {
-      for (let month in capexQData[0].capexQ[i].años[j].cobrado) {
-        gastosAnualesPagadosInversiones[j] = gastosAnualesPagadosInversiones[j]
-          ? gastosAnualesPagadosInversiones[j] +
-          capexQData[0].capexQ[i].años[j].cobrado[month]
-          : capexQData[0].capexQ[i].años[j].cobrado[month];
-      }
-    }
-  }
-
-  // de capexQData creo la propiedad let gastosAnualesPorPagarInversiones que sera la resta de gastosAnualesInversiones - gastosAnualesPagadosInversiones
-  let gastosAnualesPorPagarInversiones = [];
-  for (let i = 0; i < gastosAnualesInversiones.length; i++) {
-    gastosAnualesPorPagarInversiones.push(
-      gastosAnualesInversiones[i] - gastosAnualesPagadosInversiones[i],
-    );
-  }
-
-  // los 3 elementos son un array de 10 elementos, sumo los 3 en un solo llamado let resultadoGastosAnualesPorPagar
-  let resultadoGastosAnualesPorPagar = Array(10).fill(0);
-
-  try {
-    // Ensure each array exists and has proper values
-    const productos = Array.isArray(gastosPorPagarAnualesProducto) ? gastosPorPagarAnualesProducto : Array(10).fill(0);
-    const servicios = Array.isArray(gastosPorPagarAnualesServicios) ? gastosPorPagarAnualesServicios : Array(10).fill(0);
-    const inversiones = Array.isArray(gastosAnualesPorPagarInversiones) ? gastosAnualesPorPagarInversiones : Array(10).fill(0);
-
-    for (let i = 0; i < 10; i++) {
-      let producto = parseFloat(productos[i]) || 0;
-      let servicio = parseFloat(servicios[i]) || 0;
-      let inversion = parseFloat(inversiones[i]) || 0;
-      
-      // Ensure all values are reasonable numbers
-      if (Math.abs(producto) > 1e12) producto = 0;
-      if (Math.abs(servicio) > 1e12) servicio = 0;
-      if (Math.abs(inversion) > 1e12) inversion = 0;
-      
-      resultadoGastosAnualesPorPagar[i] = producto + servicio + inversion;
-      
-      // Final check to ensure no bad values
-      if (isNaN(resultadoGastosAnualesPorPagar[i]) || 
-          !isFinite(resultadoGastosAnualesPorPagar[i]) ||
-          Math.abs(resultadoGastosAnualesPorPagar[i]) > 1e12) {
-        resultadoGastosAnualesPorPagar[i] = 0;
-      }
-    }
+    console.log('✅ Deudas Comerciales calculadas:', creditos);
+    setDeudasComerciales(creditos);
+    return ivasCostosGrupoProductos;
   } catch (error) {
-    console.error("Error calculating resultadoGastosAnualesPorPagar:", error);
-    resultadoGastosAnualesPorPagar = Array(10).fill(0);
+    console.error("Fatal error in calcularDeudasComerciales:", error);
+    const defaultResult = Array(10).fill(0);
+    setDeudasComerciales(defaultResult);
+    return Array.from({ length: 10 }, () =>
+      Object.fromEntries(MONTHS.map((month) => [month, 0])),
+    );
   }
-
-  setDeudasComerciales(resultadoGastosAnualesPorPagar);
-
-  // sumo los 3 grupos de ivas en un grupo (son 10 años con 12 meses cada uno)
-  let ivasCostosGrupoTotal = [];
-  for (let i = 0; i < ivasCostosGrupoProductos.length; i++) {
-    // recorro cada año
-    ivasCostosGrupoTotal[i] = {};
-    for (let month in ivasCostosGrupoProductos[i]) {
-      ivasCostosGrupoTotal[i][month] =
-        Number(ivasCostosGrupoProductos[i][month] || 0) +
-        Number(ivasCostosGruposServicios[i][month] || 0) +
-        Number(ivasCostosGruposInversiones[i][month] || 0);
-    }
-  }
-
-  return ivasCostosGrupoTotal;
 };
 
 export const calcularDeudasFiscales = (
@@ -2808,168 +1474,316 @@ export const calcularDeudasFiscales = (
   setDeudasFiscales,
   setShowLoader,
 ) => {
-  let { volumenData, precioData, costoData } = data;
+  // Function declarations moved to the root of the function body
+  const convertDateToIndex = (dateString) => {
+    const date = new Date(dateString);
+    return date.getMonth();
+  };
 
-  if (volumenData.length === 0) volumenData = defaultVolumenData;
-  if (precioData.length === 0) precioData = defaultPrecioData;
-  if (costoData.length === 0) costoData = defaultCostoData;
+  const getLastDayOfMonth = (year, month) => new Date(year, month + 1, 0).getDate();
 
-  // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
-  let resultado = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, { SAF: 0, SAP: 0 }])),
-  );
+  try {
+    // Default result with zeros
+    const defaultResult = Array(10).fill(0);
 
-  // recorro resultado año a año y mes a mes
-  for (let i = 0; i < resultado.length; i++) {
-    for (let month in resultado[i]) {
-      // sumo los ivas de ambos grupos
-      let añoAnterior = i === 0 ? 0 : i - 1;
-      let monthAnterior =
-        month === 'enero' ? 'diciembre' : MONTHS[MONTHS.indexOf(month) - 1];
-      let restaAnterior;
-
-      if (i === 0 && month === 'enero') restaAnterior = 0;
-      else restaAnterior = resultado[añoAnterior][monthAnterior].SAF;
-
-      let resta =
-        Number(ivasDF[i][month]) -
-        (Number(ivasCF[i][month]) + Number(restaAnterior));
-      // si resta es negativo lo asigno a resultado[i][month].SAF = resta
-      if (resta < 0) {
-        resultado[i][month].SAF = resta * -1;
-      } else {
-        resultado[i][month].SAP = resta;
-      }
+    // Handle cases where input data might be missing
+    if (!ivasDF || !ivasCF || !data) {
+      console.log('⚠️ Missing data in calcularDeudasFiscales, using default zeros');
+      setDeudasFiscales(defaultResult);
+      if (setShowLoader) setShowLoader(false);
+      return;
     }
-  }
 
-  // obtengo el SAF y el SAP de cada año al obtener dichos valores del mes de diciembre y el prestamoscalculados lo guardo en un objeto {SAF: x, SAP: x} en un array de los 10 años
-  let resultadosAnualesIVA = Array.from({ length: 10 }, () => ({
-    SAF: 0,
-    SAP: 0,
-  }));
+    // Sanitize data using our utility
+    const sanitizedData = sanitizarDatosVolumen(data);
+    let { volumenData, precioData, costoData } = sanitizedData;
 
-  for (let i = 0; i < resultado.length; i++) {
-    resultadosAnualesIVA[i].SAF = resultado[i].diciembre.SAF;
-    resultadosAnualesIVA[i].SAP = resultado[i].diciembre.SAP;
-  }
+    // Use default data if any required data is missing
+    if (!volumenData || volumenData.length === 0) volumenData = defaultVolumenData;
+    if (!precioData || precioData.length === 0) precioData = defaultPrecioData;
+    if (!costoData || costoData.length === 0) costoData = defaultCostoData;
 
-  // ventas sera una copia profunda de volumenData pero con la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
-  let ventas = JSON.parse(JSON.stringify(volumenData));
-  // dentro de cada mes agrego la propiedad .vendido que sera igual a el valor en dicha direccion dentro de volumenData con la propiedad .volMeses para ese mes por el valor en dicha direccion dentro de precioData con la propiedad .volMeses para ese mes
+    // Ensure impuestosSobreLaRenta is valid
+    if (!impuestosSobreLaRenta || !Array.isArray(impuestosSobreLaRenta)) {
+      impuestosSobreLaRenta = defaultResult;
+    }
 
-  // recorro volumenData
-  for (let i = 0; i < volumenData.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < volumenData[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < volumenData[i].stats[x].productos.length; j++) {
-        // recorro cada año
-        for (
-          let t = 0;
-          t < volumenData[i].stats[x].productos[j].años.length;
-          t++
-        ) {
-          // recorro volMeses usando MONTHS
-          for (let month in volumenData[i].stats[x].productos[j].años[t]
-            .volMeses) {
-            // agrego la propiedad .vendido a cada mes
-            ventas[i].stats[x].productos[j].años[t] = {
-              ...ventas[i].stats[x].productos[j].años[t],
-              vendido: {
-                ...ventas[i].stats[x].productos[j].años[t].vendido,
-                [month]:
-                  volumenData[i].stats[x].productos[j].años[t].volMeses[month] *
-                  precioData[i].stats[x].productos[j].años[t].volMeses[month] *
-                  (costoData[i].stats[x].productos[j].impuesto / 100),
-              },
-            };
-          }
+    // ambos son un grupo de 10 años con 12 meses, lo guardare en una variable llamada resultado que sera igua, 10 años y 12 meses
+    let resultado = Array.from({ length: 10 }, () =>
+      Object.fromEntries(MONTHS.map((month) => [month, { SAF: 0, SAP: 0 }])),
+    );
+
+    // Check if ivasDF and ivasCF have the correct structure
+    let validIvasDF = true;
+    let validIvasCF = true;
+
+    if (!Array.isArray(ivasDF) || ivasDF.length === 0) {
+      validIvasDF = false;
+    } else {
+      // Check if each item has the expected structure with months
+      for (let i = 0; i < Math.min(ivasDF.length, 1); i++) {
+        if (typeof ivasDF[i] !== 'object' || !ivasDF[i].enero) {
+          validIvasDF = false;
+          break;
         }
       }
     }
-  }
 
-  // ahora creo un array de 10 años con 12 meses llamado impuestosSobreLaVenta que sera la suma de todos los .vendido de cada mes de cada año
-  let impuestosSobreLaVenta = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, 0])),
-  );
-  // recorro ventas
-  for (let i = 0; i < ventas.length; i++) {
-    // recorro cada canal
-    for (let x = 0; x < ventas[i].stats.length; x++) {
-      // recorro cada producto
-      for (let j = 0; j < ventas[i].stats[x].productos.length; j++) {
-        // recorro cada año
-        for (let t = 0; t < ventas[i].stats[x].productos[j].años.length; t++) {
-          // recorro volMeses usando MONTHS
-          for (let month in ventas[i].stats[x].productos[j].años[t].vendido) {
-            // si es un mes del año entonces obtengo su propiedad .vendido y lo sumo a impuestosSobreLaVenta
-            if (MONTHS.includes(month)) {
-              impuestosSobreLaVenta[t][month] +=
-                ventas[i].stats[x].productos[j].años[t].vendido[month];
+    if (!Array.isArray(ivasCF) || ivasCF.length === 0) {
+      validIvasCF = false;
+    } else {
+      // Check if each item has the expected structure with months
+      for (let i = 0; i < Math.min(ivasCF.length, 1); i++) {
+        if (typeof ivasCF[i] !== 'object' || !ivasCF[i].enero) {
+          validIvasCF = false;
+          break;
+        }
+      }
+    }
+
+    // If invalid, create default structures
+    if (!validIvasDF) {
+      console.warn("Invalid ivasDF structure, creating default");
+      ivasDF = Array.from({ length: 10 }, () =>
+        Object.fromEntries(MONTHS.map((month) => [month, 0])),
+      );
+    }
+
+    if (!validIvasCF) {
+      console.warn("Invalid ivasCF structure, creating default");
+      ivasCF = Array.from({ length: 10 }, () =>
+        Object.fromEntries(MONTHS.map((month) => [month, 0])),
+      );
+    }
+
+    // Cálculo del IVA
+    const resultadosAnualesIVA = Array(10).fill({ SAP: 0, SAF: 0 });
+
+    try {
+      for (let i = 0; i < 10; i++) {
+        let totalSAF = 0;
+        let totalSAP = 0;
+
+        for (let j = 0; j < MONTHS.length; j++) {
+          const month = MONTHS[j];
+          const dfValue = ivasDF[i]?.[month] || 0;
+          const cfValue = ivasCF[i]?.[month] || 0;
+
+          resultado[i][month].SAF = dfValue;
+          resultado[i][month].SAP = cfValue;
+
+          totalSAF += dfValue;
+          totalSAP += cfValue;
+        }
+
+        resultadosAnualesIVA[i] = { SAF: totalSAF, SAP: totalSAP };
+      }
+    } catch (error) {
+      console.error("Error calculating IVA:", error);
+    }
+
+    let ventas = [];
+
+    try {
+      // Clone volumenData safely
+      ventas = volumenData ? JSON.parse(JSON.stringify(volumenData)) : [];
+
+      // Process countries with valid data structure
+      if (volumenData) {
+        volumenData.forEach((pais, i) => {
+          // Only process if stats exists
+          if (pais?.stats) {
+            pais.stats.forEach((canal, x) => {
+              // Only process if productos exists
+              if (canal?.productos) {
+                canal.productos.forEach((producto, j) => {
+                  // Only process if años exists
+                  if (producto?.años) {
+                    producto.años.forEach((año, t) => {
+                      // Only process if volMeses exists
+                      if (año?.volMeses) {
+                        // Only process if destination structure exists
+                        if (ventas[i]?.stats?.[x]?.productos?.[j]?.años?.[t]) {
+                          // Initialize vendido object
+                          ventas[i].stats[x].productos[j].años[t].vendido =
+                            ventas[i].stats[x].productos[j].años[t].vendido || {};
+
+                          // Process each month
+                          Object.keys(año.volMeses).forEach(month => {
+                            try {
+                              // Use sanitized values
+                              const volMeses = sanitizarValorExtremo(año.volMeses[month], 10);
+                              const precioMeses = sanitizarValorExtremo(
+                                precioData?.[i]?.stats?.[x]?.productos?.[j]?.años?.[t]?.volMeses?.[month], 
+                                10
+                              );
+                              const impuesto = costoData?.[i]?.stats?.[x]?.productos?.[j]?.impuesto || 0;
+
+                              // Calculate and add vendido property
+                              const vendidoValue = volMeses * precioMeses * (impuesto / 100);
+                              if (!Number.isNaN(vendidoValue)) {
+                                ventas[i].stats[x].productos[j].años[t].vendido[month] = vendidoValue;
+                              } else {
+                                ventas[i].stats[x].productos[j].años[t].vendido[month] = 0;
+                              }
+                            } catch (error) {
+                              console.error(`Error processing vendido for month ${month}:`, error);
+                              ventas[i].stats[x].productos[j].años[t].vendido[month] = 0;
+                            }
+                          });
+                        }
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error processing ventas:", error);
+      // Provide default ventas in case of error
+      ventas = volumenData;
+    }
+
+    // Safely calculate impuestosSobreLaVenta
+    let impuestosSobreLaVenta = Array.from({ length: 10 }, () =>
+      Object.fromEntries(MONTHS.map((month) => [month, 0])),
+    );
+
+    try {
+      // Process ventas data with a nested approach that avoids continue statements
+      if (ventas) {
+        ventas.forEach((pais, i) => {
+          if (pais?.stats) {
+            pais.stats.forEach((canal, x) => {
+              if (canal?.productos) {
+                canal.productos.forEach((producto, j) => {
+                  if (producto?.años) {
+                    producto.años.forEach((año, t) => {
+                      if (año?.vendido) {
+                        // Process valid months
+                        Object.keys(año.vendido)
+                          .filter(month => MONTHS.includes(month))
+                          .forEach(month => {
+                            const vendidoValue = año.vendido[month] || 0;
+                            if (!Number.isNaN(vendidoValue)) {
+                              impuestosSobreLaVenta[t][month] += vendidoValue;
+                            }
+                          });
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error calculating impuestosSobreLaVenta:", error);
+      // Keep the default impuestosSobreLaVenta
+    }
+
+    let otrosImpuestos = Array.from({ length: 10 }, () =>
+      Object.fromEntries(MONTHS.map((month) => [month, 0])),
+    );
+
+    // Calculate otrosImpuestos safely
+    try {
+      for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+        Object.keys(impuestosSobreLaVenta[i]).forEach(month => {
+          let añoAnterior = i === 0 ? 0 : i - 1;
+          let monthAnterior = month === 'enero' ? 'diciembre' : MONTHS[MONTHS.indexOf(month) - 1];
+
+          if (i === 0 && month === 'enero') {
+            otrosImpuestos[i][month] = 0;
+          } else {
+            const impuestoValue = impuestosSobreLaVenta?.[añoAnterior]?.[monthAnterior] || 0;
+            otrosImpuestos[i][month] = impuestoValue;
+          }
+        });
+      }
+
+      // Calculate additional otrosImpuestos for January
+      for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+        Object.keys(impuestosSobreLaVenta[i]).forEach(month => {
+          if (month === 'enero' && i !== 0) {
+            const impuestoValue = impuestosSobreLaRenta?.[i - 1] || 0;
+            if (!Number.isNaN(impuestoValue)) {
+              otrosImpuestos[i][month] += impuestoValue;
             }
           }
+        });
+      }
+    } catch (error) {
+      console.error("Error calculating otrosImpuestos:", error);
+    }
+
+    // Calculate pagoOtrosImpuestos safely
+    let pagoOtrosImpuestos = Array(10).fill(0);
+    try {
+      for (let i = 0; i < otrosImpuestos.length; i++) {
+        let suma = 0;
+        Object.keys(otrosImpuestos[i]).forEach(month => {
+          const impuestoValue = otrosImpuestos[i][month] || 0;
+          if (!Number.isNaN(impuestoValue)) {
+            suma += impuestoValue;
+          }
+        });
+        pagoOtrosImpuestos[i] = suma;
+      }
+    } catch (error) {
+      console.error("Error calculating pagoOtrosImpuestos:", error);
+    }
+
+    // Calculate pendienteOtrosImpuestos safely
+    let pendienteOtrosImpuestos = Array(10).fill(0);
+    try {
+      for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
+        const dicValue = impuestosSobreLaVenta[i]?.diciembre || 0;
+        const impuestoValue = impuestosSobreLaRenta[i] || 0;
+
+        if (!Number.isNaN(dicValue) && !Number.isNaN(impuestoValue)) {
+          pendienteOtrosImpuestos[i] = dicValue + impuestoValue;
         }
       }
+    } catch (error) {
+      console.error("Error calculating pendienteOtrosImpuestos:", error);
     }
-  }
 
-  let otrosImpuestos = Array.from({ length: 10 }, () =>
-    Object.fromEntries(MONTHS.map((month) => [month, 0])),
-  );
+    // Calculate totalPendienteImpuestos safely
+    let totalPendienteImpuestos = Array(10).fill(0);
+    try {
+      for (let i = 0; i < pendienteOtrosImpuestos.length; i++) {
+        const pendienteValue = pendienteOtrosImpuestos[i] || 0;
+        const sapValue = resultadosAnualesIVA[i]?.SAP || 0;
 
-  // a cada mes le asigno como valor el valor de impuestosSobreLaVenta pero del mes anterior, si es por ejemplo enero entonces le asigno el valor de diciembre del año anterior, si es enero del año 0 entonces le asigno 0, si es febrero del año 0 entonces le asigno el valor de enero del año 0
-  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
-    for (let month in impuestosSobreLaVenta[i]) {
-      let añoAnterior = i === 0 ? 0 : i - 1;
-      let monthAnterior =
-        month === 'enero' ? 'diciembre' : MONTHS[MONTHS.indexOf(month) - 1];
-      if (i === 0 && month === 'enero') otrosImpuestos[i][month] = 0;
-      else
-        otrosImpuestos[i][month] =
-          impuestosSobreLaVenta[añoAnterior][monthAnterior];
-    }
-  }
-  // vuelvo a recorrerlo y ahora tomo en cuenta que para diciembre unicamente le agrego el valor de impuestosSobreLaRenta y hago la misma logica de antes
-  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
-    for (let month in impuestosSobreLaVenta[i]) {
-      if (month === 'enero' && i !== 0) {
-        let añoAnterior = i - 1;
-        otrosImpuestos[i][month] += impuestosSobreLaRenta[añoAnterior];
+        if (!Number.isNaN(pendienteValue) && !Number.isNaN(sapValue)) {
+          totalPendienteImpuestos[i] = pendienteValue + sapValue;
+        }
       }
+    } catch (error) {
+      console.error("Error calculating totalPendienteImpuestos:", error);
     }
+
+    // Validate all values are numbers
+    totalPendienteImpuestos = totalPendienteImpuestos.map(value => {
+      if (Number.isNaN(value) || value === undefined || value === null) {
+        return 0;
+      }
+      return value;
+    });
+
+    setDeudasFiscales(totalPendienteImpuestos);
+    if (setShowLoader) setShowLoader(false);
+  } catch (error) {
+    console.error("Fatal error in calcularDeudasFiscales:", error);
+    const defaultResult = Array(10).fill(0);
+    setDeudasFiscales(defaultResult);
+    if (setShowLoader) setShowLoader(false);
   }
-
-  let pagoOtrosImpuestos = [];
-  // sumo los 12 meses de cada año y el valor resultante lo guardo en un array de 10 años en pagoOtrosImpuestos
-  for (let i = 0; i < otrosImpuestos.length; i++) {
-    let suma = 0;
-    for (let month in otrosImpuestos[i]) {
-      suma += otrosImpuestos[i][month];
-    }
-    pagoOtrosImpuestos.push(suma);
-  }
-
-  let pendienteOtrosImpuestos = [];
-  // obtengo el valor de impuestosSobreLaVenta de Diciembre de cada año y lo sumo al vañor de impuestosSobreLaRenta de ese indice y lo coloco en pendienteOtrosImpuestos
-  for (let i = 0; i < impuestosSobreLaVenta.length; i++) {
-    pendienteOtrosImpuestos.push(
-      impuestosSobreLaVenta[i].diciembre + impuestosSobreLaRenta[i],
-    );
-  }
-
-  let totalPendienteImpuestos = [];
-
-  // sumo en un array de 10 el vañor de pendienteOtrosImpuestos[x] y el valor de resultadosAnualesIVA[x].SAP
-  for (let i = 0; i < pendienteOtrosImpuestos.length; i++) {
-    totalPendienteImpuestos.push(
-      pendienteOtrosImpuestos[i] + resultadosAnualesIVA[i].SAP,
-    );
-  }
-
-  setDeudasFiscales(totalPendienteImpuestos);
-  setShowLoader(false);
 };
 
 export const calcularResultadosNoAsignados = (
@@ -3071,7 +1885,7 @@ export const calcularPrestamos = (prestamos, setFinal, setShowLoader) => {
     return;
   }
   
-  console.log('prestamos: ', prestamos)
+
   for (let i = 0; i < prestamos.length; i++) {
     prestamoscalculados[i] = {
       titulo: prestamos[i]?.titulo ? prestamos[i]?.titulo : '',

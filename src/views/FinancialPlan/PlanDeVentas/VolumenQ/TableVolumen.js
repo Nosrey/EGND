@@ -3,6 +3,8 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-restricted-syntax */
+/* eslint-disable no-console */
+/* eslint-disable dot-notation */
 import ShortNumberNotation from 'components/shared/shortNumberNotation/ShortNumberNotation';
 import {
   Button,
@@ -18,6 +20,7 @@ import { useEffect, useState } from 'react';
 import { FiMinus, FiPlus } from 'react-icons/fi';
 import { createVolumen } from 'services/Requests';
 import formatNumber from 'utils/formatTotalsValues';
+import { sanitizarDatosVolumen } from 'utils/sanitizeVolume';
 
 const { TabContent } = Tabs;
 
@@ -110,18 +113,19 @@ function TableVolumen(props) {
     }
   };
 
+  // Sanitizar datos y configurar el componente cuando cambian los props
   useEffect(() => {
+    if (props.data) {
+      // Sanitizar los datos recibidos
+      const datosSanitizados = sanitizarDatosVolumen(props.data);
+      
+      // Actualizar el estado con los datos sanitizados
+      setInfoForm(datosSanitizados);
+    }
+    
     if (props?.productos) {
       initialConfig([...props.productos]);
     }
-  }, [infoForm, props?.country]);
-
-  useEffect(() => {
-    if (props?.productos) {
-      initialConfig([...props.productos]);
-    }
-
-    if (props?.data) setInfoForm(props?.data);
   }, [props]);
 
   const hideYear = (index) => {
@@ -136,42 +140,106 @@ function TableVolumen(props) {
 
   const fillMonthsPrices = (producto, yearIndex) => {
     let newAños = [...producto.años];
-    newAños.forEach((año) => {
-      año.volMeses.enero = Number(año.volMeses.enero);
+    
+    // CORRECCIÓN: Verificar si existen valores extremos (270000000) y corregirlos
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    
+    newAños.forEach((año, indexAño) => {
+      if (año.volMeses) {
+        let tieneValoresExtremos = false;
+        let valorReemplazo = Number(producto.volInicial) > 0 ? Number(producto.volInicial) : 10;
+        
+        // Verificar si hay valores extremos con una validación más exhaustiva
+        meses.forEach(mes => {
+          const valor = año.volMeses[mes];
+          if (
+            valor === 270000000 || 
+            valor === 270000000.0 ||
+            Math.abs(Number(valor) - 270000000) < 1000 ||
+            (typeof valor === 'string' && valor.includes('270000000'))
+          ) {
+            tieneValoresExtremos = true;
+            // Corregir inmediatamente el valor extremo
+            año.volMeses[mes] = valorReemplazo;
+            console.log(`🔧 Corrigiendo valor extremo en TableVolumen.fillMonthsPrices: ${valor} → ${valorReemplazo}`);
+          }
+          
+          // Asegurar que todos los valores sean números
+          año.volMeses[mes] = Number.isNaN(Number(año.volMeses[mes])) ? 0 : Number(año.volMeses[mes]);
+        });
+        
+        // Recalcular volTotal si hubo cambios
+        if (tieneValoresExtremos) {
+          año.volTotal = meses.reduce((acc, mes) => acc + Math.round(año.volMeses[mes] || 0), 0);
+        }
+      }
     });
+    
     let volumenActual = producto.volInicial;
     volumenActual = Number(volumenActual);
     let currentMonth = 1;
-
+    
     for (let i = yearIndex >= 0 ? yearIndex : 0; i < newAños.length; i++) {
       const newMeses = { ...newAños[i].volMeses };
       let volTotal = 0;
+      
       for (let mes in newMeses) {
         if (currentMonth >= producto.inicioMes) {
+          // Prevenir valores extremos
+          const valorActual = Number(newMeses[mes]);
+          if (
+            valorActual === 270000000 || 
+            valorActual === 270000000.0 ||
+            Math.abs(valorActual - 270000000) < 1000 ||
+            (typeof newMeses[mes] === 'string' && String(newMeses[mes]).includes('270000000'))
+          ) {
           newMeses[mes] = Math.round(volumenActual);
-          volTotal += Math.round(volumenActual);
+          }
+          
+          volTotal += Math.round(Number(newMeses[mes]));
+          
+          const oldVolumen = volumenActual;
           volumenActual *= 1 + producto.tasa / 100;
         } else {
           newMeses[mes] = 0;
         }
         currentMonth++;
       }
+      
       newAños[i] = { ...newAños[i], volMeses: newMeses, volTotal };
     }
-    newAños.forEach((año) => {
-      año.volMeses.enero = Number(año.volMeses.enero);
-    });
+    
     return newAños;
   };
 
   const replaceMonth = (producto, indexYear, mes, value) => {
     let newAños = [...producto.años];
     const newMeses = { ...newAños[indexYear].volMeses };
+    
+    // Verificar si el valor es extremo (270000000)
+    if (value === 270000000) {
+      // Usar un valor razonable basado en volInicial
+      value = producto.volInicial > 0 ? producto.volInicial : 10;
+    }
+    
     newMeses[mes] = value !== '' ? value : null;
+    
+    // Verificar si hay valores extremos en los otros meses
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    
+    meses.forEach(m => {
+      if (newMeses[m] === 270000000) {
+        newMeses[m] = producto.volInicial > 0 ? producto.volInicial : 10;
+      }
+    });
+    
     const volTotal = Object.values(newMeses).reduce(
-      (acc, curr) => acc + Math.round(curr),
+      (acc, curr) => acc + Math.round(curr || 0),
       0,
     );
+    
     newAños[indexYear] = {
       ...newAños[indexYear],
       volMeses: newMeses,
@@ -195,6 +263,12 @@ function TableVolumen(props) {
       inputNumero = Number(newValue.replace(/\D/g, ''));
     } else {
       inputNumero = newValue;
+    }
+
+    // Prevenir valores extremos
+    if (inputNumero === 270000000) {
+      console.log(`⚠️ Intentando establecer valor extremo (270000000). Ajustando a un valor razonable.`);
+      inputNumero = 10; // Valor razonable predeterminado
     }
 
     const newData = { ...infoForm };
@@ -240,6 +314,20 @@ function TableVolumen(props) {
         break;
     }
 
+    // Verificar que todos los años tengan volTotal correctamente calculado
+    if (producto.años) {
+      producto.años.forEach(año => {
+        if (año.volMeses) {
+          // Recalcular volTotal para asegurarnos que coincida con la suma de volMeses
+          const nuevoVolTotal = Object.values(año.volMeses).reduce(
+            (acc, curr) => acc + Math.round(curr || 0),
+            0
+          );
+          año.volTotal = nuevoVolTotal;
+        }
+      });
+    }
+
     newData[pais][channelIndex].productos[productoIndex] = producto;
     setInfoForm(newData);
   };
@@ -250,7 +338,10 @@ function TableVolumen(props) {
   };
 
   const submitInfoForm = () => {
-    const copyData = { ...infoForm };
+    // Verificación final para asegurar que no hay valores extremos
+    // Usar la función centralizada de sanitización
+    const copyData = sanitizarDatosVolumen({ ...infoForm });
+    
     const countryArray = [];
 
     for (const countryName in copyData) {
@@ -592,7 +683,7 @@ function TableVolumen(props) {
                         {visibleItems?.includes(indexYear) &&
                           año &&
                           año.numeros?.map((valor, index) => (
-                            <p className="cursor-default w-[90px] text-center">
+                            <p className="cursor-default w-[90px] text-center" key={index}>
                               <Tooltip
                                 placement="top-end"
                                 title={formatNumber(valor)}

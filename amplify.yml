@@ -1,0 +1,35 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  customHeaders:
+    - pattern: '/api/**'
+      headers:
+        - key: 'Access-Control-Allow-Origin'
+          value: '*'
+        - key: 'Access-Control-Allow-Methods'
+          value: 'GET, PUT, POST, DELETE, OPTIONS'
+        - key: 'Access-Control-Allow-Headers'
+          value: 'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  redirects:
+    - source: '/sign-out'
+      target: 'https://app.egndfinance.com/api/sign-out'
+      status: '200'
+      condition: 'none'
+    - source: '/api/*'
+      target: 'https://api.egndfinance.com/api/:splat'
+      status: '200'
+      condition: 'none'
+    - source: '/*'
+      target: '/index.html'
+      status: '200'
+      condition: 'not /\\.\\w+$' 

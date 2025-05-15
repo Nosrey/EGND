@@ -6,9 +6,130 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { getUser } from 'services/Requests';
 import MySpinner from 'components/shared/loaders/MySpinner';
+import { sanitizarDatosVolumen, detectarValoresExtremos } from 'utils/sanitizeVolume';
 import TableVolumen from './TableVolumen';
 
 const { TabNav, TabList } = Tabs;
+
+// Función para imprimir datos de volumen en formato más legible
+const mostrarDatosVolumen = (datos, origen) => {
+  console.log(`\n📊 DATOS DE VOLUMEN (${origen}):`);
+  
+  if (!datos) {
+    console.log('  ❌ No hay datos para mostrar');
+    return;
+  }
+  
+  // Para datos de volumenData
+  if (datos.volumenData && Array.isArray(datos.volumenData)) {
+    console.log(`📌 MOSTRANDO VOLUMEN DATA (${datos.volumenData.length} países):`);
+    
+    // Mostrar datos reales de volumen para cada país
+    datos.volumenData.forEach((pais, iPais) => {
+      if (!pais.stats) return;
+      
+      console.log(`\n🌎 PAÍS: ${pais.countryName}`);
+      
+      pais.stats.forEach((canal, iCanal) => {
+        if (!canal.productos) return;
+        
+        console.log(`  📢 CANAL: ${canal.canalName}`);
+        
+        canal.productos.forEach((producto, iProd) => {
+          if (!producto.años) return;
+          
+          console.log(`    📦 PRODUCTO: ${producto.name || producto.id}`);
+          console.log(`      Volumen Inicial: ${producto.volInicial} | Tasa: ${producto.tasa}%`);
+          
+          producto.años.forEach((año, iAño) => {
+            if (!año.volMeses) return;
+            
+            console.log(`      📅 AÑO ${año.año}: volTotal = ${año.volTotal}`);
+            
+            // Mostrar todos los valores de los meses
+            console.log('      VALORES MENSUALES:');
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            
+            let lineaMeses = '      ';
+            meses.forEach(mes => {
+              const valor = año.volMeses[mes];
+              lineaMeses += `${mes.substring(0,3)}: ${valor}  `;
+            });
+            console.log(lineaMeses);
+            
+            // Si hay un valor extremo, mostrarlo destacado
+            const valoresExtremos = meses.filter(mes => año.volMeses[mes] === 270000000);
+            if (valoresExtremos.length > 0) {
+              console.log(`      ⚠️ VALORES EXTREMOS DETECTADOS: ${valoresExtremos.join(', ')}`);
+            }
+          });
+        });
+      });
+    });
+  }
+  
+  // Para datos de estructura creada localmente
+  if (Object.keys(datos).length > 0 && !datos.volumenData) {
+    console.log(`\n📌 MOSTRANDO DATOS LOCALES (${Object.keys(datos).length} países):`);
+    
+    Object.keys(datos).forEach(paisKey => {
+      const canales = datos[paisKey];
+      if (!Array.isArray(canales)) return;
+      
+      console.log(`\n🌎 PAÍS: ${paisKey}`);
+      
+      canales.forEach((canal, iCanal) => {
+        if (!canal.productos) return;
+        
+        console.log(`  📢 CANAL: ${canal.canalName}`);
+        
+        canal.productos.forEach((producto, iProd) => {
+          if (!producto.años) return;
+          
+          console.log(`    📦 PRODUCTO: ${producto.name || producto.id}`);
+          console.log(`      Volumen Inicial: ${producto.volInicial} | Tasa: ${producto.tasa}%`);
+          
+          producto.años.forEach((año, iAño) => {
+            if (!año.volMeses) return;
+            
+            console.log(`      📅 AÑO ${año.año}: volTotal = ${año.volTotal}`);
+            
+            // Mostrar todos los valores de los meses
+            console.log('      VALORES MENSUALES:');
+            const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+            
+            let lineaMeses = '      ';
+            meses.forEach(mes => {
+              const valor = año.volMeses[mes];
+              lineaMeses += `${mes.substring(0,3)}: ${valor}  `;
+            });
+            console.log(lineaMeses);
+            
+            // Si hay un valor extremo, mostrarlo destacado
+            const valoresExtremos = meses.filter(mes => año.volMeses[mes] === 270000000);
+            if (valoresExtremos.length > 0) {
+              console.log(`      ⚠️ VALORES EXTREMOS DETECTADOS: ${valoresExtremos.join(', ')}`);
+            }
+          });
+        });
+      });
+    });
+  }
+  
+  // Mostrar resumen de valores extremos
+  const { conteo, ubicaciones } = detectarValoresExtremos(datos);
+  
+  console.log(`\n📊 RESUMEN: ${conteo} valores extremos encontrados`);
+  
+  if (conteo > 0) {
+    console.log('📍 Detalle de valores extremos:');
+    ubicaciones.forEach((ubicacion, i) => {
+      console.log(`  ${i+1}) País: ${ubicacion.pais}, Canal: ${ubicacion.canal}, Producto: ${ubicacion.producto}, Año: ${ubicacion.año}, Mes: ${ubicacion.mes}`);
+    });
+  }
+};
 
 function VolumenQ() {
   const [info, setInfo] = useState(null);
@@ -21,9 +142,11 @@ function VolumenQ() {
   const [products, setProducts] = useState([]);
   const [showLoader, setShowLoader] = useState(true);
 
+  // Efecto para inicializar datos cuando no hay información previa
   useEffect(() => {
     let estructura = {};
     if (info && info[0]) {
+      console.log('🔄 Creando estructura inicial desde info[0]');
       setProducts(info[0].productos);
       for (let i = 0; i < info[0]?.paises.length; i++) {
         let productos = [];
@@ -49,14 +172,30 @@ function VolumenQ() {
         }
         estructura[info[0]?.paises[i].value] = [...canales];
       }
-      setInfoForm(() => ({ ...estructura }));
+      console.log('✅ Estructura inicial creada (info[0])');
+      
+      // Sanitizar la estructura antes de pasarla al estado
+      const estructuraSanitizada = sanitizarDatosVolumen(estructura);
+      console.log('✅ Estructura inicial creada y sanitizada (info[0])');
+      
+      // Inspeccionar la estructura creada
+      mostrarDatosVolumen(estructuraSanitizada, 'estructura inicial sanitizada');
+      
+      setInfoForm(() => ({ ...estructuraSanitizada }));
     }
   }, [info]);
 
+  // Efecto para cargar datos del servidor
   useEffect(() => {
     getUser(currentState.id)
       .then((data) => {
-        if (data?.volumenData.length !== 0) {
+        console.log('📡 Datos recibidos de getUser()');
+        
+        // Inspeccionar datos crudos recibidos
+        mostrarDatosVolumen(data, 'datos del servidor');
+        
+        if (data?.volumenData && data?.volumenData.length !== 0) {
+          console.log('🔄 Usando datos precargados de volumenData');
           // tengo info precargada
           const datosPrecargados = {};
           let volDataOrdenada = data?.volumenData.sort((a, b) =>
@@ -66,9 +205,17 @@ function VolumenQ() {
             datosPrecargados[volDataOrdenada[i].countryName] =
               volDataOrdenada[i].stats;
           }
-          setInfoForm(() => ({ ...datosPrecargados }));
+          
+          // Sanitizar los datos precargados
+          const datosPrecargadosSanitizados = sanitizarDatosVolumen(datosPrecargados);
+          
+          // Inspeccionar los datos precargados procesados
+          mostrarDatosVolumen(datosPrecargadosSanitizados, 'datos precargados sanitizados');
+          
+          setInfoForm(() => ({ ...datosPrecargadosSanitizados }));
           setProducts(data?.assumptionData[0].productos);
         } else {
+          console.log('🔄 No hay datos precargados, usando assumptionData');
           // no tengo info precargada
           setInfo(data?.assumptionData);
         }
@@ -77,8 +224,16 @@ function VolumenQ() {
 
         setShowLoader(false);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => console.error('❌ Error en getUser():', error));
   }, []);
+
+  // Efecto para inspeccionar datos finales antes de renderizar
+  useEffect(() => {
+    if (infoForm) {
+      console.log('🔄 infoForm actualizado - Datos que se envían a TableVolumen:');
+      mostrarDatosVolumen(infoForm, 'infoForm final');
+    }
+  }, [infoForm]);
 
   return (
     <div>

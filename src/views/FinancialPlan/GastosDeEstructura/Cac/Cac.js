@@ -155,15 +155,6 @@ function Cac() {
     const costos = costosMktyComercial(gastosPorCCData);
     const nuevosClientes = calculateClients();
     
-    // Mostrar valores por año para verificación
-    console.log('--- Resumen de valores para cálculo de CAC por año ---');
-    for (let i = 0; i < 10; i++) {
-      console.log(`Año ${i+1}:
-      - Costos Comercial/Marketing: ${costos[i]}
-      - Nuevos clientes: ${nuevosClientes[i]}
-      - CAC esperado: ${costos[i] / Math.max(1, nuevosClientes[i])}`);
-    }
-    
     // Verificar si hay algún problema con los nuevos clientes
     const clientesCorregidos = nuevosClientes.map(valor => 
       valor <= 0 || isNaN(valor) ? 1 : valor // Prevenir división por cero o valores muy pequeños
